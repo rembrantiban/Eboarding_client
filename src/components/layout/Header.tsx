@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { User, LogOut } from "lucide-react"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge" 
-
+import { Badge } from "@/components/ui/badge"
+import { HashLink } from "react-router-hash-link"
 
 const Header = () => {
   const navigate = useNavigate();
@@ -106,20 +106,20 @@ const Header = () => {
               </Link>
             )}
 
-            <a href="#features" className="relative group">
+            <HashLink smooth to="/#features" className="relative group">
               Features
               <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </a>
+            </HashLink>
 
-            <a href="#about" className="relative group">
+            <HashLink smooth to="/#about" className="relative group">
               About
               <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </a>
-            <a href="#location" className="relative group">
-              location
-              <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </a>
+            </HashLink>
 
+            <HashLink smooth to="/#location" className="relative group">
+              Location
+              <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
+            </HashLink>
 
           </nav>
 

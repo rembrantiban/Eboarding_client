@@ -11,6 +11,10 @@ export const useRoom = () => {
   const getRooms = useRoomStore((state) => state.getRooms);
   const getAvailableRooms = useRoomStore((state) => state.getAvailableRooms);
   const deleteRoom = useRoomStore((state) => state.deleteRoom);
+  const dashboardStats = useRoomStore((state) => state.dashboardStats);
+  const getDashboardStats = useRoomStore((state) => state.getDashboardStats);
+  const occupancyTrend = useRoomStore((state) => state.occupancyTrend);
+  const getOccupancyTrend = useRoomStore((state) => state.getOccupancyTrend);
 
   return {
     rooms,
@@ -22,5 +26,9 @@ export const useRoom = () => {
     getRooms,
     getAvailableRooms,
     deleteRoom,
+    dashboardStats,
+    getDashboardStats,
+    occupancyTrend,
+    getOccupancyTrend,
   };
 };

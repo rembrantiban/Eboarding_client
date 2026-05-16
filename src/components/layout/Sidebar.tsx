@@ -135,9 +135,17 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
             onClick={() => setDropdownOpen((v) => !v)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
           >
-            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">
-              {initial}
-            </div>
+            { user?.avatar_url ? (
+              <img
+                src={user.avatar_url}
+                alt="Profile"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm shrink-0">
+                {initial}
+              </div>
+            )}
             <div className="flex-1 text-left min-w-0">
               <p className="text-sm font-semibold text-slate-800 truncate leading-tight">{fullName}</p>
               <p className="text-[11px] text-slate-400 truncate leading-tight">{email}</p>

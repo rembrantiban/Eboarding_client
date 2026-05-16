@@ -67,7 +67,7 @@ const BoardingFullCalendar = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Calendar</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Track payments and tenant schedules</p>
+          <p className="text-sm text-slate-400 mt-0.5">Track payments and Monitor boarding house operations in real time</p>
         </div>
       </div>
 
@@ -127,7 +127,7 @@ const BoardingFullCalendar = () => {
             <div className="flex items-center gap-2 mb-3 opacity-80">
               <CreditCard size={15} />
               <span className="text-xs font-semibold tracking-wide uppercase">
-                Total Due This Month
+                Total Due Next This Month
               </span>
             </div>
 

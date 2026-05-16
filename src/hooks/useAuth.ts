@@ -5,7 +5,6 @@ export const useAuth = () => {
   const token = useAuthStore((state) => state.token);
   const isLoading = useAuthStore((state) => state.isLoading);
   const users = useAuthStore((state) => state.users);
-
   const register = useAuthStore((state) => state.register);
   const login = useAuthStore((state) => state.login);
   const logout = useAuthStore((state) => state.logout);
@@ -17,7 +16,9 @@ export const useAuth = () => {
   const checkAuth = useAuthStore((state) => state.checkAuth);
   const updateUser = useAuthStore((state) => state.updateUser);
   const updateProfile = useAuthStore((state) => state.updateProfile);
-
+  const getTotalBoarders = useAuthStore((state) => state.getTotalBoarders);
+  const totalBoarders = useAuthStore((state) => state.totalBoarders);
+  const updateProfileSettings = useAuthStore((state) => state.updateProfileSettings);
   return {
     user,
     token,
@@ -34,6 +35,9 @@ export const useAuth = () => {
     logout,
     forgotPassword,
     resetPassword,
+    getTotalBoarders,
+    totalBoarders,
+    updateProfileSettings,
 
     isAuthenticated: !!token,
     isAdmin: user?.user_type === "Admin",

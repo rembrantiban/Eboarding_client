@@ -9,6 +9,9 @@ import {
   Cell,
 } from "recharts";
 
+
+
+
 type PaymentData = {
   name: string;
   current: number;
@@ -159,6 +162,7 @@ const PaymentChart = ({ data }: { data: PaymentData[] }) => {
   const totalCurrent  = data.reduce((s, d) => s + d.current, 0);
   const totalTenants  = data.reduce((s, d) => s + d.count, 0);
 
+
   return (
     <div
       style={{
@@ -225,14 +229,14 @@ const PaymentChart = ({ data }: { data: PaymentData[] }) => {
       <div style={{ display: "flex", gap: 10, marginBottom: 18 }}>
         <StatPill
           label="COLLECTED"
-          value={`₱${(totalCurrent / 1000).toFixed(0)}k`}
+          value={ totalCurrent >= 1000 ? `₱${(totalCurrent / 1000).toFixed(1)}k`: `₱${totalCurrent.toLocaleString()}`}
           sub={`${totalTenants} tenants`}
         />
         {data.map((d) => (
           <StatPill
             key={d.name}
             label={d.name.toUpperCase()}
-            value={`₱${(d.current / 1000).toFixed(0)}k`}
+            value={ d.current >= 1000 ? `₱${(d.current / 1000).toFixed(1)}k`: `₱${d.current.toLocaleString()}`}
             sub={`${d.count} tenants`}
           />
         ))}

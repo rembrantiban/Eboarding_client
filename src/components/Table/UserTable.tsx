@@ -23,18 +23,27 @@ const UserTable = () => {
   }, [getUsers]);
 
   const filteredUsers = useMemo(() => {
-    return users.filter((user: User) => {
-      const searchLower = search.toLowerCase();
+  return users.filter((user: User) => {
+    const searchLower = search.toLowerCase();
 
-      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+    const fullName =
+      `${user.first_name} ${user.last_name}`.toLowerCase();
 
-      return (
-        fullName.includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower) ||
-        user.username.toLowerCase().includes(searchLower)
-      );
-    });
-  }, [users, search]);
+    // 🔷 Search match
+    const matchesSearch =
+      fullName.includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower) ||
+      user.username.toLowerCase().includes(searchLower);
+
+    // 🔷 Filter match
+    const matchesFilter =
+      filter === ""
+        ? true
+        : user.user_type === filter;
+
+    return matchesSearch && matchesFilter;
+  });
+}, [users, search, filter]);
   
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
 

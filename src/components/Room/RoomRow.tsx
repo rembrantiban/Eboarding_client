@@ -10,6 +10,7 @@ import {
   Eye,
 } from "lucide-react";
 import type { Room } from "@/store/useRoomStore"
+import { useAuth } from "@/hooks/useAuth"
 
 type Props = {
   room: Room & {
@@ -22,6 +23,7 @@ type Props = {
 
 const RoomRow = ({ room, onView, onDelete, onEdit }: Props) => {
   const [openMenu, setOpenMenu] = useState(false);
+  const { user } = useAuth();
 
   return (
     <tr className="border-t hover:bg-muted/50 transition relative">
@@ -108,15 +110,17 @@ const RoomRow = ({ room, onView, onDelete, onEdit }: Props) => {
                 <Pencil size={14} /> Edit
               </button>
 
-              <button
-                onClick={() => {
-                  onDelete?.(room);
-                  setOpenMenu(false);
-                }}
-                className="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-100 text-red-500 text-sm"
-              >
-                <Trash2 size={14} /> Delete
-              </button>
+             { user?.user_type === "Admin" && (
+                <button
+                  onClick={() => {
+                    onDelete?.(room);
+                    setOpenMenu(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-red-100 text-red-500 text-sm"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
+              )}
 
             </div>
           )}

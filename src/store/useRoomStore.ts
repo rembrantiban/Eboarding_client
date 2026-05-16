@@ -58,26 +58,40 @@ export interface AvailableRoom {
 
   beds: AvailableBed[];
 
-  images?: string[];      
-  description?: string;  
-   status?: "Available" | "Full"; 
+  images?: string[];
+  description?: string;
+  status?: "Available" | "Full";
 }
+
+export type OccupancyTrend = {
+  month: string
+  occupied: number
+}
+
+
 
 interface RoomState {
   rooms: Room[];
   availableRooms: AvailableRoom[];
   selectedRoomBeds: Bed[];
+  dashboardStats: {
+    totalRooms: number,
+    fullyOccupied: number,
+    occupiedBeds: number,
+    availableBeds: number,
+  };
+  occupancyTrend: OccupancyTrend[],
 
   loading: boolean;
   error: string | null;
-
+  getDashboardStats: () => Promise<void>;
   getRooms: () => Promise<void>;
   createRoom: (data: CreateRoomPayload) => Promise<void>;
   updateRoom: (data: UpdateRoomPayload) => Promise<void>;
   deleteRoom: (id: number) => Promise<void>;
   getRoomById: (id: number) => Promise<void>;
   getAvailableRooms: () => Promise<void>;
-
+  getOccupancyTrend: () => Promise<void>
 }
 
 
@@ -87,8 +101,51 @@ export const useRoomStore = create<RoomState>((set) => ({
   loading: false,
   error: null,
   availableRooms: [],
+  occupancyTrend: [],
 
+  dashboardStats: {
+    totalRooms: 0,
+    fullyOccupied: 0,
+    occupiedBeds: 0,
+    availableBeds: 0,
+  },
 
+  getOccupancyTrend: async () => {
+    try {
+
+      const res =
+        await axiosInstance.get(
+          "/rooms/occupancy-trend"
+        )
+
+      set({
+        occupancyTrend: res.data,
+      })
+
+    } catch (error) {
+
+      console.error(
+        "Occupancy trend error:",
+        error
+      )
+    }
+  },
+
+  getDashboardStats: async () => {
+    try {
+
+      const res = await axiosInstance.get(
+        "/rooms/dashboard-stats"
+      );
+
+      set({
+        dashboardStats: res.data,
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  },
   getRooms: async () => {
     try {
       set({ loading: true, error: null });

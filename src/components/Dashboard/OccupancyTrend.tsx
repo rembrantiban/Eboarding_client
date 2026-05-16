@@ -8,17 +8,16 @@ import {
   ResponsiveContainer,
   CartesianGrid
 } from "recharts"
-
-const data = [
-  { month: "Jan", occupied: 30 },
-  { month: "Feb", occupied: 45 },
-  { month: "Mar", occupied: 38 },
-  { month: "Apr", occupied: 20 },
-  { month: "May", occupied: 35 },
-  { month: "Jun", occupied: 32 },
-]
-
+import { useRoom } from "@/hooks/useRoom"
+import { useEffect } from "react"
 const OccupancyTrend = () => {
+  const { occupancyTrend, getOccupancyTrend } = useRoom()
+  
+
+  useEffect(() => {
+    getOccupancyTrend()
+  }, [getOccupancyTrend])
+
   return (
     <div className="rounded-md border w-4xl lg:w-full bg-background p-6 shadow-sm space-y-4">
 
@@ -32,7 +31,7 @@ const OccupancyTrend = () => {
       {/* 🔷 Chart */}
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data}>
+          <AreaChart data={occupancyTrend}>
             
             {/* Gradient */}
             <defs>

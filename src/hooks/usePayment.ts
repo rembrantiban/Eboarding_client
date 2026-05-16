@@ -12,6 +12,10 @@ export const usePayment = () => {
   const markAsPaid = usePaymentStore((state) => state.markAsPaid);
   const getMyPaid = usePaymentStore((state) => state.getMyPaid);
   const getUserPaid = usePaymentStore((state) => state.getUserPaid);
+  const getAnalytics = usePaymentStore((state) => state.getAnalytics);
+  const analytics = usePaymentStore((state) => state.analytics);
+  const revenueAnalytics = usePaymentStore((state) => state.revenueAnalytics);
+  const getRevenueAnalytics = usePaymentStore((state) => state.getRevenueAnalytics);
 
   return {
     payments,
@@ -24,5 +28,9 @@ export const usePayment = () => {
     markAsPaid,
     getMyPaid,
     getUserPaid,
+    getAnalytics,
+    analytics,
+    revenueAnalytics,
+    getRevenueAnalytics
   };
 };

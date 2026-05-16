@@ -16,7 +16,7 @@ export type Payment = {
 
   contact_number: string;
   assigned_by: string;
-  payment_status: string, 
+  payment_status: string,
 
   price_per_month: number;
 
@@ -53,15 +53,48 @@ type CalendarApiResponse = {
   };
 };
 
+export type PaymentAnalytics = {
+  name: string;
+
+  current: number;
+  previous: number;
+
+  count: number;
+  prevCount: number;
+};
+
+export type RevenueAnalytics = {
+  revenue: {
+    month: string;
+    revenue: number;
+  }[];
+
+  totalRevenue: number;
+
+  paidUsers: number;
+
+  recentPaidUsers: {
+    name: string;
+    amount: number;
+    room: string;
+    bed: string;
+    paid_at: string;
+  }[];
+};
+
 type PaymentStore = {
   payments: Payment[];
-  Reports : Payment[];
+  Reports: Payment[];
   getMyPaid: Payment[];
   loading: boolean;
   calendarEvents: CalendarEvent[];
+  analytics: PaymentAnalytics[];
+  revenueAnalytics: RevenueAnalytics | null;
 
+  getRevenueAnalytics: () => Promise<void>;
+  getAnalytics: () => Promise<void>;
   getPayments: () => Promise<void>;
-  getReports : () => Promise<void>;
+  getReports: () => Promise<void>;
   getUserPaid: () => Promise<void>;
   markAsPaid: (payment_id: number) => Promise<void>;
   getCalendar: () => Promise<void>;
@@ -69,13 +102,62 @@ type PaymentStore = {
 
 export const usePaymentStore = create<PaymentStore>((set) => ({
   payments: [],
-  Reports : [],
+  Reports: [],
   getMyPaid: [],
   loading: false,
   calendarEvents: [],
+  analytics: [],
+  revenueAnalytics: null,
+  
+  getRevenueAnalytics: async () => {
+  try {
 
+    set({ loading: true });
 
+    const res = await axiosInstance.get(
+      "/payments/revenue-dashboard"
+    );
 
+    set({
+      revenueAnalytics: res.data,
+      loading: false,
+    });
+
+  } catch (error) {
+
+    set({ loading: false });
+
+    console.error(
+      "Revenue analytics fetch error:",
+      error
+    );
+  }
+},
+
+  getAnalytics: async () => {
+    try {
+
+      set({ loading: true });
+
+      const res = await axiosInstance.get(
+        "/payments/payment-analytics"
+      );
+
+      set({
+        analytics: res.data,
+        loading: false,
+      });
+
+    } catch (error) {
+
+      set({ loading: false });
+
+      console.error(
+        "Analytics fetch error:",
+        error
+      );
+    }
+  },
 
   getCalendar: async () => {
     try {
@@ -101,25 +183,25 @@ export const usePaymentStore = create<PaymentStore>((set) => ({
   },
 
   getUserPaid: async () => {
-      try{
-          set({ loading: true})
-          const res = await axiosInstance.get("/payments/my-paid-payments")
-          set({ getMyPaid: res.data, loading: false })
-      } 
-      catch(error){
-        console.error("User paid fetch error:", error);
-        set({ loading: false })
-      }
-  }, 
+    try {
+      set({ loading: true })
+      const res = await axiosInstance.get("/payments/my-paid-payments")
+      set({ getMyPaid: res.data, loading: false })
+    }
+    catch (error) {
+      console.error("User paid fetch error:", error);
+      set({ loading: false })
+    }
+  },
 
   getReports: async () => {
-    try{
+    try {
       set({ loading: true })
 
       const res = await axiosInstance.get("/payments/getreport")
       set({ Reports: res.data, loading: false })
     }
-    catch(error){
+    catch (error) {
       console.error("Report fetch error:", error);
       set({ loading: false })
     }

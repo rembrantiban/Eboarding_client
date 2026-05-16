@@ -64,6 +64,18 @@ type ApiError = {
 };
 
 
+type UpdateProfileSettingsData = {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  password?: string;
+  avatar?: File | null;
+};
+
+type UpdateProfileSettingsResponse = {
+  message: string;
+  user: User;
+};
 
 
 type GetUsersResponse = {
@@ -86,12 +98,16 @@ type ResetPasswordPayload = {
   newPassword: string;
 };
 
+  type totalBoardersResponse = {
+     total: number;
+  }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
-  users: User[]
+  users: User[];
+  totalBoarders: number;
 
 
   register: (data: RegisterPayload) => Promise<void>;
@@ -105,13 +121,104 @@ interface AuthState {
   updateProfile: (data: FormData) => Promise<UpdateUserResponse>;
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (data: ResetPasswordPayload) => Promise<void>;
+  getTotalBoarders: () => Promise<number>;
+  updateProfileSettings: (  data: UpdateProfileSettingsData) => Promise<UpdateProfileSettingsResponse>;
+
 }
 export const useAuthStore = create<AuthState>((set) => ({
   user: JSON.parse(localStorage.getItem("user") || "null"),
   token: localStorage.getItem("token"),
   isLoading: false,
   users: [],
+  totalBoarders: 0,
 
+  updateProfileSettings: async ( data: UpdateProfileSettingsData ) => {
+  try {
+    set({ isLoading: true });
+
+    const formData = new FormData();
+
+    if (data.first_name) {
+      formData.append(
+        "first_name",
+        data.first_name
+      );
+    }
+
+    if (data.last_name) {
+      formData.append(
+        "last_name",
+        data.last_name
+      );
+    }
+
+    if (data.email) {
+      formData.append(
+        "email",
+        data.email
+      );
+    }
+
+    if (data.password) {
+      formData.append(
+        "password",
+        data.password
+      );
+    }
+
+    if (data.avatar) {
+      console.log("📤 Appending avatar:", data.avatar.name, data.avatar.size, data.avatar.type);
+      formData.append(
+        "avatar",
+        data.avatar
+      );
+    }
+
+    console.log("📤 Sending formData to /auth/profile-settings");
+
+    const res = await axiosInstance.put<UpdateProfileSettingsResponse>( 
+      "/auth/profile-settings",
+      formData
+      // Let axios handle the Content-Type header automatically for multipart/form-data
+    );
+
+    const updatedUser = res.data.user;
+
+    console.log("✅ Profile updated:", updatedUser);
+
+    set({
+      user: updatedUser,
+      isLoading: false,
+    });
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(updatedUser)
+    );
+
+    return res.data;
+
+  } catch (error: unknown) {
+    const err = error as ApiError;
+
+    set({ isLoading: false });
+
+    throw (
+      err.response?.data?.message ||
+      "Failed to update profile"
+    );
+  }
+},
+  getTotalBoarders: async () => {
+    try {
+      const res = await axiosInstance.get<totalBoardersResponse>("/auth/total-boarders");
+      set({ totalBoarders: Number(res.data.total) });
+      return Number(res.data.total);
+    } catch (error: unknown) {
+      const err = error as ApiError;
+      throw err.response?.data?.message || "Failed to fetch total boarders";
+    }
+  },
 
   getUsers: async (params?: GetUsersParams): Promise<GetUsersResponse> => {
     try {
