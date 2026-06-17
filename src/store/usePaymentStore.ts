@@ -108,31 +108,31 @@ export const usePaymentStore = create<PaymentStore>((set) => ({
   calendarEvents: [],
   analytics: [],
   revenueAnalytics: null,
-  
+
   getRevenueAnalytics: async () => {
-  try {
+    try {
 
-    set({ loading: true });
+      set({ loading: true });
 
-    const res = await axiosInstance.get(
-      "/payments/revenue-dashboard"
-    );
+      const res = await axiosInstance.get(
+        "/payments/revenue-dashboard"
+      );
 
-    set({
-      revenueAnalytics: res.data,
-      loading: false,
-    });
+      set({
+        revenueAnalytics: res.data,
+        loading: false,
+      });
 
-  } catch (error) {
+    } catch (error) {
 
-    set({ loading: false });
+      set({ loading: false });
 
-    console.error(
-      "Revenue analytics fetch error:",
-      error
-    );
-  }
-},
+      console.error(
+        "Revenue analytics fetch error:",
+        error
+      );
+    }
+  },
 
   getAnalytics: async () => {
     try {
@@ -233,22 +233,28 @@ export const usePaymentStore = create<PaymentStore>((set) => ({
     try {
       set({ loading: true });
 
-      await axiosInstance.put(`/payments/mark-as-paid/${payment_id}`);
+      await axiosInstance.put(
+        `/payments/mark-as-paid/${payment_id}`
+      );
 
-      toast.success("Payment marked as paid");
-
-      const res = await axiosInstance.get("/payments/report");
+      const res = await axiosInstance.get(
+        "/payments/getpayment"
+      );
 
       set({
         payments: res.data,
         loading: false,
       });
 
+      toast.success("Payment marked as paid");
     } catch (error) {
       set({ loading: false });
 
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || "Failed to update payment");
+        toast.error(
+          error.response?.data?.message ||
+          "Failed to update payment"
+        );
       } else {
         toast.error("Something went wrong");
       }
