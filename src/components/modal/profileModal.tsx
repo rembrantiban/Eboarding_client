@@ -26,6 +26,7 @@ const ProfileModal = ({ open, onClose }: Props) => {
         email: user?.email || "",
         username: user?.username || "",
         password: "",
+        contact_number: user?.contact_number || "",
     });
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -74,6 +75,7 @@ const ProfileModal = ({ open, onClose }: Props) => {
             await updateProfileSettings({
                 first_name: form.first_name,
                 last_name: form.last_name,
+                contact_number: form.contact_number,
                 email: form.email,
                 password: form.password,
                 avatar: selectedFile,
@@ -212,6 +214,10 @@ const ProfileModal = ({ open, onClose }: Props) => {
                                 onChange={handleChange}
                                 disabled
                             />
+                            <div className="hidden">
+                              <input type="text" placeholder="Contact number" 
+                              value={form.contact_number} onChange={handleChange} />
+                            </div>
                         </div>
 
                         <div className="h-px bg-gray-100" />
