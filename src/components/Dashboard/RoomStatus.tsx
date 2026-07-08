@@ -10,7 +10,7 @@ import {
   CartesianGrid,
 } from "recharts"
 import { usePayment } from "@/hooks/usePayment"
-import { TrendingUp, Wallet, Users, ArrowUpRight } from "lucide-react"
+import { TrendingUp, Wallet, Users } from "lucide-react"
 import { useEffect } from "react"
 
 type TooltipProps = {
@@ -186,7 +186,7 @@ return (
             width: 36,
             height: 36,
             borderRadius: 10,
-            background: "#185fa5",
+            background: "#242D2E",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -291,8 +291,8 @@ return (
             >
               <defs>
                 <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#185fa5" stopOpacity={0.18} />
-                  <stop offset="100%" stopColor="#185fa5" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#242D2E" stopOpacity={0.18} />
+                  <stop offset="100%" stopColor="#242D2E" stopOpacity={0} />
                 </linearGradient>
               </defs>
 
@@ -308,7 +308,7 @@ return (
                 tickLine={false}
                 tick={{
                   fontSize: 11,
-                  fill: "#94a3b8",
+                  fill: "#242D2E",
                   fontFamily: "Syne",
                 }}
               />
@@ -387,23 +387,6 @@ return (
               Payments this month
             </p>
           </div>
-
-          <button
-            style={{
-              fontSize: 13,
-              color: "#185fa5",
-              fontWeight: 500,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-              fontFamily: "'Syne', sans-serif",
-            }}
-          >
-            See all <ArrowUpRight size={13} />
-          </button>
         </div>
 
         <div
@@ -446,8 +429,8 @@ return (
                     width: 36,
                     height: 36,
                     borderRadius: "50%",
-                    background: "#e6f1fb",
-                    color: "#185fa5",
+                    background: "#242D2E",
+                    color: "white",
                     fontSize: 12,
                     fontWeight: 600,
                     display: "flex",

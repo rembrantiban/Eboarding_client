@@ -26,6 +26,7 @@ import EditAccountPage from "./pages/EditAccountPage"
 import BoardeAnnouncement from './pages/BoarderAnnouncement'
 import MyRoom from "@/pages/MyRoom"
 import ViewOwnAccount from "@/pages/ViewOwnAccount"
+import PaymentHistoryPage from './pages/PaymentHistoryPage'
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
           <Route path='/boarder/announcements' element={<BoardeAnnouncement />} />  
           <Route path='/my-room' element={<MyRoom />} />
           <Route path="/view-account" element={<ViewOwnAccount />} />
+          <Route path="/payment-history" element={<PaymentHistoryPage />} />
         </Route>
       </Routes>
       

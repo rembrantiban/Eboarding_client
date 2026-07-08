@@ -3,18 +3,18 @@
 import { useNavigate } from "react-router-dom";
 import {
     LayoutDashboard,
-    Bookmark,
     User,
     Settings,
     LogOut,
     Bed,
     Bell,
+    Layers
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/boarder-dashboard" },
-    { label: "Profile", icon: Bookmark, path: "/view-account" },
+    { label: "Profile", icon: Layers, path: "/view-account" },
     { label: "Bed & Room", icon: Bed, path: "/my-room" },
     { label: "Edit profile", icon: User, path: "/edit-account" },
     { label: "Announcements", icon: Bell, path: "/boarder/announcements" },
@@ -43,7 +43,7 @@ export default function Sidebar() {
                             className="h-11 w-11 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="h-11 w-11 rounded-full bg-slate-900 text-lg font-bold text-emerald-100 flex items-center justify-center">
+                        <div className="h-11 w-14 rounded-full bg-slate-900 text-lg font-bold text-emerald-100 flex items-center justify-center">
                             {user?.first_name?.charAt(0).toUpperCase()}{user?.last_name?.charAt(0).toUpperCase()}
                         </div>
                     )}

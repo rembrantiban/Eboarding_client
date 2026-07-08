@@ -45,7 +45,7 @@ const UserTableRow = ({ user, onDeleteSuccess, onUpdateSuccess }: Props) => {
               className="w-9 h-9 rounded-2xl object-cover"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full flex bg-blue-100 text-blue-600 items-center justify-center text-sm font-semibold">
+            <div className="w-9 h-9 rounded-full flex bg-slate-700 text-blue-100 items-center justify-center text-sm font-semibold">
               {user.first_name?.charAt(0)}
             </div>
           )}

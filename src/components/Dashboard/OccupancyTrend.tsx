@@ -36,8 +36,8 @@ const OccupancyTrend = () => {
             {/* Gradient */}
             <defs>
               <linearGradient id="colorOcc" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#383535" stopOpacity={0.4}/>
+                <stop offset="95%" stopColor="#383535" stopOpacity={0}/>
               </linearGradient>
             </defs>
 
@@ -55,7 +55,7 @@ const OccupancyTrend = () => {
             <Area
               type="monotone"
               dataKey="occupied"
-              stroke="#3b82f6"
+              stroke="#383535"
               strokeWidth={2}
               fill="url(#colorOcc)"
             />

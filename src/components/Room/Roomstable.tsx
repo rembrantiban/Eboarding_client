@@ -36,7 +36,7 @@ const RoomsTable = () => {
   const filteredRooms = rooms.filter((room) => {
     const matchSearch =
       room.room_number.toLowerCase().includes(search.toLowerCase()) ||
-      room.price_per_month.toString().includes(search) 
+      room.price_per_month.toString().includes(search)
     const matchFilter =
       filter === "All" || room.status === filter;
 
@@ -91,51 +91,51 @@ const RoomsTable = () => {
       <div className="rounded border overflow-visible">
         <table className="w-full text-sm">
 
-         <thead className="bg-muted">
-  <tr>
-    <th className="text-left px-4 py-3">
-      <div className="flex items-center gap-2">
-        <ArrowUpDown size={16} />
-        Room
-      </div>
-    </th>
+          <thead className="bg-slate-700 text-white">
+            <tr>
+              <th className="text-left px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown size={16} />
+                  Room
+                </div>
+              </th>
 
-    <th className="text-left px-4 py-3">
-      <div className="flex items-center gap-2">
-        <ArrowUpDown size={16} />
-        Capacity
-      </div>
-    </th>
+              <th className="text-left px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown size={16} />
+                  Capacity
+                </div>
+              </th>
 
-    <th className="text-left px-4 py-3">
-      <div className="flex items-center gap-2">
-        <ArrowUpDown size={16} />
-        Beds
-      </div>
-    </th>
+              <th className="text-left px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown size={16} />
+                  Beds
+                </div>
+              </th>
 
-    <th className="text-left px-4 py-3">
-      <div className="flex items-center gap-2">
-        <ArrowUpDown size={16} />
-        Price Per Month
-      </div>
-    </th>
+              <th className="text-left px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown size={16} />
+                  Price Per Month
+                </div>
+              </th>
 
-    <th className="text-left px-4 py-3">
-      <div className="flex items-center gap-2">
-        <ArrowUpDown size={16} />
-        Status
-      </div>
-    </th>
+              <th className="text-left px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown size={16} />
+                  Status
+                </div>
+              </th>
 
-    <th className="text-right px-4 py-3">
-      <div className="flex items-center justify-end gap-2">
-        <ArrowUpDown size={16} />
-        Actions
-      </div>
-    </th>
-  </tr>
-</thead>
+              <th className="text-right px-4 py-3">
+                <div className="flex items-center justify-end gap-2">
+                  <ArrowUpDown size={16} />
+                  Actions
+                </div>
+              </th>
+            </tr>
+          </thead>
 
           <tbody>
             {loading ? (

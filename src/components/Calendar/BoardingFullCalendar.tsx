@@ -83,9 +83,9 @@ const BoardingFullCalendar = () => {
             <style>{`
               .fc .fc-toolbar-title       { font-size: 1rem; font-weight: 700; color: #0f172a; }
               .fc .fc-button              { background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; font-size: 0.75rem; font-weight: 600; border-radius: 8px; padding: 4px 12px; text-transform: capitalize; box-shadow: none; }
-              .fc .fc-button:hover        { background: #2563eb; border-color: #cbd5e1; margin-bottom: 2px; }
+              .fc .fc-button:hover        { background: #242D2E; border-color: #cbd5e1; margin-bottom: 2px; }
               .fc .fc-button-active,
-              .fc .fc-button-primary:not(:disabled).fc-button-active { background: #2563eb; border-color: #2563eb; color: #fff; }
+              .fc .fc-button-primary:not(:disabled).fc-button-active { background: #242D2E; border-color: #2563eb; color: #fff; }
               .fc .fc-button-group        { gap: 4px; display: flex; }
               .fc .fc-toolbar              { gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
               .fc .fc-daygrid-day-number  { color: #475569; font-size: 0.8rem; padding: 4px 6px; }
@@ -185,7 +185,7 @@ const BoardingFullCalendar = () => {
 
                         {/* LEFT */}
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-slate-700 text-blue-100 flex items-center justify-center font-bold text-xs shrink-0">
                             {p.first_name.charAt(0)}
                           </div>
 

@@ -173,7 +173,7 @@ const PaymentReport = () => {
     <div className="p-6 space-y-6">
       {/* HEADER */}
       <div>
-        <h1 className="text-xl font-semibold">Payment Report</h1>
+        <h1 className="text-xl font-semibold">Billing Report</h1>
         <p className="text-sm text-muted-foreground">
           Track all boarder payments
         </p>
@@ -277,14 +277,14 @@ const PaymentReport = () => {
       <div className="rounded border bg-white/80 backdrop-blur-xl shadow-md overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead>Boarder</TableHead>
-              <TableHead>Room</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Penalty</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+            <TableRow className="bg-slate-700 hover:bg-slate-500">
+              <TableHead className="text-white">Boarder</TableHead>
+              <TableHead className="text-white">Room</TableHead>
+              <TableHead className="text-white">Amount</TableHead>
+              <TableHead className="text-white">Due Date</TableHead>
+              <TableHead className="text-white">Status</TableHead>
+              <TableHead className="text-white">Penalty</TableHead>
+              <TableHead className="text-right text-white">Action</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -310,7 +310,7 @@ const PaymentReport = () => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarFallback className="bg-blue-100 text-blue-700 font-semibold">
+                        <AvatarFallback className="bg-slate-700 text-slate-100 font-semibold">
                           {initials}
                         </AvatarFallback>
                       </Avatar>

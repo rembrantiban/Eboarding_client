@@ -8,7 +8,6 @@ import {
     Receipt,
     ArrowUpRight,
     Clock,
-    CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePayment } from "@/hooks/usePayment";
@@ -29,13 +28,7 @@ const stats = [
         sub: "Billed monthly",
         icon: Wallet,
     },
-    {
-        label: "Balance",
-        value: "₱0.00",
-        sub: "Fully settled",
-        icon: CheckCircle2,
-        accent: "text-emerald-600",
-    },
+
     {
         label: "Stay duration",
         value: "6 months",
@@ -44,20 +37,15 @@ const stats = [
     },
 ];
 
-const recentPayments = [
-    { month: "June 2026", amount: 3500, date: "Jun 12, 2026", status: "Paid" },
-    { month: "May 2026", amount: 3500, date: "May 10, 2026", status: "Paid" },
-    { month: "April 2026", amount: 3500, date: "Apr 09, 2026", status: "Paid" },
-];
-
 export default function BoarderDashboard() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { getUpcomingPayment, upcomingPayment } = usePayment();
+    const { getUpcomingPayment, upcomingPayment, getRecentPayments, recentPayments } = usePayment();
 
     useEffect(() => {
         getUpcomingPayment();
-    }, [getUpcomingPayment]);
+        getRecentPayments();
+    }, [getUpcomingPayment, getRecentPayments]);
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString("en-US", {
@@ -106,8 +94,8 @@ export default function BoarderDashboard() {
                 </section>
 
                 {/* Stats grid */}
-                <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                    {stats.map(({ label, value, sub, icon: Icon, accent }) => (
+                <section className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+                    {stats.map(({ label, value, sub, icon: Icon, }) => (
                         <div
                             key={label}
                             className="rounded-2xl border border-slate-200 bg-white p-5"
@@ -119,8 +107,7 @@ export default function BoarderDashboard() {
                                 <Icon size={16} className="text-slate-400" />
                             </div>
                             <p
-                                className={`mt-3 text-xl font-semibold text-slate-900 ${accent ?? ""
-                                    }`}
+                                className="mt-3 text-xl font-semibold text-slate-900"
                             >
                                 {value}
                             </p>
@@ -141,7 +128,7 @@ export default function BoarderDashboard() {
                             </p>
                         </div>
                         <button
-                            onClick={() => navigate("/payments")}
+                            onClick={() => navigate("/payment-history")}
                             className="flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-slate-900"
                         >
                             View all
@@ -167,7 +154,11 @@ export default function BoarderDashboard() {
                                             {payment.month}
                                         </p>
                                         <p className="text-xs text-slate-500">
-                                            {payment.date}
+                                            {new Date(payment.paidDate).toLocaleDateString("en-US", {
+                                                month: "long",
+                                                day: "numeric",
+                                                year: "numeric",
+                                            })}
                                         </p>
                                     </div>
                                 </div>

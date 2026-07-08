@@ -133,15 +133,15 @@ const BoardersTable = () => {
       {/* TABLE */}
       <div className="rounded border bg-white/80 backdrop-blur-xl shadow-md overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Boarder</TableHead>
-              <TableHead>Room</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>Monthly</TableHead>
-              <TableHead>Next Payment</TableHead>
-              <TableHead>Assign By</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+          <TableHeader className="bg-slate-700">
+            <TableRow> 
+              <TableHead className="text-white">Boarder</TableHead>
+              <TableHead className="text-white">Room</TableHead>
+              <TableHead className="text-white">Start Date</TableHead>
+              <TableHead className="text-white">Monthly</TableHead>
+              <TableHead className="text-white">Next Payment</TableHead>
+              <TableHead className="text-white">Assign By</TableHead>
+              <TableHead className="text-right text-white">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -168,7 +168,7 @@ const BoardersTable = () => {
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
+                        <AvatarFallback className="bg-slate-700 text-slate-100 font-semibold">
                           {initials}
                         </AvatarFallback>
                       </Avatar>
@@ -231,11 +231,11 @@ const BoardersTable = () => {
                   {/* STATUS */}
                   <TableCell>
                     {b.assigned_by_first_name ? (
-                      <Badge className="bg-green-100 text-green-700">
+                      <Badge className="bg-slate-700 text-slate-300">
                         {b.assigned_by_first_name} {b.assigned_by_last_name}
                       </Badge>
                     ) : (
-                      <Badge className="bg-gray-200 text-gray-600">
+                      <Badge className="bg-slate-200 text-slate-700">
                         Not Assigned
                       </Badge>
                     )}

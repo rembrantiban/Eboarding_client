@@ -81,7 +81,7 @@ const handleUpdateSuccess = (updatedUser: User) => {
 
       <div className="rounded border overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-muted">
+          <thead className="bg-slate-700 text-white">
             <tr>
               <th className="text-left px-4 py-3">User</th>
               <th className="text-left px-4 py-3">Email</th>

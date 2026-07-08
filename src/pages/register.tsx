@@ -187,7 +187,7 @@ const Register = () => {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="w-full md:w-lg border p-10">
+        <div className="w-full md:w-lg border rounded-tr-2xl rounded-br-2xl p-10">
 
           <h1 className="text-xl font-semibold text-slate-900 mb-1">
             Create account

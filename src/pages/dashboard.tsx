@@ -59,11 +59,11 @@ const Dashboard = () => {
 
                 {/* 🔷 STATS */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-                    <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-purple-300/30" />} />
-                    <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-blue-300/30" />} />
-                    <StatCard title="Fully Occupied" value={dashboardStats.fullyOccupied.toString()} icon={<Layers size={110} className="text-yellow-300/30" />} />
-                    <StatCard title="Occupied Beds" value={dashboardStats.occupiedBeds.toString()} icon={<BedDouble size={110} className="text-green-300/30" />} />
-                    <StatCard title="Available Beds" value={dashboardStats.availableBeds.toString()} icon={<CheckCircle size={110} className="text-yellow-300/30" />} />
+                    <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-slate-600/70" />} />
+                    <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-slate-600/70" />} />
+                    <StatCard title="Fully Occupied" value={dashboardStats.fullyOccupied.toString()} icon={<Layers size={110} className="text-slate-600/70" />} />
+                    <StatCard title="Occupied Beds" value={dashboardStats.occupiedBeds.toString()} icon={<BedDouble size={110} className="text-slate-600/70" />} />
+                    <StatCard title="Available Beds" value={dashboardStats.availableBeds.toString()} icon={<CheckCircle size={110} className="text-slate-600/70" />} />
 
                 </div>
 

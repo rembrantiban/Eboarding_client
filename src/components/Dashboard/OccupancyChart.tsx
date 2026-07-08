@@ -51,7 +51,7 @@ const OccupancyChart = () => {
           <div className="w-full bg-muted rounded-full h-2 mt-1">
 
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
+              className="bg-slate-600 h-2 rounded-full transition-all"
               style={{
                 width: `${occupiedPercent}%`,
               }}
@@ -69,7 +69,7 @@ const OccupancyChart = () => {
           <div className="w-full bg-muted rounded-full h-2 mt-1">
 
             <div
-              className="bg-green-500 h-2 rounded-full transition-all"
+              className="bg-slate-400 h-2 rounded-full transition-all"
               style={{
                 width: `${availablePercent}%`,
               }}

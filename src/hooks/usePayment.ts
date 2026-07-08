@@ -18,6 +18,10 @@ export const usePayment = () => {
   const getRevenueAnalytics = usePaymentStore((state) => state.getRevenueAnalytics);
   const getUpcomingPayment = usePaymentStore((state) => state.getUpcomingPayment);
   const upcomingPayment = usePaymentStore((state) => state.upcomingPayment);
+  const recentPayments = usePaymentStore((state) => state.recentPayments);
+  const getRecentPayments = usePaymentStore((state) => state.getRecentPayments);
+  const paymentHistory = usePaymentStore((state) => state.paymentHistory);
+  const getPaymentHistory = usePaymentStore((state) => state.getPaymentHistory);
 
   return {
     payments,
@@ -35,6 +39,10 @@ export const usePayment = () => {
     revenueAnalytics,
     getRevenueAnalytics,
     getUpcomingPayment,
-    upcomingPayment
+    upcomingPayment,
+    recentPayments,
+    getRecentPayments,
+    getPaymentHistory,
+    paymentHistory,
   };
 };

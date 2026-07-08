@@ -209,20 +209,7 @@ const PaymentChart = ({ data }: { data: PaymentData[] }) => {
           </p>
         </div>
 
-        <button
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: "#3b82f6",
-            background: "#eff6ff",
-            border: "1px solid #bfdbfe",
-            borderRadius: 8,
-            padding: "6px 12px",
-            cursor: "pointer",
-          }}
-        >
-          View Report →
-        </button>
+    
       </div>
 
       {/* ── Stat pills ── */}
@@ -258,7 +245,7 @@ const PaymentChart = ({ data }: { data: PaymentData[] }) => {
               width: 9,
               height: 9,
               borderRadius: 2,
-              background: "#3b82f6",
+              background: "#383535",
               display: "inline-block",
             }}
           />
@@ -323,7 +310,7 @@ const PaymentChart = ({ data }: { data: PaymentData[] }) => {
               {data.map((entry) => (
                 <Cell
                   key={entry.name}
-                  fill={COLOR_MAP[entry.name]?.current ?? "#3b82f6"}
+                  fill={COLOR_MAP[entry.name]?.current ?? "#383535"}
                 />
               ))}
             </Bar>

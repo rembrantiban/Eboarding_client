@@ -103,10 +103,46 @@ export type UpcomingPayment = {
   status: "Pending" | "Overdue";
 };
 
+export type RecentPayment = {
+  payment_id: number;
+  month: string;
+  amount: number;
+  penalty: number;
+  totalAmount: number;
+  paidDate: string;
+  status: "Paid";
+};
+
 export type UpcomingPaymentResponse = {
   hasUpcomingPayment: boolean;
   payment?: UpcomingPayment;
 };
+
+
+type PaymentHistoryApi = {
+  payment_id: number;
+  amount: string;
+  due_date: string;
+  paid_at: string | null;
+  status: "Paid" | "Pending" | "Overdue";
+  penalty_amount: string;
+  room_number: string;
+  bed_number: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+};
+
+export type PaymentHistory = {
+  payment_id: number;
+  month: string;
+  amount: number;
+  payment_penalty: number;
+  dueDate: string;
+  paidDate: string | null;
+  status: "Paid" | "Pending" | "Overdue";
+};
+
 
 type PaymentStore = {
   payments: Payment[];
@@ -117,7 +153,11 @@ type PaymentStore = {
   analytics: PaymentAnalytics[];
   revenueAnalytics: RevenueAnalytics | null;
   upcomingPayment: UpcomingPayment | null;
+  recentPayments: RecentPayment[];
 
+  paymentHistory: PaymentHistory[];
+
+  getRecentPayments: () => Promise<void>;
   getUpcomingPayment: () => Promise<void>;
 
   getRevenueAnalytics: () => Promise<void>;
@@ -127,6 +167,7 @@ type PaymentStore = {
   getUserPaid: () => Promise<void>;
   markAsPaid: (payment_id: number) => Promise<void>;
   getCalendar: () => Promise<void>;
+  getPaymentHistory: () => Promise<void>;
 };
 
 export const usePaymentStore = create<PaymentStore>((set) => ({
@@ -138,33 +179,107 @@ export const usePaymentStore = create<PaymentStore>((set) => ({
   analytics: [],
   revenueAnalytics: null,
   upcomingPayment: null,
+  recentPayments: [],
+  paymentHistory: [],
 
+ getPaymentHistory: async () => {
+    try {
+        set({ loading: true });
+
+        const res = await axiosInstance.get(
+            "/payments/my-paid-payments"
+        );
+
+        const formatted = res.data.map((payment: PaymentHistoryApi) => ({
+            payment_id: payment.payment_id,
+
+            month: new Date(payment.due_date).toLocaleDateString(
+                "en-US",
+                {
+                    month: "long",
+                    year: "numeric",
+                }
+            ),
+
+            amount: Number(payment.amount),
+
+            payment_penalty: Number(payment.penalty_amount),
+
+            dueDate: payment.due_date,
+
+            paidDate: payment.paid_at,
+
+            status: payment.status,
+        }));
+
+        set({
+            paymentHistory: formatted,
+            loading: false,
+        });
+
+    } catch (error) {
+        set({ loading: false });
+        console.error(error);
+    }
+},
+  getRecentPayments: async () => {
+    try {
+      set({ loading: true });
+
+      const res = await axiosInstance.get<RecentPayment[]>(
+        "/payments/my-recent-payments"
+      );
+
+      set({
+        recentPayments: res.data,
+        loading: false,
+      });
+
+    } catch (error) {
+
+      set({ loading: false });
+
+      console.error(
+        "Recent payments fetch error:",
+        error
+      );
+
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ??
+          "Failed to load recent payments"
+        );
+      } else {
+        toast.error("Something went wrong");
+      }
+    }
+  },
 
   getUpcomingPayment: async () => {
-  try {
-    set({ loading: true });
+    try {
+      set({ loading: true });
 
-    const res = await axiosInstance.get<UpcomingPaymentResponse>(
-      "/payments/my-upcoming-payment"
-    );
+      const res = await axiosInstance.get<UpcomingPaymentResponse>(
+        "/payments/my-upcoming-payment"
+      );
 
-    set({
-      upcomingPayment: res.data.hasUpcomingPayment
-        ? res.data.payment ?? null
-        : null,
-      loading: false,
-    });
+      set({
+        upcomingPayment: res.data.hasUpcomingPayment
+          ? res.data.payment ?? null
+          : null,
+        loading: false,
+      });
 
-  } catch (error) {
+    } catch (error) {
 
-    set({ loading: false });
+      set({ loading: false });
 
-    console.error(
-      "Upcoming payment fetch error:",
-      error
-    );
-  }
-},
+      console.error(
+        "Upcoming payment fetch error:",
+        error
+      );
+    }
+  },
   getRevenueAnalytics: async () => {
     try {
 
