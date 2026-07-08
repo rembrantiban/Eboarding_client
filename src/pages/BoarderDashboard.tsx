@@ -11,41 +11,22 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePayment } from "@/hooks/usePayment";
+import { useRoom } from "@/hooks/useRoom";
 
 // TODO: replace with real data from usePayments / useBoarder hooks
 
 
-const stats = [
-    {
-        label: "Room",
-        value: "Room 204",
-        sub: "Double occupancy",
-        icon: Home,
-    },
-    {
-        label: "Monthly rate",
-        value: "₱3,500",
-        sub: "Billed monthly",
-        icon: Wallet,
-    },
-
-    {
-        label: "Stay duration",
-        value: "6 months",
-        sub: "Since Jan 2026",
-        icon: Clock,
-    },
-];
 
 export default function BoarderDashboard() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { getUpcomingPayment, upcomingPayment, getRecentPayments, recentPayments } = usePayment();
-
+    const { getMyDashboard, dashboard } = useRoom();
     useEffect(() => {
         getUpcomingPayment();
         getRecentPayments();
-    }, [getUpcomingPayment, getRecentPayments]);
+        getMyDashboard();
+    }, [getUpcomingPayment, getRecentPayments, getMyDashboard]);
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString("en-US", {
@@ -54,6 +35,29 @@ export default function BoarderDashboard() {
             year: "numeric",
         });
     };
+
+    const stats = [
+    {
+        label: "Room",
+        value: `Room ${dashboard?.room.roomNumber}`,
+        sub: "Double occupancy",
+        icon: Home,
+    },
+    {
+        label: "Monthly rate",
+        value: `₱${dashboard?.monthlyRate?.toLocaleString()}`,
+        sub: "Billed monthly",
+        icon: Wallet,
+    },
+
+    {
+        label: "Stay duration",
+        value: `${dashboard?.stay.months} months`,
+        sub: `Since ${formatDate(dashboard?.stay.moveInDate ?? "")}`,
+        icon: Clock,
+    },
+];
+
 
     return (
         <div className="min-h-screen px-6 py-8">
@@ -121,7 +125,7 @@ export default function BoarderDashboard() {
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-sm font-semibold text-slate-900">
-                                Payment history
+                                Payment History 
                             </h2>
                             <p className="mt-0.5 text-xs text-slate-500">
                                 Your last 3 payments

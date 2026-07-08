@@ -15,6 +15,8 @@ export const useRoom = () => {
   const getDashboardStats = useRoomStore((state) => state.getDashboardStats);
   const occupancyTrend = useRoomStore((state) => state.occupancyTrend);
   const getOccupancyTrend = useRoomStore((state) => state.getOccupancyTrend);
+  const getMyDashboard = useRoomStore((state) => state.getMyDashboard);
+  const dashboard = useRoomStore((state) => state.dashboard);
 
   return {
     rooms,
@@ -30,5 +32,7 @@ export const useRoom = () => {
     getDashboardStats,
     occupancyTrend,
     getOccupancyTrend,
+    getMyDashboard,
+    dashboard
   };
 };

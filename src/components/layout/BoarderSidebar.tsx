@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
     LayoutDashboard,
     User,
-    Settings,
+    ReceiptSwissFranc,
     LogOut,
     Bed,
     Bell,
@@ -20,7 +20,7 @@ const navItems = [
     { label: "Bed & Room", icon: Bed, path: "/my-room" },
     { label: "Edit profile", icon: User, path: "/edit-account" },
     { label: "Announcements", icon: Bell, path: "/boarder/announcements" },
-    { label: "Account", icon: Settings, path: "/settings" },
+    { label: "Payment History", icon: ReceiptSwissFranc, path: "/payment-history" },
 ];
 
 export default function Sidebar() {
@@ -48,7 +48,7 @@ export default function Sidebar() {
                         <img
                             src={user.avatar_url}
                             alt={`${user.first_name} ${user.last_name}`}
-                            className="h-11 w-11 rounded-full object-cover"
+                            className="h-11 w-13 rounded-full object-cover"
                         />
                     ) : (
                         <div className="h-11 w-14 rounded-full bg-slate-900 text-lg font-bold text-emerald-100 flex items-center justify-center">

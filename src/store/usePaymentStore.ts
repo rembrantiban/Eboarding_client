@@ -119,18 +119,17 @@ export type UpcomingPaymentResponse = {
 };
 
 
-type PaymentHistoryApi = {
+export type PaymentHistoryApi = {
   payment_id: number;
-  amount: string;
-  due_date: string;
-  paid_at: string | null;
+  month: string;
+  amount: number;
+  penalty: number;
+  dueDate: string;
+  paidDate: string | null;
   status: "Paid" | "Pending" | "Overdue";
-  penalty_amount: string;
-  room_number: string;
-  bed_number: string;
-  first_name: string;
-  last_name: string;
-  email: string;
+  room?: string;
+  bed?: string;
+  totalAmount?: number;
 };
 
 export type PaymentHistory = {
@@ -182,32 +181,27 @@ export const usePaymentStore = create<PaymentStore>((set) => ({
   recentPayments: [],
   paymentHistory: [],
 
- getPaymentHistory: async () => {
+getPaymentHistory: async () => {
     try {
         set({ loading: true });
 
-        const res = await axiosInstance.get(
-            "/payments/my-paid-payments"
-        );
+        const res = await axiosInstance.get("/payments/my-paid-payments");
+
+        console.log(res.data);
 
         const formatted = res.data.map((payment: PaymentHistoryApi) => ({
             payment_id: payment.payment_id,
 
-            month: new Date(payment.due_date).toLocaleDateString(
-                "en-US",
-                {
-                    month: "long",
-                    year: "numeric",
-                }
-            ),
+            // API already sends this
+            month: payment.month,
 
             amount: Number(payment.amount),
 
-            payment_penalty: Number(payment.penalty_amount),
+            payment_penalty: Number(payment.penalty),
 
-            dueDate: payment.due_date,
+            dueDate: payment.dueDate,
 
-            paidDate: payment.paid_at,
+            paidDate: payment.paidDate,
 
             status: payment.status,
         }));

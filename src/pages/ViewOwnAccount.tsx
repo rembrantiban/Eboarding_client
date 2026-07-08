@@ -73,9 +73,17 @@ export default function PersonalInformation() {
                 {/* Identity card */}
                 <section className="rounded-2xl bg-slate-900 p-6 sm:p-8">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg font-semibold text-white">
-                            {initials}
-                        </div>
+                        { user?.avatar_url ? (
+                            <img
+                                src={user.avatar_url}
+                                alt={`${user.first_name} ${user.last_name}`}
+                                className="h-16 w-16 border-2 border-slate-400 rounded-full object-cover"
+                            />
+                        ) : (
+                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg font-semibold text-white">
+                                {initials}
+                            </div>
+                        )}
                         <div className="min-w-0">
                             <p className="truncate text-lg font-semibold text-white">
                                 {fullName}

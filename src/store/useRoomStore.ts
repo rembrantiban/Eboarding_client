@@ -68,6 +68,20 @@ export type OccupancyTrend = {
   occupied: number
 }
 
+export interface DashboardData {
+  room: {
+    roomNumber: string;
+    bedNumber: string;
+    capacity: number;
+  };
+
+  monthlyRate: number;
+
+  stay: {
+    months: number;
+    moveInDate: string;
+  };
+}
 
 
 interface RoomState {
@@ -80,6 +94,9 @@ interface RoomState {
     occupiedBeds: number,
     availableBeds: number,
   };
+
+  dashboard: DashboardData | null;
+  getMyDashboard: () => Promise<void>;
   occupancyTrend: OccupancyTrend[],
 
   loading: boolean;
@@ -102,6 +119,7 @@ export const useRoomStore = create<RoomState>((set) => ({
   error: null,
   availableRooms: [],
   occupancyTrend: [],
+  dashboard: null,
 
   dashboardStats: {
     totalRooms: 0,
@@ -110,6 +128,17 @@ export const useRoomStore = create<RoomState>((set) => ({
     availableBeds: 0,
   },
 
+  getMyDashboard: async () => {
+    try {
+        const res = await axiosInstance.get("/rooms/my-stats-dashboard");
+
+        set({
+            dashboard: res.data,
+        });
+    } catch (error) {
+        console.error(error);
+    }
+},
   getOccupancyTrend: async () => {
     try {
 

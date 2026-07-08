@@ -46,16 +46,16 @@ function groupByYear(payments: Payment[]) {
     const groups = new Map<string, Payment[]>();
 
     payments.forEach((payment) => {
+        let year: string;
 
-        const date =
-            payment.dueDate ??
-            payment.paidDate;
-
-        if (!date) return;
-
-        const year = new Date(date)
-            .getFullYear()
-            .toString();
+        if (payment.paidDate) {
+            year = new Date(payment.paidDate).getFullYear().toString();
+        } else if (payment.dueDate) {
+            year = new Date(payment.dueDate).getFullYear().toString();
+        } else {
+            // "July 2026" -> "2026"
+            year = payment.month.split(" ")[1];
+        }
 
         if (!groups.has(year)) {
             groups.set(year, []);
@@ -74,42 +74,42 @@ export default function PaymentHistoryPage() {
     const { paymentHistory, getPaymentHistory } = usePayment();
     const [search, setSearch] = useState("");
 
-     useEffect(() => {
+    useEffect(() => {
         getPaymentHistory()
-     }, [getPaymentHistory]);
+    }, [getPaymentHistory]);
 
-     console.log(paymentHistory)
+    console.log(paymentHistory)
 
     const filtered = useMemo(() => {
-    return paymentHistory.filter((payment) => {
+        return paymentHistory.filter((payment) => {
 
-        const month =
-            payment.month ??
-            new Date(payment.dueDate ?? payment.paidDate ?? "")
-                .toLocaleDateString("en-US", {
-                    month: "long",
-                    year: "numeric",
-                });
+            const month =
+                payment.month ??
+                new Date(payment.dueDate ?? payment.paidDate ?? "")
+                    .toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                    });
 
-        return (
-            search.trim() === "" ||
-            month.toLowerCase().includes(search.toLowerCase())
-        );
-    });
-}, [paymentHistory, search]);
+            return (
+                search.trim() === "" ||
+                month.toLowerCase().includes(search.toLowerCase())
+            );
+        });
+    }, [paymentHistory, search]);
 
     const grouped = useMemo(() => groupByYear(filtered), [filtered]);
 
     const totals = useMemo(() => {
         const totalPaid = paymentHistory.filter((p) => p.status === "Paid").reduce((s, p) => s + parseFloat(p.amount.toString()), 0);
-      
+
         return { totalPaid, count: paymentHistory.length };
 
     }, [paymentHistory]);
 
     const paidCount = paymentHistory.filter(
-    (payment) => payment.status === "Paid"
-).length;
+        (payment) => payment.status === "Paid"
+    ).length;
 
     return (
         <div className="min-h-screen px-6 py-8">
