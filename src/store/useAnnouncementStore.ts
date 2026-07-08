@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
     created_by: number;
     created_by_name: string;
+    created_by_avatar: string | null;
 
     created_at: string;
     updated_at: string;
@@ -34,7 +35,7 @@ export type NotificationAnnouncement = {
   created_by_name: string;
 
   created_by_avatar: string | null;
-  
+
   is_read: boolean;
 
   created_at: string;
@@ -83,7 +84,7 @@ export const useAnnouncementStore = create<AnnouncementStore>((set) => ({
 
   markAllAsRead: async () => {
   try {
-    await axiosInstance.put("/announcement/read-all");
+    await axiosInstance.put("/announcements/read-all");
 
     set((state) => ({
       announcements: state.announcements.map((a) => ({

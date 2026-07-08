@@ -76,7 +76,7 @@ export default function AdminAnnouncementsPage() {
     };
 
     const saveDraft = async () => {
-        if (!draft.title.trim() || !draft.description.trim()) return;
+        if (!draft.title.trim() || !draft.description.trim() || !draft.category) return;
 
         try {
             if (editing) {
@@ -176,20 +176,36 @@ export default function AdminAnnouncementsPage() {
                                     className="rounded-2xl border border-slate-200 bg-white p-6"
                                 >
                                     <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-3">
+                                            {item.created_by_avatar ? (
+                                                <img
+                                                    src={item.created_by_avatar}
+                                                    alt={item.created_by_name}
+                                                    className="h-10 w-10 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
+                                                    {item.created_by_name
+                                                        .split(" ")
+                                                        .map((n) => n[0])
+                                                        .join("")
+                                                        .toUpperCase()}
+                                                </div>
+                                            )}
+
+                                            <div>
                                                 <p className="text-sm font-medium text-slate-900">
                                                     {item.created_by_name}
                                                 </p>
 
+                                                <p className="text-xs text-slate-500">
+                                                    {new Date(item.created_at).toLocaleDateString("en-US", {
+                                                        month: "long",
+                                                        day: "numeric",
+                                                        year: "numeric",
+                                                    })}
+                                                </p>
                                             </div>
-                                            <p className="text-xs text-slate-500">
-                                                {new Date(item.created_at).toLocaleDateString("en-US", {
-                                                    month: "long",
-                                                    day: "numeric",
-                                                    year: "numeric",
-                                                })}
-                                            </p>
                                         </div>
 
                                         <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${categoryStyles[item.category]}`}>
