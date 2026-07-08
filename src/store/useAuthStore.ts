@@ -68,6 +68,7 @@ type UpdateProfileSettingsData = {
   first_name?: string;
   last_name?: string;
   email?: string;
+  contact_number: string;
   password?: string;
   avatar?: File | null;
 };
@@ -156,6 +157,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       formData.append(
         "email",
         data.email
+      );
+    }
+
+     if (data.contact_number) {
+      formData.append(
+        "contact_number",
+        data.contact_number
       );
     }
 
