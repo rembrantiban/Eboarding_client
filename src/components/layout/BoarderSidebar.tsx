@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnnouncement } from "@/hooks/useAnnouncement"
+import { useEffect } from "react";
 
 const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/boarder-dashboard" },
@@ -25,8 +26,13 @@ const navItems = [
 export default function Sidebar() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { markAllAsRead, getUnreadCount } = useAnnouncement();
+    const { markAllAsRead, getUnreadCount, unreadCount } = useAnnouncement();
 
+    useEffect(() => {
+        getUnreadCount()
+    }, [getUnreadCount]);
+
+    console.log(unreadCount);
     const currentPath =
         typeof window !== "undefined" ? window.location.pathname : "";
 
@@ -93,8 +99,15 @@ export default function Sidebar() {
                                 }
                         `}
                         >
+                            
                             <Icon size={18} />
-                            {label}
+                            <span>{label}</span>
+                            {label === "Announcements" && unreadCount > 0 && (
+                                <span className="flex h-4 w-4 items-center justify-center rounded-full  bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+                                    {unreadCount}
+                                </span>
+                            )}
+
                         </button>
                     );
                 })}
