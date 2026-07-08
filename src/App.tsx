@@ -27,6 +27,7 @@ import BoardeAnnouncement from './pages/BoarderAnnouncement'
 import MyRoom from "@/pages/MyRoom"
 import ViewOwnAccount from "@/pages/ViewOwnAccount"
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
+import BoarderRoute from './route/BoarderRoute'
 
 function App() {
   return (
@@ -39,7 +40,6 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/viewroom" element={<Viewroom />} />
-        <Route path="/profile" element={<ProfilePage />} />
 
         <Route element={<AdminRoute />}>
           <Route element={<DashboardLayout />}>
@@ -52,19 +52,24 @@ function App() {
             <Route path='/payments' element={<Payment />} />
             <Route path='/reports' element={<Report />} />
             <Route path='/announcements' element={<Announcement />} />
+            <Route path="/profile" element={<ProfilePage />} />
+
           </Route>
         </Route>
 
-        <Route element={<BoarderLayout />}>
-          <Route path="/boarder-dashboard" element={<BoarderDashboard />} />
-          <Route path='/edit-account' element={<EditAccountPage />} />
-          <Route path='/boarder/announcements' element={<BoardeAnnouncement />} />  
-          <Route path='/my-room' element={<MyRoom />} />
-          <Route path="/view-account" element={<ViewOwnAccount />} />
-          <Route path="/payment-history" element={<PaymentHistoryPage />} />
+        <Route element={<BoarderRoute />}>
+          <Route element={<BoarderLayout />}>
+            <Route path="/boarder-dashboard" element={<BoarderDashboard />} />
+            <Route path='/edit-account' element={<EditAccountPage />} />
+            <Route path='/boarder/announcements' element={<BoardeAnnouncement />} />
+            <Route path='/my-room' element={<MyRoom />} />
+            <Route path="/view-account" element={<ViewOwnAccount />} />
+            <Route path="/payment-history" element={<PaymentHistoryPage />} />
+          </Route>
         </Route>
+
       </Routes>
-      
+
       <Toaster position="top-center" />
     </>
   )

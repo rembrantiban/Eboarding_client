@@ -166,7 +166,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
                 <DropdownButton
                   icon={<User size={14} />}
                   label="Profile"
-                  onClick={() => { setOpenProfile(true); setDropdownOpen(false) }}
+                  onClick={() => { navigate("/profile"); setDropdownOpen(false) }}
                 />
                 <DropdownButton
                   icon={<Settings size={14} />}
