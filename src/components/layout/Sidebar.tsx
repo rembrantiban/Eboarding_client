@@ -22,6 +22,7 @@ import { useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import ProfileModal from "../modal/profileModal"
+import { IoHomeSharp } from "react-icons/io5";
 
 
 export const MobileHeader = ({ onMenuOpen }: { onMenuOpen: () => void }) => (
@@ -40,7 +41,7 @@ export const MobileHeader = ({ onMenuOpen }: { onMenuOpen: () => void }) => (
         <span className="text-white font-black text-xs leading-none"><Warehouse size={20} /></span>
       </div>
       <span className="text-[15px] font-bold tracking-tight text-slate-900">
-        E-<span className="bg-linear-to-r from-purple-600 to-teal-700 bg-clip-text text-transparent select-none">boarding</span>
+        E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">boarding</span>
       </span>
     </div>
   </header>
@@ -89,11 +90,11 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
       >
         <div className="px-5 py-5 border-b border-slate-200 flex items-center justify-between  w-full">
           <div className="flex items-center gap-2 ">
-            <div className="w-8 h-8 rounded-md border-2 border-green-400 bg-linear-to-r from-purple-600 to-teal-700 flex items-center justify-center shrink-0">
-              <span className="text-white font-black text-sm leading-none"><Warehouse size={20} /></span>
+            <div className="w-8 h-8 rounded-md  bg-linear-to-r from-slate-600 to-slate-700 flex items-center justify-center shrink-0">
+              <span className="text-white font-black text-sm leading-none"><IoHomeSharp size={17} className="text-white" /></span>
             </div>
             <span className="text-[17px] font-bold tracking-tight text-slate-900">
-              E-<span className="bg-linear-to-r from-purple-600 to-teal-700 bg-clip-text text-transparent select-none">boarding</span>
+              E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">boarding</span>
             </span>
           </div>
 
@@ -121,7 +122,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
 
           <SectionLabel label="Transactions" />
           <SidebarItem icon={<BedDouble size={16} />} label="Boarders" to="/boarders" onNavigate={closeAll} />
-          <SidebarItem icon={<Wallet size={16} />} label="Payments" to="/payments" onNavigate={closeAll} />
+          <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/payments" onNavigate={closeAll} />
           <SidebarItem icon={<ScrollText size={16} />} label="Reports" to="/reports" onNavigate={closeAll} />
 
           <SectionLabel label="Others" />
@@ -210,17 +211,17 @@ const SidebarItem = ({ icon, label, to, onNavigate }: SidebarItemProps) => (
     className={({ isActive }) =>
       `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
         isActive
-          ? "bg-blue-50 text-blue-700"
+          ? "bg-slate-700 text-slate-100"
           : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
       }`
     }
   >
     {({ isActive }) => (
       <>
-        <span className={isActive ? "text-blue-600" : "text-slate-400"}>{icon}</span>
+        <span className={isActive ? "text-slate-100" : "text-slate-400"}>{icon}</span>
         <span>{label}</span>
         {isActive && (
-          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600" />
+          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-slate-100" />
         )}
       </>
     )}

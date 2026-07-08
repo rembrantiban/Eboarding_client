@@ -38,7 +38,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+    <div className="flex items-center justify-center min-h-screen bg-white px-4">
       
       <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
 
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
 
         {/* Logo */}
         <h2 className="text-2xl font-bold text-center  mb-2">
-          E-<span className="bg-linear-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent">boarding</span>
+          E-<span className="bg-linear-to-r from-slate-700 to-slate-800 bg-clip-text text-transparent">boarding</span>
         </h2>
 
         {/* Title */}
@@ -84,7 +84,7 @@ const ForgotPassword = () => {
           <input
             type="email"
             placeholder="Enter your email"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-slate-800"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
             className={`w-full py-3 rounded-lg font-semibold transition ${
               isLoading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-teal-600 hover:bg-teal-800 text-white"
+                : "bg-slate-600 hover:bg-slate-800 text-white"
             }`}
           >
             {isLoading ? "Sending..." : "Send Code"}

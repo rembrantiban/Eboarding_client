@@ -7,7 +7,7 @@ const CTA = () => {
     <section className="relative py-24 px-6 text-center overflow-hidden">
       
       {/* 🔷 GRADIENT BACKGROUND */}
-      <div className="absolute inset-0 z-10 bg-linear-to-br from-purple-200 via-blue-300 to-indigo-300" />
+      <div className="absolute inset-0 z-10 bg-linear-to-br from-slate-200 via-slate-900 to-slate-300" />
 
       {/* 🔷 GLOW EFFECTS */}
       <div className="absolute inset-0 -z-10">

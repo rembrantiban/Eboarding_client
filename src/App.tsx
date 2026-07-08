@@ -20,6 +20,12 @@ import Payment from "./pages/Payment"
 import ProfilePage from './pages/ProfilePage'
 import Report from "@/pages/Report"
 import Announcement from "@/pages/announcement"
+import BoarderDashboard from './pages/BoarderDashboard'
+import BoarderLayout from './components/layout/BoarderLayout'
+import EditAccountPage from "./pages/EditAccountPage"
+import BoardeAnnouncement from './pages/BoarderAnnouncement'
+import MyRoom from "@/pages/MyRoom"
+import ViewOwnAccount from "@/pages/ViewOwnAccount"
 
 function App() {
   return (
@@ -47,7 +53,16 @@ function App() {
             <Route path='/announcements' element={<Announcement />} />
           </Route>
         </Route>
+
+        <Route element={<BoarderLayout />}>
+          <Route path="/boarder-dashboard" element={<BoarderDashboard />} />
+          <Route path='/edit-account' element={<EditAccountPage />} />
+          <Route path='/boarder/announcements' element={<BoardeAnnouncement />} />  
+          <Route path='/my-room' element={<MyRoom />} />
+          <Route path="/view-account" element={<ViewOwnAccount />} />
+        </Route>
       </Routes>
+      
       <Toaster position="top-center" />
     </>
   )

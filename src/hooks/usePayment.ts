@@ -16,8 +16,8 @@ export const usePayment = () => {
   const analytics = usePaymentStore((state) => state.analytics);
   const revenueAnalytics = usePaymentStore((state) => state.revenueAnalytics);
   const getRevenueAnalytics = usePaymentStore((state) => state.getRevenueAnalytics);
-
-
+  const getUpcomingPayment = usePaymentStore((state) => state.getUpcomingPayment);
+  const upcomingPayment = usePaymentStore((state) => state.upcomingPayment);
 
   return {
     payments,
@@ -33,6 +33,8 @@ export const usePayment = () => {
     getAnalytics,
     analytics,
     revenueAnalytics,
-    getRevenueAnalytics
+    getRevenueAnalytics,
+    getUpcomingPayment,
+    upcomingPayment
   };
 };

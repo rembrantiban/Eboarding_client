@@ -1,6 +1,6 @@
 "use client";
 
-import { Building2, Users, ShieldCheck, Sparkles, ArrowRight } from "lucide-react";
+import { Building2, Users, ShieldCheck, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type FeatureProps = {
@@ -78,12 +78,12 @@ const FeatureCard = ({ icon, title, desc, index }: FeatureProps) => (
         flex-shrink: 0;
         width: 40px; height: 40px;
         border-radius: 10px;
-        background: #eff6ff;
+        background: gray;
         border: 1px solid #dbeafe;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #2563eb;
+        color: white;
       }
       .feat-title {
         font-size: 0.875rem;
@@ -111,7 +111,6 @@ const AboutSection = () => {
       <div className="ab-dots" aria-hidden />
 
       {/* Top accent line */}
-      <div className="ab-topline" aria-hidden />
 
       <div className="ab-inner">
 
@@ -147,9 +146,6 @@ const AboutSection = () => {
               portfolio, E-Boarding adapts to your scale and pace.
             </p>
 
-            <a href="#" className="ab-cta">
-              See how it works <ArrowRight size={15} />
-            </a>
 
             {/* STATS */}
             <div className="ab-stats">
@@ -270,7 +266,7 @@ const AboutSection = () => {
           letter-spacing: 0.12em;
           text-transform: uppercase;
           color: #2563eb;
-          background: #eff6ff;
+          background: #dbeafe;
           border: 1px solid #dbeafe;
           padding: 0.3rem 0.9rem;
           border-radius: 999px;
@@ -416,10 +412,10 @@ const AboutSection = () => {
           position: absolute;
           top: 0; left: 0;
           width: 56px; height: 3px;
-          background: #2563eb;
+          background: gray;
           border-radius: 0 0 4px 0;
         }
-        .ab-mv-bar-v { background: #0ea5e9; }
+        .ab-mv-bar-v { background: gray; }
         .ab-mv-chip {
           display: inline-block;
           font-size: 0.65rem;

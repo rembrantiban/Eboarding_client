@@ -19,10 +19,8 @@ import {
   CheckCircle2,
   XCircle,
   ChevronRight,
-  ArrowLeft,
   Camera,
   X,
-  Building2,
 } from "lucide-react";
 import type { User } from "@/store/useAuthStore";
 import { toast } from "sonner"
@@ -58,6 +56,7 @@ const ProfilePage = () => {
     { id: "announcements", label: "Announcements", icon: Bell },
   ]
 
+
   return (
     <>
       <style>{`
@@ -66,16 +65,16 @@ const ProfilePage = () => {
         .pg-root {
           min-height: 100vh;
           display: flex;
-          background: #FCFCFC;
+          background: #F9FAFB;
           font-family: 'Mulish', sans-serif;
         }
 
         /* ── SIDEBAR ── */
         .pg-sidebar {
-          width: 260px;
+          width: 264px;
           min-height: 100vh;
           background: #ffffff;
-          border-right: 1px solid #e2e8f0;
+          border-right: 1px solid #eef1f5;
           display: flex;
           flex-direction: column;
           flex-shrink: 0;
@@ -85,99 +84,40 @@ const ProfilePage = () => {
           overflow-y: auto;
         }
 
-        /* TOP SECTION */
-        .pg-sidebar-top {
-          padding: 1.25rem 1.25rem 0;
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-
-        /* BACK BUTTON */
-        .pg-back {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.4rem;
-          font-size: 0.78rem;
-          font-weight: 600;
-          color: #94a3b8;
-          background: none;
-          border: none;
-          padding: 0;
-          cursor: pointer;
-          transition: color 0.2s;
-          letter-spacing: 0.02em;
-        }
-        .pg-back:hover { color: #2563eb; }
-
-        /* WORDMARK */
-        .pg-wordmark {
-          display: flex;
-          align-items: center;
-          gap: 0.55rem;
-          text-decoration: none;
-          padding: 0.1rem 0;
-        }
-        .pg-wordmark-icon {
-          width: 30px;
-          height: 30px;
-          border-radius: 8px;
-          background: #2563eb;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #fff;
-          flex-shrink: 0;
-        }
-        .pg-wordmark-label {
-          font-family: 'Bricolage Grotesque', sans-serif;
-          font-size: 1rem;
-          font-weight: 800;
-          color: #0f172a;
-          letter-spacing: -0.02em;
-        }
-        .pg-wordmark-label span { color: #2563eb; }
-
-        /* DIVIDER */
-        .pg-divider {
-          height: 1px;
-          background: #f1f5f9;
-          margin: 0 1.25rem;
-        }
-
         /* AVATAR CARD */
         .pg-avatar-card {
-          margin: 0 1.25rem;
+          margin: 1.5rem 1.25rem 0.5rem;
           padding: 1rem;
-          border-radius: 12px;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          border-radius: 14px;
+          background: #F8FAFC;
+          border: 1px solid #E7EBF0;
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 0.85rem;
         }
         .pg-avatar {
-          width: 42px;
-          height: 42px;
+          width: 46px;
+          height: 46px;
           border-radius: 50%;
           overflow: hidden;
           flex-shrink: 0;
-          border: 2px solid #e2e8f0;
+          border: 2px solid #ffffff;
+          box-shadow: 0 0 0 1px #E7EBF0;
         }
         .pg-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .pg-avatar-fallback {
           width: 100%; height: 100%;
-          background: linear-gradient(135deg, #2563eb, #7c3aed);
+          background: linear-gradient(135deg, #2563eb, #4f46e5);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1rem;
+          font-size: 1.05rem;
           font-weight: 700;
           color: #fff;
           font-family: 'Bricolage Grotesque', sans-serif;
         }
         .pg-avatar-name {
-          font-size: 0.85rem;
+          font-size: 0.9rem;
           font-weight: 700;
           color: #0f172a;
           line-height: 1.3;
@@ -186,35 +126,37 @@ const ProfilePage = () => {
           text-overflow: ellipsis;
         }
         .pg-avatar-role {
-          display: inline-block;
-          margin-top: 3px;
-          font-size: 0.68rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3rem;
+          margin-top: 4px;
+          font-size: 0.66rem;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
           color: #2563eb;
-          background: #eff6ff;
-          border: 1px solid #dbeafe;
-          padding: 0.15rem 0.5rem;
-          border-radius: 5px;
+          background: #EFF6FF;
+          border: 1px solid #DBEAFE;
+          padding: 0.15rem 0.55rem;
+          border-radius: 999px;
         }
 
         /* SECTION LABEL */
         .pg-section-label {
-          padding: 0.5rem 1.25rem 0.25rem;
-          font-size: 0.62rem;
+          padding: 1.25rem 1.5rem 0.5rem;
+          font-size: 0.66rem;
           font-weight: 700;
-          letter-spacing: 0.12em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: #cbd5e1;
+          color: #B6BFCA;
         }
 
         /* NAV */
         .pg-nav {
-          padding: 0 0.75rem;
+          padding: 0 0.9rem;
           display: flex;
           flex-direction: column;
-          gap: 2px;
+          gap: 3px;
         }
         .pg-nav-item {
           width: 100%;
@@ -222,21 +164,21 @@ const ProfilePage = () => {
           align-items: center;
           justify-content: space-between;
           gap: 0.75rem;
-          padding: 0.65rem 0.85rem;
-          border-radius: 10px;
+          padding: 0.6rem 0.75rem;
+          border-radius: 11px;
           font-size: 0.85rem;
           font-weight: 600;
           font-family: 'Mulish', sans-serif;
           cursor: pointer;
-          border: none;
-          transition: background 0.18s, color 0.18s;
+          border: 1px solid transparent;
+          transition: background 0.18s, color 0.18s, border-color 0.18s;
           text-align: left;
-          color: #64748b;
+          color: #64748B;
           background: transparent;
         }
         .pg-nav-item:hover {
-          background: #f1f5f9;
-          color: #0f172a;
+          background: #F5F7FA;
+          color: #0F172A;
         }
         .pg-nav-item-inner {
           display: flex;
@@ -246,78 +188,82 @@ const ProfilePage = () => {
         .pg-nav-item-icon {
           width: 32px;
           height: 32px;
-          border-radius: 8px;
-          background: #f1f5f9;
+          border-radius: 9px;
+          background: #F1F5F9;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          transition: background 0.18s;
+          color: #64748B;
+          transition: background 0.18s, color 0.18s;
         }
         .pg-nav-item--active {
-          background: #eff6ff !important;
-          color: #1d4ed8 !important;
-          border: 1px solid #dbeafe;
+          background: #EFF6FF !important;
+          color: #1D4ED8 !important;
+          border: 1px solid #DBEAFE;
         }
         .pg-nav-item--active .pg-nav-item-icon {
-          background: #2563eb;
+          background: #2563EB;
           color: #fff;
         }
-        .pg-nav-chevron {
-          color: #93c5fd;
-          flex-shrink: 0;
+        .pg-nav-chevron { color: #93C5FD; flex-shrink: 0; }
+
+        .pg-badge-dot {
+          background: #EF4444;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 700;
+          line-height: 1;
+          padding: 3px 6px;
+          border-radius: 999px;
         }
 
-        /* SPACER */
         .pg-spacer { flex: 1; }
 
         /* LOGOUT */
         .pg-logout-wrap {
-          padding: 0.75rem;
-          border-top: 1px solid #f1f5f9;
+          padding: 0.9rem;
+          border-top: 1px solid #F1F5F9;
         }
         .pg-logout {
           width: 100%;
           display: flex;
           align-items: center;
           gap: 0.7rem;
-          padding: 0.65rem 0.85rem;
-          border-radius: 10px;
+          padding: 0.6rem 0.75rem;
+          border-radius: 11px;
           font-size: 0.85rem;
           font-weight: 600;
           font-family: 'Mulish', sans-serif;
           cursor: pointer;
           border: none;
           background: transparent;
-          color: #94a3b8;
+          color: #94A3B8;
           transition: background 0.18s, color 0.18s;
           text-align: left;
         }
-        .pg-logout:hover {
-          background: #fff5f5;
-          color: #ef4444;
-        }
+        .pg-logout:hover { background: #FEF2F2; color: #EF4444; }
         .pg-logout-icon {
           width: 32px;
           height: 32px;
-          border-radius: 8px;
-          background: #f1f5f9;
+          border-radius: 9px;
+          background: #F1F5F9;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
-          transition: background 0.18s;
+          transition: background 0.18s, color 0.18s;
         }
-        .pg-logout:hover .pg-logout-icon {
-          background: #fee2e2;
-          color: #ef4444;
-        }
+        .pg-logout:hover .pg-logout-icon { background: #FEE2E2; color: #EF4444; }
 
         /* ── MAIN ── */
         .pg-main {
           flex: 1;
-          padding: 2.5rem;
+          padding: 2.5rem 3rem;
           overflow: auto;
+        }
+        @media (max-width: 768px) {
+          .pg-main { padding: 1.5rem; }
         }
       `}</style>
 
@@ -325,28 +271,6 @@ const ProfilePage = () => {
 
         {/* ── SIDEBAR ── */}
         <aside className="pg-sidebar">
-
-          <div className="pg-sidebar-top">
-            {/* Back */}
-            <button className="pg-back" onClick={() => navigate("/")}>
-              <ArrowLeft size={14} /> Back
-            </button>
-
-            {/* Wordmark */}
-            <div className="pg-wordmark">
-              <div className="pg-wordmark-icon">
-                <Building2 size={16} />
-              </div>
-              <span className="pg-wordmark-label">
-                E<span>·Boarding</span>
-              </span>
-            </div>
-          </div>
-
-          <div style={{ height: "1rem" }} />
-          <div className="pg-divider" />
-          <div style={{ height: "0.75rem" }} />
-
           {/* Avatar card */}
           <div className="pg-avatar-card">
             <div className="pg-avatar">
@@ -361,8 +285,6 @@ const ProfilePage = () => {
               <span className="pg-avatar-role">{user?.user_type || "Member"}</span>
             </div>
           </div>
-
-          <div style={{ height: "1.25rem" }} />
 
           <div className="pg-section-label">Navigation</div>
 
@@ -381,14 +303,10 @@ const ProfilePage = () => {
                     </span>
                     <span className="flex items-center gap-2">
                       {label}
-
                       {id === "announcements" && unreadCount > 0 && (
-                        <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">
-                          {unreadCount}
-                        </span>
+                        <span className="pg-badge-dot">{unreadCount}</span>
                       )}
                     </span>
-
                   </span>
                   {isActive && <ChevronRight size={14} className="pg-nav-chevron" />}
                 </button>
@@ -407,7 +325,6 @@ const ProfilePage = () => {
               Sign out
             </button>
           </div>
-
         </aside>
 
         {/* ── MAIN CONTENT ── */}
@@ -417,7 +334,6 @@ const ProfilePage = () => {
           {activeTab === "payments" && <PaymentHistory />}
           {activeTab === "announcements" && <Announcements />}
         </main>
-
       </div>
     </>
   )
@@ -514,21 +430,23 @@ const ProfileContent = ({ user }: ProfileContentProps) => {
 
   const displayAvatar = avatarPreview ?? user?.avatar_url ?? null;
   const initial = user?.first_name?.charAt(0).toUpperCase() || "U";
+  const firstName = user?.first_name || "there";
 
   return (
     <div className="w-full space-y-8">
-
-      {/* Header */}
-      <div className="flex items-start justify-between">
+      {/* Header — greeting style, matches dashboard pattern */}
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Profile Settings</h1>
-          <p className="text-sm text-gray-400 mt-1">Manage your personal information</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Hi, {firstName} <span role="img" aria-label="wave">👋</span>
+          </h1>
+          <p className="text-sm text-gray-400 mt-1">Here&apos;s your personal information</p>
         </div>
 
         {!editing ? (
           <button
             onClick={() => setEditing(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-[#0f1623] text-white hover:bg-[#1a2535] transition-all duration-200 shadow"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 shadow-sm"
           >
             <Edit3 size={14} />
             Edit Profile
@@ -537,14 +455,14 @@ const ProfileContent = ({ user }: ProfileContentProps) => {
           <div className="flex gap-2">
             <button
               onClick={handleCancel}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition-all"
+              className="px-4 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-linear-to-r from-sky-500 to-indigo-500 text-white hover:opacity-90 transition-all shadow disabled:opacity-60"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-sm disabled:opacity-60"
             >
               <Save size={14} />
               {saving ? "Saving…" : "Save Changes"}
@@ -567,7 +485,7 @@ const ProfileContent = ({ user }: ProfileContentProps) => {
         </div>
       )}
 
-      <div className="bg-white rounded border border-gray-100 shadow-sm divide-y divide-gray-50">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
 
         {/* ── Avatar row ── */}
         <div className="flex items-center gap-5 p-6">
@@ -577,7 +495,7 @@ const ProfileContent = ({ user }: ProfileContentProps) => {
               {displayAvatar ? (
                 <img src={displayAvatar} alt="avatar" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full bg-linear-to-br from-sky-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white">
+                <div className="w-full h-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white">
                   {initial}
                 </div>
               )}
@@ -620,7 +538,7 @@ const ProfileContent = ({ user }: ProfileContentProps) => {
 
           <div>
             <p className="font-semibold text-gray-900">{user?.first_name} {user?.last_name}</p>
-            <span className="inline-block mt-1 text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+            <span className="inline-block mt-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">
               {user?.user_type}
             </span>
             {editing && (
@@ -665,8 +583,8 @@ const MyRooms = () => {
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">My Room</h1>
-          <p className="text-sm text-gray-400">Your current boarding assignment</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">My Room</h1>
+          <p className="text-sm text-gray-400 mt-1">Your current boarding assignment</p>
         </div>
 
         {myBoarding && (
@@ -679,8 +597,8 @@ const MyRooms = () => {
 
       {/* LOADING */}
       {loading ? (
-        <div className="bg-white flex rounded-xl border p-6 animate-pulse space-y-4">
-          <div className="h-130 bg-gray-100 rounded-lg" />
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse space-y-4">
+          <div className="h-64 bg-gray-100 rounded-xl" />
           <div className="h-4 bg-gray-100 w-1/3 rounded" />
           <div className="grid grid-cols-2 gap-3">
             {[...Array(4)].map((_, i) => (
@@ -691,9 +609,9 @@ const MyRooms = () => {
 
       ) : myBoarding ? (
 
-        <div className="bg-white flex  rounded-md border shadow-sm overflow-hidden group hover:shadow-lg transition">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group hover:shadow-md transition">
 
-          <div className="relative h-130 w-full overflow-hidden bg-gray-100">
+          <div className="relative h-72 w-full overflow-hidden bg-gray-100">
 
             {images.length > 0 ? (
               <img
@@ -764,7 +682,7 @@ const MyRooms = () => {
           </div>
 
           {/* BODY */}
-          <div className="p-5 space-y-5">
+          <div className="p-6 space-y-5">
 
             <p className="text-sm text-gray-400">
               Comfortable and secure boarding space with essential amenities.
@@ -785,7 +703,7 @@ const MyRooms = () => {
 
       ) : (
 
-        <div className="bg-white border border-dashed py-16 text-center">
+        <div className="bg-white rounded-2xl border border-dashed border-gray-200 py-16 text-center">
           <Home className="mx-auto text-gray-300" size={28} />
           <p className="text-sm mt-3 text-gray-500 font-medium">
             No room assigned yet
@@ -821,8 +739,8 @@ const Info = ({
   label: string
   value: string
 }) => (
-  <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border">
-    <div className="bg-white p-2 rounded-md shadow-sm">{icon}</div>
+  <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+    <div className="bg-white p-2 rounded-lg shadow-sm">{icon}</div>
     <div>
       <p className="text-xs text-gray-400">{label}</p>
       <p className="text-sm font-semibold text-gray-800">{value}</p>
@@ -848,7 +766,7 @@ const StatusBadge = ({ status }: { status: PaymentStatus }) => {
   }
 
   return (
-    <span className={`px-3 py-1 text-xs rounded-full ${styles[status]}`}>
+    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${styles[status]}`}>
       {status}
     </span>
   )
@@ -857,9 +775,15 @@ const StatusBadge = ({ status }: { status: PaymentStatus }) => {
 type CardColor = "green" | "yellow" | "red"
 
 const iconMap: Record<CardColor, React.ReactNode> = {
-  green: <DollarSign color="#10B981" size={98} />,
-  yellow: <Clock color="#EBD081" size={98} />,
-  red: <AlertTriangle color="#EF4444" size={98} />,
+  green: <DollarSign color="#10B981" size={20} />,
+  yellow: <Clock color="#D97706" size={20} />,
+  red: <AlertTriangle color="#EF4444" size={20} />,
+}
+
+const cardColorStyles: Record<CardColor, string> = {
+  green: "bg-emerald-50 border-emerald-100",
+  yellow: "bg-amber-50 border-amber-100",
+  red: "bg-red-50 border-red-100",
 }
 
 const SummaryCard = ({ label, amount, color }: {
@@ -867,21 +791,17 @@ const SummaryCard = ({ label, amount, color }: {
   amount: number
   color: CardColor
 }) => {
-
-
   return (
-    <div className={`p-4 rounded-md border flex items-center justify-between gap-4 `}>
-
+    <div className={`p-5 rounded-2xl border flex items-center justify-between gap-4 ${cardColorStyles[color]}`}>
       {/* TEXT */}
       <div>
-        <p className="text-xs uppercase">{label}</p>
-        <p className="text-xl font-bold">₱{amount.toLocaleString()}</p>
+        <p className="text-xs uppercase font-semibold text-gray-500 tracking-wide">{label}</p>
+        <p className="text-2xl font-bold text-gray-900 mt-1">₱{amount.toLocaleString()}</p>
       </div>
 
-      <div className="w-10 h-10 flex items-center justify-center rounded-lg bg-white/60">
+      <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-white shadow-sm">
         {iconMap[color]}
       </div>
-
     </div>
   )
 }
@@ -934,17 +854,17 @@ const PaymentHistory = () => {
     <div className="space-y-6">
 
       <div>
-        <h1 className="text-2xl font-bold">Payment History</h1>
-        <p className="text-gray-400 text-sm">Track your monthly rent payments</p>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Payment History</h1>
+        <p className="text-gray-400 text-sm mt-1">Track your monthly rent payments</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      {/* STAT STRIP */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <SummaryCard label="Total Paid" amount={totalPaid} color="green" />
-        <div className="p-4 rounded-md border flex items-center gap-4 w-full max-w-5xl">
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative w-full max-w-2xl">
-
+        <div className="md:col-span-2 p-5 rounded-2xl border border-gray-100 bg-white shadow-sm flex items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full">
+            <div className="relative flex-1 min-w-50">
               {/* 🔍 ICON */}
               <Search
                 size={16}
@@ -957,9 +877,9 @@ const PaymentHistory = () => {
                 placeholder="Search payments..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 text-sm rounded-lg border border-gray-200 
-              bg-white text-gray-700 placeholder:text-gray-400
-              focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400
+                className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl border border-gray-200 
+              bg-gray-50 text-gray-700 placeholder:text-gray-400
+              focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400
               transition-all"
               />
 
@@ -971,18 +891,18 @@ const PaymentHistory = () => {
                   <X size={14} />
                 </button>
               )}
-
             </div>
+
             {/* 🔵 STATUS FILTER */}
             <div className="flex gap-2">
               {["All", "Paid", "Pending", "Overdue"].map((status) => (
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status as PaymentStatus | "All")}
-                  className={`px-4 py-1.5 text-[13px] rounded-full border transition
+                  className={`px-4 py-2 text-[13px] font-medium rounded-full border transition
                       ${statusFilter === status
                       ? "bg-blue-600 text-white border-blue-600"
-                      : "bg-white text-gray-500 hover:bg-gray-100"
+                      : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
                     }
                     `}
                 >
@@ -990,18 +910,12 @@ const PaymentHistory = () => {
                 </button>
               ))}
             </div>
-
-
           </div>
-
-
-
         </div>
-
       </div>
 
       {/* TABLE */}
-      <div className="bg-white border rounded-md overflow-hidden">
+      <div className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-400 text-xs uppercase">
             <tr>
@@ -1016,13 +930,13 @@ const PaymentHistory = () => {
           <tbody>
             {filteredPayments.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-6 text-gray-400">
+                <td colSpan={4} className="text-center py-8 text-gray-400">
                   No payments found
                 </td>
               </tr>
             ) : (
               filteredPayments.map((p, i) => (
-                <tr key={i} className="border-t">
+                <tr key={i} className="border-t border-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <span
@@ -1030,7 +944,7 @@ const PaymentHistory = () => {
                       />
 
                       {/* TEXT */}
-                      <p className="font-medium">
+                      <p className="font-medium text-gray-800">
                         {new Date(p.due_date).toLocaleDateString("en-US", {
                           month: "long",
                           day: "numeric",
@@ -1041,7 +955,7 @@ const PaymentHistory = () => {
                     </div>
                   </td>
 
-                  <td className="px-4 py-3 font-semibold">
+                  <td className="px-4 py-3 font-semibold text-gray-800">
                     ₱{p.amount.toLocaleString()}
                   </td>
 
@@ -1099,10 +1013,13 @@ const Announcements = () => {
       </div>
 
       {/* LIST */}
-      <div className="space-y-1">
+      <div className="space-y-3">
         {announcements.length === 0 ? (
-          <div className="text-center text-gray-400 py-10">
-            No announcements yet
+          <div className="bg-white rounded-2xl border border-dashed border-gray-200 py-16 text-center">
+            <Megaphone className="mx-auto text-gray-300" size={28} />
+            <p className="text-sm mt-3 text-gray-500 font-medium">
+              No announcements yet
+            </p>
           </div>
         ) : (
           announcements.map((item) => (
@@ -1113,7 +1030,7 @@ const Announcements = () => {
                   markAsRead(item.notification_id);
                 }
               }}
-              className={`group cursor-pointer bg-white rounded-lg border p-5 space-y-1 transition
+              className={`group cursor-pointer bg-white rounded-2xl border p-5 space-y-1 shadow-sm transition
               ${item.is_read
                   ? "border-gray-100 hover:shadow-md"
                   : "border-blue-200 bg-blue-50/40 hover:shadow-md"
@@ -1123,7 +1040,7 @@ const Announcements = () => {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <p className="font-semibold text-gray-900 text-sm flex items-center gap-2">
-                    <Megaphone size={20} />
+                    <Megaphone size={18} />
                     {item.title}
                   </p>
 
@@ -1141,7 +1058,7 @@ const Announcements = () => {
               </div>
 
               {/* BODY */}
-              <div className="text-sm text-blue-600/80 leading-relaxed space-y-1">
+              <div className="text-sm text-gray-600 leading-relaxed space-y-1">
                 {item.description?.split("\n").map((line, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.75" />
@@ -1190,7 +1107,7 @@ const Field = ({ label, name, value, readOnly, onChange, type = "text", disabled
           disabled={isDisabled}
           className={`text-sm ${icon ? "pl-9" : ""} rounded-xl border-gray-300 bg-gray-50 text-gray-800
             ${isDisabled ? "opacity-70 cursor-not-allowed" : ""}
-          focus:ring-2 focus:ring-sky-500/30 focus:border-sky-400
+          focus:ring-4 focus:ring-blue-100 focus:border-blue-400
           disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-default
           transition-all duration-200`}
         />

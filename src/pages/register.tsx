@@ -5,7 +5,18 @@ import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useState } from "react"
-import { ArrowLeft } from "lucide-react"
+import {
+  ArrowLeft,
+  User,
+  AtSign,
+  Phone,
+  MapPin,
+  Mail,
+  Lock,
+  Loader2,
+  Check,
+  X as XIcon,
+} from "lucide-react"
 
 const Register = () => {
   const navigate = useNavigate()
@@ -146,26 +157,21 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-10">
 
-      <div className="w-full max-w-6xl flex  overflow-hidden shadow-2xl">
+      <div className="w-full max-w-5xl flex rounded-2xl overflow-hidden bg-white">
 
-        {/* 🔷 LEFT PANEL */}
-        <div className="hidden md:flex w-md bg-teal-700 text-white p-10 flex-col justify-between relative bg-cover bg-center"
-          style={{
-            backgroundImage: "url('/Background.jpg')"
-          }}
-        >
-          <div className="absolute inset-0  bg-linear-to-br from-teal-900/90 via-teal-900/90 to-black/70" />
+        {/* LEFT PANEL */}
+        <div className="hidden md:flex w-80 shrink-0 bg-slate-900 text-white p-10 flex-col justify-between">
 
           <div>
-            <h2 className="text-3xl font-bold mb-4 z-10 relative">🏠 E-<span className="text-blue-500">Boarding</span></h2>
+            <h2 className="text-2xl font-bold mb-4">E-boarding</h2>
 
-            <p className="text-sm opacity-90 mb-6">
+            <p className="text-sm text-white/70 mb-6">
               Smart and simple boarding house management for everyone.
             </p>
 
-            <p className="text-sm leading-relaxed opacity-80">
+            <p className="text-sm leading-relaxed text-white/50">
               E-Boarding is a computerized boarding house management system designed
               to streamline tenant records, room assignments, and payment tracking —
               all in one centralized platform for better efficiency and control.
@@ -174,157 +180,122 @@ const Register = () => {
 
           <button
             onClick={() => navigate("/login")}
-            className="relative z-10 flex items-center gap-2 text-sm opacity-80 hover:opacity-100 hover:text-green-50"
+            className="flex items-center gap-2 text-sm text-white/60 transition-colors hover:text-white"
           >
             <ArrowLeft size={16} /> Back
           </button>
         </div>
 
-        {/* 🔷 RIGHT PANEL */}
-        <div className="w-full md:w-1/2 bg-white p-10">
+        {/* RIGHT PANEL */}
+        <div className="w-full md:w-lg border p-10">
 
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
-            Create Account
+          <h1 className="text-xl font-semibold text-slate-900 mb-1">
+            Create account
           </h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-slate-500 mb-6">
             Sign up to get started
           </p>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4 " onSubmit={handleSubmit}>
 
             {/* NAME */}
             <div className="grid grid-cols-2 gap-3">
-              <div>
+              <Field icon={User} error={errors.first_name}>
                 <Input
                   name="first_name"
                   placeholder="First name"
                   onChange={handleChange}
-                  className={`bg-gray-100 border ${errors.first_name ? "border-red-400" : "border-gray-300"
-                    }`}
+                  className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
                 />
-                {errors.first_name && (
-                  <p className="text-xs text-red-500">{errors.first_name}</p>
-                )}
-              </div>
+              </Field>
 
-              <div>
+              <Field icon={User} error={errors.last_name}>
                 <Input
                   name="last_name"
                   placeholder="Last name"
                   onChange={handleChange}
-                  className={`bg-gray-100 border ${errors.last_name ? "border-red-400" : "border-gray-300"
-                    }`}
+                  className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
                 />
-                {errors.last_name && (
-                  <p className="text-xs text-red-500">{errors.last_name}</p>
-                )}
-              </div>
+              </Field>
             </div>
 
             {/* USERNAME */}
-            <div>
+            <Field icon={AtSign} error={errors.username}>
               <Input
                 name="username"
                 placeholder="Username"
                 onChange={handleChange}
-                className={`bg-gray-100 border ${errors.username ? "border-red-400" : "border-gray-300"
-                  }`}
+                className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
-              {errors.username && (
-                <p className="text-xs text-red-500">{errors.username}</p>
-              )}
-            </div>
+            </Field>
 
             {/* CONTACT */}
-            <div>
+            <Field icon={Phone} error={errors.contact_number}>
               <Input
                 name="contact_number"
                 placeholder="Contact number"
                 onChange={handleChange}
-                className={`bg-gray-100 border ${errors.contact_number ? "border-red-400" : "border-gray-300"
-                  }`}
+                className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
-              {errors.contact_number && (
-                <p className="text-xs text-red-500">
-                  {errors.contact_number}
-                </p>
-              )}
-            </div>
+            </Field>
 
             {/* ADDRESS */}
-            <div>
+            <Field icon={MapPin} error={errors.address}>
               <Input
                 name="address"
                 placeholder="Address"
                 onChange={handleChange}
-                className={`bg-gray-100 border ${errors.address ? "border-red-400" : "border-gray-300"
-                  }`}
+                className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
-              {errors.address && (
-                <p className="text-xs text-red-500">{errors.address}</p>
-              )}
-            </div>
+            </Field>
 
             {/* EMAIL */}
-            <div>
+            <Field icon={Mail} error={errors.email}>
               <Input
                 name="email"
                 type="email"
                 placeholder="Email"
                 onChange={handleChange}
-                className={`bg-gray-100 border ${errors.email ? "border-red-400" : "border-gray-300"
-                  }`}
+                className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
-              {errors.email && (
-                <p className="text-xs text-red-500">{errors.email}</p>
-              )}
-            </div>
+            </Field>
 
             {/* PASSWORD */}
-            <div>
+            <Field icon={Lock} error={errors.password}>
               <Input
                 name="password"
                 type="password"
                 placeholder="Password"
                 onChange={handleChange}
-                className={`bg-gray-100 border ${errors.password ? "border-red-400" : "border-gray-300"
-                  }`}
+                className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
-            </div>
+            </Field>
 
             {/* CONFIRM */}
-            <div>
+            <Field icon={Lock} error={errors.confirmPassword}>
               <Input
                 name="confirmPassword"
                 type="password"
                 placeholder="Confirm password"
                 onChange={handleChange}
-                className={`bg-gray-100 border ${errors.confirmPassword
-                    ? "border-red-400"
-                    : "border-gray-300"
-                  }`}
+                className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
               />
-              {errors.confirmPassword && (
-                <p className="text-xs text-red-500">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
+            </Field>
 
             {/* BUTTON */}
             <Button
               type="submit"
-              className="w-full bg-teal-700 hover:bg-teal-800 text-white"
+              className="w-full bg-slate-900 hover:bg-slate-700 text-white rounded-lg py-2.5"
             >
               {isLoading ? "Registering..." : "Register"}
             </Button>
           </form>
 
-          <p className="text-sm text-center text-gray-500 mt-6">
+          <p className="text-sm text-center text-slate-500 mt-6">
             Already have an account?{" "}
             <span
               onClick={() => navigate("/login")}
-              className="text-teal-700 cursor-pointer hover:underline"
+              className="text-slate-900 font-medium cursor-pointer hover:underline"
             >
               Login
             </span>
@@ -332,17 +303,15 @@ const Register = () => {
         </div>
       </div>
 
-      {/* KEEP YOUR MODAL EXACTLY AS IS */}
+      {/* MODAL — logic unchanged */}
       {modal.type && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-white/10 backdrop-blur-2xl border border-white/20 rounded-2xl p-6 text-center space-y-4 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white border border-slate-100 rounded-2xl p-6 text-center space-y-4 shadow-xl">
 
             {modal.type === "loading" && (
               <>
-                <div className="flex justify-center">
-                  <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                </div>
-                <p className="text-white font-medium">
+                <Loader2 className="w-10 h-10 text-slate-400 animate-spin mx-auto" />
+                <p className="text-slate-900 text-sm font-medium">
                   Creating your account...
                 </p>
               </>
@@ -350,27 +319,23 @@ const Register = () => {
 
             {modal.type === "success" && (
               <>
-                <div className="flex justify-center">
-                  <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center">
-                    ✓
-                  </div>
+                <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto">
+                  <Check className="text-emerald-600" size={22} />
                 </div>
-                <p className="text-white font-semibold">{modal.message}</p>
+                <p className="text-slate-900 text-sm font-medium">{modal.message}</p>
               </>
             )}
 
             {modal.type === "error" && (
               <>
-                <div className="flex justify-center">
-                  <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center">
-                    ✕
-                  </div>
+                <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+                  <XIcon className="text-red-500" size={22} />
                 </div>
-                <p className="text-white font-semibold">{modal.message}</p>
+                <p className="text-slate-900 text-sm font-medium">{modal.message}</p>
 
                 <button
                   onClick={() => setModal({ type: null })}
-                  className="text-sm text-blue-400 hover:underline"
+                  className="text-sm text-slate-500 hover:text-slate-900 hover:underline"
                 >
                   Close
                 </button>
@@ -381,6 +346,32 @@ const Register = () => {
       )}
     </div>
   )
+}
+
+function Field({
+  icon: Icon,
+  error,
+  children,
+}: {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div
+        className={`relative flex items-center rounded-lg bg-white border transition-colors ${
+          error
+            ? "border-red-300"
+            : "border-slate-200 hover:border-slate-300 focus-within:border-slate-400"
+        }`}
+      >
+        <Icon size={16} className="absolute left-3 text-slate-400" />
+        {children}
+      </div>
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  );
 }
 
 export default Register

@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
-import { Phone, Star, Warehouse } from "lucide-react";
+import { Bell, LayoutDashboard, Phone, Star, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -10,14 +10,25 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
-import { User, LogOut } from "lucide-react"
+import { LogOut } from "lucide-react"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
 import { HashLink } from "react-router-hash-link"
+import { IoHomeSharp } from "react-icons/io5";
+
+const NAV_LINKS = [
+  { label: "Home", to: "/" },
+  { label: "Features", to: "/#features", hash: true },
+  { label: "About", to: "/#about", hash: true },
+  { label: "Location", to: "/#location", hash: true },
+];;
+
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  const initials = `${user?.first_name?.charAt(0) ?? ""}${user?.last_name?.charAt(0) ?? ""
+            }`.toUpperCase();
 
 
   const content = (
@@ -82,83 +93,77 @@ const Header = () => {
 
           {/* LOGO */}
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-md border-2 border-green-400 bg-linear-to-r from-purple-600 to-teal-700 flex items-center justify-center shrink-0">
-              <span className="text-white font-black text-sm leading-none"><Warehouse size={20} /></span>
+            <div className="w-8 h-8 rounded-md border-2 border-slate-400 bg-linear-to-r from-slate-800 to-slate-700 flex items-center justify-center shrink-0">
+              <span className="text-white font-black text-sm leading-none"><IoHomeSharp size={20} /></span>
             </div>
             <h1 className="text-xl font-bold tracking-tight">
 
-              E- <span className="bg-linear-to-r from-blue-600 to-teal-700 bg-clip-text text-transparent select-none ">BOARDING</span>
+              E- <span className="text-slate-700 ">BOARDING</span>
             </h1>
           </div>
 
           {/* NAV */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <nav className="hidden items-center gap-1 text-sm font-medium text-slate-600 md:flex">
+            <nav className="hidden items-center gap-1 md:flex">
+              {NAV_LINKS.map((item) =>
+                item.hash ? (
+                  <HashLink
+                    key={item.label}
+                    smooth
+                    to={item.to}
+                    className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    {item.label}
+                  </HashLink>
+                ) : (
+                  <Link
+                    key={item.label}
+                    to={item.to}
+                    className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
 
-            <a href="/" className="relative group">
-              Home
-              <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </a>
-
-            {user && (
-              <Link to="/viewroom" className="relative group">
-                Rooms
-                <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-              </Link>
-            )}
-
-            <HashLink smooth to="/#features" className="relative group">
-              Features
-              <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </HashLink>
-
-            <HashLink smooth to="/#about" className="relative group">
-              About
-              <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </HashLink>
-
-            <HashLink smooth to="/#location" className="relative group">
-              Location
-              <span className="absolute left-0 -bottom-1 w-0 h-2 bg-blue-500 transition-all group-hover:w-full"></span>
-            </HashLink>
-
+              {user && (
+                <Link
+                  to="/viewroom"
+                  className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                >
+                  Rooms
+                </Link>
+              )}
+            </nav>
           </nav>
 
           {/* ACTIONS */}
           {user ? (
-            <DropdownMenu>
+            <div className="flex items-center gap-4">
+              <div className="w-9 border p-2 rounded-full h-9 text-gray-800">
+                <Bell size={20} />
+              </div>
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition">
-
-                  {/* 🔷 AVATAR */}
-                  <div className="w-9 h-9 rounded-full bg-linear-to-r from-blue-500 to-indigo-500 text-white flex items-center justify-center text-xs font-semibold shadow-sm">
-                    {user?.first_name
-                      ?.split(" ")
-                      .map(n => n[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()}
+                <button className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-slate-100">
+                  <div className="relative shrink-0">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+                      {initials}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-2 ring-white">
+                      <User size={10} className="text-slate-500" />
+                    </div>
                   </div>
-
-                  {/* 🔷 USER INFO */}
-                  <div className="flex flex-col items-start leading-tight">
-
-                    <span className="text-sm font-medium max-w-30 truncate">
-                      {user?.first_name} {user?.last_name}
-                    </span>
-
-                    <Badge className="text-[11px] bg-blue-200 text-blue-800  capitalize">
-                      {user?.user_type}
-                    </Badge>
-
-                  </div>
-
                 </button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
-                  <User size={16} className="mr-2" />
-                  Profile
+                <DropdownMenuItem
+                  onClick={() => navigate("/boarder-dashboard")}
+                  className="cursor-pointer"
+                >
+                  <LayoutDashboard size={16} className="mr-2" />
+                  Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -169,6 +174,8 @@ const Header = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            </div>
           ) : (
             <div className="flex gap-2">
               <Button variant="ghost" onClick={() => navigate("/login")}>
@@ -177,7 +184,7 @@ const Header = () => {
 
               <Button
                 onClick={() => navigate("/register")}
-                className="bg-linear-to-r from-blue-600 to-indigo-600 text-white hover:opacity-90"
+                className="bg-linear-to-r from-slate-700 to-slate-500 text-white hover:opacity-90"
               >
                 Register
               </Button>

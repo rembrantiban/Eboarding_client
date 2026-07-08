@@ -45,7 +45,7 @@ const Features = () => {
       />
 
       {/* Soft blue blob */}
-      <div className="absolute top-0 right-0 w-125 h-125 bg-blue-100 rounded-full blur-[120px] opacity-60 -z-10 translate-x-1/3 -translate-y-1/3" />
+      <div className="absolute top-0 right-0 w-125 h-125 bg-slate-100 rounded-full blur-[120px] opacity-60 -z-10 translate-x-1/3 -translate-y-1/3" />
 
       <div className="max-w-6xl mx-auto">
 
@@ -94,10 +94,8 @@ const Features = () => {
                     {feature.number}
                   </span>
                   <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center text-white shadow-md transition-transform duration-300 group-hover:-translate-y-1"
-                    style={{
-                      background: `linear-gradient(135deg, ${feature.accent}, ${feature.accent}99)`,
-                    }}
+                    className="w-11 h-11 rounded-xl flex items-center justify-center text-white bg-slate-800 shadow-md transition-transform duration-300 group-hover:-translate-y-1"
+                    
                   >
                     <Icon size={20} />
                   </div>

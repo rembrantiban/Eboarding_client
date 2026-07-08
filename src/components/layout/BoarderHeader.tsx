@@ -1,0 +1,269 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { useNavigate, Link } from "react-router-dom";
+import {
+  Bell,
+  User,
+  LogOut,
+  LayoutDashboard,
+  Wallet,
+  Home,
+  Megaphone,
+  Wrench,
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { HashLink } from "react-router-hash-link";
+import { IoHomeSharp } from "react-icons/io5";
+
+const NAV_LINKS = [
+  { label: "Home", to: "/" },
+  { label: "Features", to: "/#features", hash: true },
+  { label: "About", to: "/#about", hash: true },
+  { label: "Location", to: "/#location", hash: true },
+];
+
+// TODO: replace with real data from useNotifications hook
+const NOTIFICATIONS = [
+  {
+    id: 1,
+    icon: Wallet,
+    title: "Payment due soon",
+    message: "Your July rent of ₱3,500 is due in 8 days.",
+    time: "2h ago",
+    unread: true,
+  },
+  {
+    id: 2,
+    icon: Wrench,
+    title: "Maintenance scheduled",
+    message: "Aircon servicing for Room 204 on July 10, 9 AM.",
+    time: "5h ago",
+    unread: true,
+  },
+  {
+    id: 3,
+    icon: Megaphone,
+    title: "House announcement",
+    message: "Water interruption this Saturday, 8 AM–12 PM.",
+    time: "1d ago",
+    unread: false,
+  },
+  {
+    id: 4,
+    icon: Home,
+    title: "Welcome to E-Boarding",
+    message: "Your account has been set up successfully.",
+    time: "3d ago",
+    unread: false,
+  },
+];
+
+const Header = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    const toastId = toast.loading("Logging out...");
+
+    try {
+      await logout();
+      toast.success("Logged out successfully!", { id: toastId });
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+      toast.error("Logout failed. Try again.", { id: toastId });
+    }
+  };
+
+  const initials = `${user?.first_name?.charAt(0) ?? ""}${user?.last_name?.charAt(0) ?? ""
+            }`.toUpperCase();
+
+
+  const unreadCount = NOTIFICATIONS.filter((n) => n.unread).length;
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+        {/* LOGO */}
+        <div className="flex shrink-0 items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 shadow-sm">
+            <IoHomeSharp size={17} className="text-white" />
+          </div>
+          <h1 className="text-lg font-semibold tracking-tight text-slate-900">
+            E-<span className="text-slate-500">Boarding</span>
+          </h1>
+        </div>
+
+        {/* NAV */}
+        <nav className="hidden items-center gap-1 text-sm font-medium text-slate-600 md:flex">
+          <nav className="hidden items-center gap-1 md:flex">
+            {NAV_LINKS.map((item) =>
+              item.hash ? (
+                <HashLink
+                  key={item.label}
+                  smooth
+                  to={item.to}
+                  className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {item.label}
+                </HashLink>
+              ) : (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+
+            {user && (
+              <Link
+                to="/viewroom"
+                className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              >
+                Rooms
+              </Link>
+            )}
+          </nav>
+        </nav>
+
+        {/* ACTIONS */}
+        {user ? (
+          <div className="flex items-center gap-2">
+            {/* NOTIFICATIONS */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="relative flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900">
+                  <Bell size={18} />
+                  {unreadCount > 0 && (
+                    <span className="absolute right-1 top-1 flex h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="w-80 p-0">
+                <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                  <p className="text-sm font-semibold text-slate-900">
+                    Notifications
+                  </p>
+                  {unreadCount > 0 && (
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                      {unreadCount} new
+                    </span>
+                  )}
+                </div>
+
+                <div className="max-h-80 overflow-y-auto">
+                  {NOTIFICATIONS.length === 0 ? (
+                    <p className="px-4 py-6 text-center text-sm text-slate-400">
+                      You're all caught up.
+                    </p>
+                  ) : (
+                    NOTIFICATIONS.map(
+                      ({ id, icon: Icon, title, message, time, unread }) => (
+                        <div
+                          key={id}
+                          className="flex cursor-pointer items-start gap-3 border-b border-slate-50 px-4 py-3 last:border-0 hover:bg-slate-50"
+                        >
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100">
+                            <Icon size={14} className="text-slate-500" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <p className="truncate text-sm font-medium text-slate-900">
+                                {title}
+                              </p>
+                              {unread && (
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                              )}
+                            </div>
+                            <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">
+                              {message}
+                            </p>
+                            <p className="mt-1 text-[11px] text-slate-400">
+                              {time}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    )
+                  )}
+                </div>
+
+                <div className="border-t border-slate-100 px-4 py-2.5">
+                  <button
+                    onClick={() => navigate("/notifications")}
+                    className="w-full text-center text-xs font-medium text-slate-600 hover:text-slate-900"
+                  >
+                    View all notifications
+                  </button>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* PROFILE */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-slate-100">
+                  <div className="relative shrink-0">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+                      {initials}
+                    </div>
+                    <div className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-2 ring-white">
+                      <User size={10} className="text-slate-500" />
+                    </div>
+                  </div>
+                </button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem
+                  onClick={() => navigate("/boarder-dashboard")}
+                  className="cursor-pointer"
+                >
+                  <LayoutDashboard size={16} className="mr-2" />
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="cursor-pointer text-red-500 focus:text-red-500"
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/login")}
+              className="text-slate-600 hover:text-slate-900"
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => navigate("/register")}
+              className="bg-slate-900 text-white hover:bg-slate-800"
+            >
+              Register
+            </Button>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
+
+export default Header;

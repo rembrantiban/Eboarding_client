@@ -82,6 +82,32 @@ export type RevenueAnalytics = {
   }[];
 };
 
+export type UpcomingPayment = {
+  payment_id: number;
+
+  label: string;
+
+  room: string;
+  bed: string;
+
+  amount: number;
+  penalty: number;
+  totalAmount: number;
+
+  dueDate: string;
+
+  daysLeft: number;
+
+  paymentState: "Upcoming" | "Due Today" | "Overdue";
+
+  status: "Pending" | "Overdue";
+};
+
+export type UpcomingPaymentResponse = {
+  hasUpcomingPayment: boolean;
+  payment?: UpcomingPayment;
+};
+
 type PaymentStore = {
   payments: Payment[];
   Reports: Payment[];
@@ -90,6 +116,9 @@ type PaymentStore = {
   calendarEvents: CalendarEvent[];
   analytics: PaymentAnalytics[];
   revenueAnalytics: RevenueAnalytics | null;
+  upcomingPayment: UpcomingPayment | null;
+
+  getUpcomingPayment: () => Promise<void>;
 
   getRevenueAnalytics: () => Promise<void>;
   getAnalytics: () => Promise<void>;
@@ -108,7 +137,34 @@ export const usePaymentStore = create<PaymentStore>((set) => ({
   calendarEvents: [],
   analytics: [],
   revenueAnalytics: null,
+  upcomingPayment: null,
 
+
+  getUpcomingPayment: async () => {
+  try {
+    set({ loading: true });
+
+    const res = await axiosInstance.get<UpcomingPaymentResponse>(
+      "/payments/my-upcoming-payment"
+    );
+
+    set({
+      upcomingPayment: res.data.hasUpcomingPayment
+        ? res.data.payment ?? null
+        : null,
+      loading: false,
+    });
+
+  } catch (error) {
+
+    set({ loading: false });
+
+    console.error(
+      "Upcoming payment fetch error:",
+      error
+    );
+  }
+},
   getRevenueAnalytics: async () => {
     try {
 

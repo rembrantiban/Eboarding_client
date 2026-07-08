@@ -123,7 +123,7 @@ const BoardingFullCalendar = () => {
         <div className="flex flex-col gap-4">
 
           {/* SUMMARY CARD */}
-          <div className="bg-blue-600 rounded-2xl p-5 text-white shadow-md">
+          <div className="bg-slate-700 rounded-2xl p-5 text-white shadow-md">
             <div className="flex items-center gap-2 mb-3 opacity-80">
               <CreditCard size={15} />
               <span className="text-xs font-semibold tracking-wide uppercase">
