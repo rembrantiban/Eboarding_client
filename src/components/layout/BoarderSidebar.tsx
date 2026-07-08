@@ -11,6 +11,7 @@ import {
     Layers
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAnnouncement } from "@/hooks/useAnnouncement"
 
 const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/boarder-dashboard" },
@@ -24,6 +25,7 @@ const navItems = [
 export default function Sidebar() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const { markAllAsRead, getUnreadCount } = useAnnouncement();
 
     const currentPath =
         typeof window !== "undefined" ? window.location.pathname : "";
@@ -66,24 +68,30 @@ export default function Sidebar() {
                     return (
                         <button
                             key={path}
-                            onClick={() => navigate(path)}
-                            className={`
-                                flex
-                                w-full
-                                items-center
-                                gap-3
-                                rounded-lg
-                                px-4
-                                py-2.5
-                                text-left
-                                text-sm
-                                transition-colors
-                                ${
-                                    isActive
-                                        ? "bg-slate-900 font-medium text-white"
-                                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                            onClick={async () => {
+                                if (path === "/boarder/announcements") {
+                                    await markAllAsRead();
+                                    await getUnreadCount();
                                 }
-                            `}
+
+                                navigate(path);
+                            }}
+                            className={`
+                                    flex
+                                    w-full
+                                    items-center
+                                    gap-3
+                                    rounded-lg
+                                    px-4
+                                    py-2.5
+                                    text-left
+                                    text-sm
+                                    transition-colors
+                                    ${isActive
+                                    ? "bg-slate-900 font-medium text-white"
+                                    : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                                }
+                        `}
                         >
                             <Icon size={18} />
                             {label}

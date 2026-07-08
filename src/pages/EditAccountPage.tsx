@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Camera,
@@ -32,15 +32,35 @@ export default function EditAccountPage() {
         user?.avatar_url ?? null
     )
 
-    const [form, setForm] = useState({
-        firstName: "Rembrant",
-        lastName: "Iban",
-        email: user?.email ?? "",
-        contact_number: user?.contact_number ?? "",
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    contact_number: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+});
+
+const initialized = useRef(false);
+
+useEffect(() => {
+    if (!user || initialized.current) return;
+
+    initialized.current = true;
+    //eslint-disable-next-line
+    setForm({
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        contact_number: user.contact_number,
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
     });
+
+    setPreview(user.avatar_url ?? null);
+}, [user]);
 
     const handleChange =
         (field: keyof typeof form) =>

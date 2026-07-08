@@ -22,6 +22,8 @@ import {
 import { toast } from "sonner";
 import { HashLink } from "react-router-hash-link";
 import { IoHomeSharp } from "react-icons/io5";
+import { useAnnouncement } from "@/hooks/useAnnouncement";
+import { useEffect } from "react";
 
 const NAV_LINKS = [
   { label: "Home", to: "/" },
@@ -30,45 +32,24 @@ const NAV_LINKS = [
   { label: "Location", to: "/#location", hash: true },
 ];
 
-// TODO: replace with real data from useNotifications hook
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    icon: Wallet,
-    title: "Payment due soon",
-    message: "Your July rent of ₱3,500 is due in 8 days.",
-    time: "2h ago",
-    unread: true,
-  },
-  {
-    id: 2,
-    icon: Wrench,
-    title: "Maintenance scheduled",
-    message: "Aircon servicing for Room 204 on July 10, 9 AM.",
-    time: "5h ago",
-    unread: true,
-  },
-  {
-    id: 3,
-    icon: Megaphone,
-    title: "House announcement",
-    message: "Water interruption this Saturday, 8 AM–12 PM.",
-    time: "1d ago",
-    unread: false,
-  },
-  {
-    id: 4,
-    icon: Home,
-    title: "Welcome to E-Boarding",
-    message: "Your account has been set up successfully.",
-    time: "3d ago",
-    unread: false,
-  },
-];
+const categoryIcons = {
+  General: Home,
+  Billing: Wallet,
+  Maintenance: Wrench,
+} as const;
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { announcements, getAnnouncements, unreadCount, getUnreadCount, markAsRead } = useAnnouncement();
+
+  useEffect(() => {
+    if (!user) return;
+
+    getAnnouncements();
+    getUnreadCount();
+    //eslint-disable-next-line
+  }, [user]);
 
   const handleLogout = async () => {
     const toastId = toast.loading("Logging out...");
@@ -83,11 +64,8 @@ const Header = () => {
     }
   };
 
-  const initials = `${user?.first_name?.charAt(0) ?? ""}${user?.last_name?.charAt(0) ?? ""
-            }`.toUpperCase();
-
-
-  const unreadCount = NOTIFICATIONS.filter((n) => n.unread).length;
+  const initials = `${user?.first_name?.charAt(0) ?? ""}${user?.last_name?.charAt(0) ?? ""}`.toUpperCase();
+  const preview = user?.avatar_url ?? null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-xl">
@@ -164,48 +142,73 @@ const Header = () => {
                 </div>
 
                 <div className="max-h-80 overflow-y-auto">
-                  {NOTIFICATIONS.length === 0 ? (
+                  {announcements.length === 0 ? (
                     <p className="px-4 py-6 text-center text-sm text-slate-400">
                       You're all caught up.
                     </p>
                   ) : (
-                    NOTIFICATIONS.map(
-                      ({ id, icon: Icon, title, message, time, unread }) => (
+                    announcements.map((item) => {
+                      const CategoryIcon =
+                        categoryIcons[item.category] ?? Megaphone;
+
+                      return (
                         <div
-                          key={id}
+                          key={item.notification_id}
+                          onClick={async () => {
+                            if (!item.is_read) {
+                              await markAsRead(item.notification_id);
+                              await getAnnouncements();
+                              await getUnreadCount();
+                            }
+                            navigate("/boarder/announcements");
+                          }}
                           className="flex cursor-pointer items-start gap-3 border-b border-slate-50 px-4 py-3 last:border-0 hover:bg-slate-50"
                         >
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100">
-                            <Icon size={14} className="text-slate-500" />
+                            <CategoryIcon
+                              size={14}
+                              className="text-slate-500"
+                            />
                           </div>
+
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-1.5">
                               <p className="truncate text-sm font-medium text-slate-900">
-                                {title}
+                                {item.title}
                               </p>
-                              {unread && (
-                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+
+                              {!item.is_read && (
+                                <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
                               )}
                             </div>
+
                             <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">
-                              {message}
+                              {item.description}
                             </p>
+
                             <p className="mt-1 text-[11px] text-slate-400">
-                              {time}
+                              {new Date(item.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
                             </p>
                           </div>
                         </div>
-                      )
-                    )
+                      );
+                    })
                   )}
                 </div>
 
                 <div className="border-t border-slate-100 px-4 py-2.5">
                   <button
-                    onClick={() => navigate("/notifications")}
+                    onClick={() => navigate("/boarder/announcements")}
                     className="w-full text-center text-xs font-medium text-slate-600 hover:text-slate-900"
                   >
-                    View all notifications
+                    View all announcements
                   </button>
                 </div>
               </DropdownMenuContent>
@@ -216,9 +219,17 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-slate-100">
                   <div className="relative shrink-0">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
-                      {initials}
-                    </div>
+                    {preview ? (
+                      <img
+                        src={preview}
+                        alt="Avatar"
+                        className="h-9 w-9 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-white">
+                        {initials}
+                      </div>
+                    )}
                     <div className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-white ring-2 ring-white">
                       <User size={10} className="text-slate-500" />
                     </div>

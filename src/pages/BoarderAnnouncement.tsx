@@ -1,70 +1,31 @@
 "use client";
 
-import { useState } from "react";
-import { Pin, Bell, MessageCircle, ChevronRight, Megaphone } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Bell, Megaphone } from "lucide-react";
+import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 
-type Category = "All" | "Maintenance" | "Billing" | "Events" | "General";
+type Category = "All" | "Maintenance" | "Billing" | "General";
 
 // TODO: replace with real data from useAnnouncements hook
-const categories: Category[] = ["All", "Maintenance", "Billing", "Events", "General"];
+const categories: Category[] = ["All", "Maintenance", "Billing", "General"];
 
-const pinnedAnnouncement = {
-    id: "0",
-    author: "Management Office",
-    avatar: "/avatar.jpg",
-    date: "Jul 5, 2026",
-    category: "Maintenance" as Category,
-    title: "Water interruption scheduled this Saturday",
-    body:
-        "Water service will be temporarily unavailable from 8:00 AM to 12:00 PM this Saturday, July 11, for scheduled maintenance of the main line. Please store water in advance.",
-};
 
-const announcements = [
-    {
-        id: "1",
-        author: "Management Office",
-        avatar: "/avatar.jpg",
-        date: "Jul 3, 2026",
-        category: "Billing" as Category,
-        title: "July rent statements are now available",
-        body:
-            "You can now view and download your July billing statement from the Payments tab. Please settle your balance on or before the 15th to avoid late fees.",
-        comments: 4,
-    },
-    {
-        id: "2",
-        author: "Management Office",
-        avatar: "/avatar.jpg",
-        date: "Jun 28, 2026",
-        category: "Events" as Category,
-        title: "Boarders' movie night this Friday",
-        body:
-            "Join us at the common lounge this Friday at 7 PM for a movie night. Snacks will be provided. Feel free to bring suggestions for what we should watch next month.",
-        comments: 12,
-    },
-    {
-        id: "3",
-        author: "Management Office",
-        avatar: "/avatar.jpg",
-        date: "Jun 20, 2026",
-        category: "General" as Category,
-        title: "Updated house rules on visitor hours",
-        body:
-            "Starting July 1, visitor hours will be extended to 9 PM on weekdays and 10 PM on weekends. Please remind your guests to log in at the front desk.",
-        comments: 2,
-    },
-];
+
 
 const categoryStyles: Record<Category, string> = {
     All: "bg-slate-100 text-slate-600",
     Maintenance: "bg-amber-50 text-amber-700",
     Billing: "bg-rose-50 text-rose-700",
-    Events: "bg-emerald-50 text-emerald-700",
     General: "bg-slate-100 text-slate-600",
 };
 
 export default function AnnouncementsPage() {
     const [activeCategory, setActiveCategory] = useState<Category>("All");
+    const { announcements, getAnnouncements } = useAnnouncementStore();
+
+    useEffect(() => {
+        getAnnouncements();
+    }, [getAnnouncements]);
 
     const filtered =
         activeCategory === "All"
@@ -95,37 +56,16 @@ export default function AnnouncementsPage() {
                         <button
                             key={category}
                             onClick={() => setActiveCategory(category)}
-                            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                                activeCategory === category
+                            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors ${activeCategory === category
                                     ? "bg-slate-900 text-white"
                                     : "bg-white text-slate-500 hover:text-slate-900"
-                            }`}
+                                }`}
                         >
                             {category}
                         </button>
                     ))}
                 </div>
 
-                {/* Pinned announcement */}
-                {activeCategory === "All" && (
-                    <section className="rounded-2xl bg-slate-900 p-6">
-                        <div className="flex items-center gap-2 text-xs font-medium text-white/60">
-                            <Pin size={12} />
-                            Pinned
-                        </div>
-                        <h2 className="mt-3 text-base font-semibold text-white">
-                            {pinnedAnnouncement.title}
-                        </h2>
-                        <p className="mt-1.5 text-sm leading-relaxed text-white/70">
-                            {pinnedAnnouncement.body}
-                        </p>
-                        <div className="mt-4 flex items-center gap-3 text-xs text-white/50">
-                            <span>{pinnedAnnouncement.author}</span>
-                            <span>·</span>
-                            <span>{pinnedAnnouncement.date}</span>
-                        </div>
-                    </section>
-                )}
 
                 {/* Feed */}
                 <section className="space-y-4">
@@ -144,30 +84,36 @@ export default function AnnouncementsPage() {
                     ) : (
                         filtered.map((item) => (
                             <article
-                                key={item.id}
+                                key={item.notification_id}
                                 className="rounded-2xl bg-white p-6"
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="flex items-center gap-3">
                                         <img
-                                            src={item.avatar}
+                                            src={item.created_by_avatar || ""}
                                             alt=""
                                             className="h-10 w-10 rounded-full object-cover"
                                         />
                                         <div>
                                             <p className="text-sm font-medium text-slate-900">
-                                                {item.author}
+                                                {item.created_by_name}
                                             </p>
                                             <p className="text-xs text-slate-500">
-                                                {item.date}
+                                                {new Date(item.created_at).toLocaleDateString(
+                                                    "en-US",
+                                                    {
+                                                        month: "short",
+                                                        day: "numeric",
+                                                        year: "numeric",
+                                                    }
+                                                )}
                                             </p>
                                         </div>
                                     </div>
 
                                     <span
-                                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
-                                            categoryStyles[item.category]
-                                        }`}
+                                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${categoryStyles[item.category]
+                                            }`}
                                     >
                                         {item.category}
                                     </span>
@@ -177,14 +123,8 @@ export default function AnnouncementsPage() {
                                     {item.title}
                                 </h3>
                                 <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
-                                    {item.body}
+                                    {item.description}
                                 </p>
-
-                                <button className="mt-4 flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900">
-                                    <MessageCircle size={14} />
-                                    {item.comments} comments
-                                    <ChevronRight size={12} />
-                                </button>
                             </article>
                         ))
                     )}
