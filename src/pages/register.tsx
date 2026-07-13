@@ -173,7 +173,7 @@ const Register = () => {
 
             <p className="text-sm leading-relaxed text-white/50">
               E-Boarding is a computerized boarding house management system designed
-              to streamline tenant records, room assignments, and payment tracking —
+              to streamline boarder records, room assignments, and payment tracking —
               all in one centralized platform for better efficiency and control.
             </p>
           </div>

@@ -4,7 +4,7 @@ import { Users, CreditCard, BarChart } from "lucide-react"
 
 const features = [
   {
-    title: "Tenant Management",
+    title: "Boarder Management",
     desc: "Manage tenant records, profiles, and room assignments efficiently.",
     icon: Users,
     number: "01",

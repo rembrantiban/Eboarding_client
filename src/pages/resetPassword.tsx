@@ -48,7 +48,7 @@ const ResetPassword = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white px-4">
       
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+      <div className="w-full max-w-sm bg-white p-8 rounded shadow">
 
         {/* Back */}
         <Button
@@ -84,9 +84,10 @@ const ResetPassword = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
 
-          <input
+        <div className="hidden">
+            <input
             type="email"
             placeholder="Email"
             className="w-full px-4 py-3 border rounded-lg bg-gray-100 cursor-not-allowed"
@@ -94,11 +95,12 @@ const ResetPassword = () => {
             onChange={(e) => setEmail(e.target.value)}
             readOnly
           />
+        </div>
 
           <input
             type="text"
             placeholder="Enter 6-digit code"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-slate-500"
+            className="w-full px-4 py-1.5 border rounded-lg focus:outline-none focus:ring focus:ring-slate-500"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             required
@@ -108,7 +110,7 @@ const ResetPassword = () => {
           <input
             type="password"
             placeholder="New password"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-slate-500"
+            className="w-full px-4 py-1.5 border rounded-lg focus:outline-none focus:ring focus:ring-slate-500"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

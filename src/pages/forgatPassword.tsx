@@ -40,7 +40,7 @@ const ForgotPassword = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white px-4">
       
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg">
+      <div className="w-full max-w-sm bg-white p-8 rounded shadow-sm">
 
         {/* Back Button */}
         <Button
@@ -84,7 +84,7 @@ const ForgotPassword = () => {
           <input
             type="email"
             placeholder="Enter your email"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:ring-slate-800"
+            className="w-full px-4 py-1.5 border rounded-lg focus:outline-none focus:ring focus:ring-slate-800"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
