@@ -1,70 +1,53 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-//import { useRoomAssignment } from "@/hooks/useRoomAssignment";
+import type { AssignedBoarder } from "@/store/useRoomAssignmentStore";
 
-import { MOCK_ASSIGNMENTS } from "./Data";
-import type { EnrichedAssignment, StatusFilter } from "./types";
+import type { StatusFilter } from "./types";
 
 import StatsCards from "./StatsCard";
 import AssignmentToolbar from "./AssignmentToolbar";
 import AssignmentTable from "./AssignmentTable";
 import AssignmentFormModal from "./AssignmentFormModal";
 import AssignmentDetailsModal from "./AssignmentDetailsModal";
+import { useRoomAssignment } from "@/hooks/useRoomAssignment";
 
 export default function RoomAssignmentPage() {
-    const [assignments, setAssignments] = useState<EnrichedAssignment[]>(MOCK_ASSIGNMENTS);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
-    const [selected, setSelected] = useState<EnrichedAssignment | null>(null);
+    const [selected, setSelected] = useState<AssignedBoarder | null>(null);
     const [showAssignModal, setShowAssignModal] = useState(false);
-   // const [editingAssignment, setEditingAssignment] = useState<EnrichedAssignment | null>(null);
+    const { assignedBoarders, getAssignments } = useRoomAssignment();
 
-    //const { assignRoom, getAssignments } = useRoomAssignment();
+    useEffect(() => {
+        getAssignments();
+      // eslint-disable-next-line
+    }, []);
 
     const filtered = useMemo(() => {
-        return assignments.filter((a) => {
+        return assignedBoarders.filter((a) => {
             const matchesStatus = statusFilter === "All" || a.status === statusFilter;
             const matchesSearch =
                 search.trim() === "" ||
-                a.user_name.toLowerCase().includes(search.toLowerCase()) ||
-                a.room_number.toLowerCase().includes(search.toLowerCase());
+                `${a.first_name} ${a.last_name}`
+                    .toLowerCase()
+                    .includes(search.toLowerCase()) ||
+                a.room_number
+                    .toLowerCase()
+                    .includes(search.toLowerCase());
             return matchesStatus && matchesSearch;
         });
-    }, [assignments, search, statusFilter]);
+    }, [assignedBoarders, search, statusFilter]);
 
     const counts = useMemo(
         () => ({
-            Active: assignments.filter((a) => a.status === "Active").length,
-            Transferred: assignments.filter((a) => a.status === "Transferred").length,
-            "Checked-Out": assignments.filter((a) => a.status === "Checked-Out").length,
+            Active: assignedBoarders.filter((a) => a.status === "Active").length,
+            Transferred: assignedBoarders.filter((a) => a.status === "Transferred").length,
+            "Checked-Out": assignedBoarders.filter((a) => a.status === "Checked-Out").length,
         }),
-        [assignments]
+        [assignedBoarders]
     );
-
-
-
-
-  
-
-
-    const handleCheckout = (a: EnrichedAssignment) => {
-        // TODO: call your real checkout mutation here
-        setAssignments((prev) =>
-            prev.map((r) =>
-                r.id === a.id
-                    ? { ...r, status: "Checked-Out", actual_checkout: new Date().toISOString().slice(0, 10) }
-                    : r
-            )
-        );
-    };
-
-    const handleDelete = (a: EnrichedAssignment) => {
-        // TODO: call your real delete mutation here
-        setAssignments((prev) => prev.filter((r) => r.id !== a.id));
-    };
-
 
     return (
         <div className="min-h-screen bg-slate-50 px-6 py-8">
@@ -96,9 +79,6 @@ export default function RoomAssignmentPage() {
 
                 <AssignmentTable
                     assignments={filtered}
-                    onView={setSelected}
-                    onCheckout={handleCheckout}
-                    onDelete={handleDelete}
                 />
             </div>
 

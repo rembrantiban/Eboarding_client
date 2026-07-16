@@ -2,11 +2,11 @@
 
 import { X } from "lucide-react";
 import { statusConfig } from "./Data";
-import type { EnrichedAssignment } from "./types";
 import { formatDate } from "./Utils";
+import type { AssignedBoarder } from "@/store/useRoomAssignmentStore"
 
 interface AssignmentDetailsModalProps {
-    assignment: EnrichedAssignment | null;
+    assignment: AssignedBoarder | null;
     onClose: () => void;
 }
 
@@ -31,12 +31,12 @@ export default function AssignmentDetailsModal({ assignment, onClose }: Assignme
                 <div className="mt-4 space-y-3 text-sm">
                     <div className="flex items-center justify-between">
                         <span className="text-slate-400">Boarder</span>
-                        <span className="font-medium text-slate-900">{assignment.user_name}</span>
+                        <span className="font-medium text-slate-900">{assignment.first_name} {assignment.last_name}</span>
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-slate-400">Room / Bed</span>
                         <span className="font-medium text-slate-900">
-                            Room {assignment.room_number} · {assignment.bed_label}
+                            Room {assignment.room_number} · {assignment.bed_number}
                         </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -49,7 +49,7 @@ export default function AssignmentDetailsModal({ assignment, onClose }: Assignme
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-slate-400">Actual Checkout</span>
-                        <span className="text-slate-700">{formatDate(assignment.actual_checkout)}</span>
+                        <span className="text-slate-700">{formatDate(assignment.expected_checkout)}</span>
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-slate-400">Status</span>

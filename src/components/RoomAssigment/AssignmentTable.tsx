@@ -2,22 +2,16 @@
 
 import { BedDouble, DoorOpen, User } from "lucide-react";
 import { statusConfig } from "./Data";
-import type { EnrichedAssignment } from "./types";
 import { formatDate } from "./Utils";
 import RowMenu from "./Rowmenu";
+import type { AssignedBoarder } from "@/store/useRoomAssignmentStore";
 
 interface AssignmentTableProps {
-    assignments: EnrichedAssignment[];
-    onView: (a: EnrichedAssignment) => void;
-    onCheckout: (a: EnrichedAssignment) => void;
-    onDelete: (a: EnrichedAssignment) => void;
+    assignments: AssignedBoarder[];
 }
 
 export default function AssignmentTable({
     assignments,
-    onView,
-    onCheckout,
-    onDelete,
 }: AssignmentTableProps) {
     return (
       <div className="overflow-visible rounded border border-slate-200 bg-white">
@@ -42,7 +36,7 @@ export default function AssignmentTable({
                                         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
                                             <User size={14} />
                                         </span>
-                                        <span className="font-medium text-slate-900">{a.user_name}</span>
+                                        <span className="font-medium text-slate-900">{a.first_name} {a.last_name}</span>
                                     </div>
                                 </td>
                                 <td className="px-4 py-3">
@@ -54,7 +48,7 @@ export default function AssignmentTable({
                                 <td className="px-4 py-3">
                                     <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                                         <BedDouble size={12} />
-                                        {a.bed_label}
+                                        {a.bed_number}
                                     </span>
                                 </td>
                                 <td className="hidden px-4 py-3 text-slate-600 sm:table-cell">
@@ -71,9 +65,6 @@ export default function AssignmentTable({
                                 <td className="px-4 py-3 text-right">
                                     <RowMenu
                                         assignment={a}
-                                        onView={onView}
-                                        onCheckout={onCheckout}
-                                        onDelete={onDelete}
                                     />
                                 </td>
                             </tr>

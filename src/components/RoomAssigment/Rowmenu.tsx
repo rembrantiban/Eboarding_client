@@ -2,22 +2,19 @@
 
 import { Eye, LogOut, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import type { EnrichedAssignment } from "./types";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { AssignedBoarder } from "@/store/useRoomAssignmentStore" 
 
 interface RowMenuProps {
-    assignment: EnrichedAssignment;
-    onView: (a: EnrichedAssignment) => void;
-    onCheckout: (a: EnrichedAssignment) => void;
-    onDelete: (a: EnrichedAssignment) => void;
+    assignment: AssignedBoarder;
 }
 
-export default function RowMenu({ assignment, onView, onCheckout, onDelete }: RowMenuProps) {
+export default function RowMenu({ assignment}: RowMenuProps) {
     const { user } = useAuth();
 
     return (
@@ -34,7 +31,7 @@ export default function RowMenu({ assignment, onView, onCheckout, onDelete }: Ro
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => onView(assignment)}>
+                    <DropdownMenuItem onClick={() => console.log(assignment)}>
                         <Eye size={14} className="mr-2" /> View
                     </DropdownMenuItem>
 
@@ -44,7 +41,7 @@ export default function RowMenu({ assignment, onView, onCheckout, onDelete }: Ro
 
                     {assignment.status === "Active" && (
                         <DropdownMenuItem
-                            onClick={() => onCheckout(assignment)}
+                            onClick={() => console.log(assignment)}
                             className="text-amber-700 focus:bg-amber-50 focus:text-amber-700"
                         >
                             <LogOut size={14} className="mr-2" /> Check out
@@ -53,7 +50,7 @@ export default function RowMenu({ assignment, onView, onCheckout, onDelete }: Ro
 
                     {user?.user_type === "Admin" && (
                         <DropdownMenuItem
-                            onClick={() => onDelete(assignment)}
+                            onClick={() => console.log(assignment)}
                             className="text-red-500 focus:bg-red-50 focus:text-red-500"
                         >
                             <Trash2 size={14} className="mr-2" /> Delete

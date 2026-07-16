@@ -3,6 +3,33 @@ import axiosInstance from "@/api/api";
 import axios  from "axios";
 import { useStatusStore } from "./useStatusStore";
 
+
+export interface AssignedBoarder {
+  id: number;
+  user_id_no: string;
+
+  first_name: string;
+  last_name: string;
+  email: string;
+  contact_number: string;
+  avatar_url: string | null;
+
+  assignment_id: number;
+
+  assigned_date: string;
+  expected_checkout: string | null;
+
+  status: "Active" | "Transferred" | "Checked-Out";
+
+  room_id: number;
+  room_number: string;
+
+  bed_id: number;
+  bed_number: string;
+  remarks: string;
+}
+
+
 export interface RoomAssignment {
     id: number;
 
@@ -12,7 +39,6 @@ export interface RoomAssignment {
 
     assigned_date: string;
     expected_checkout: string | null;
-    actual_checkout: string | null;
 
     status: "Active" | "Transferred" | "Checked-Out";
 
@@ -35,7 +61,7 @@ export interface AssignRoomPayload {
 interface RoomAssignmentStore {
     loading: boolean;
 
-    assignments: RoomAssignment[];
+    assignedBoarders: AssignedBoarder[];
 
     assignRoom: (
         data: AssignRoomPayload
@@ -48,7 +74,7 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
         loading: false,
 
-        assignments: [],
+        assignedBoarders: [],
 
         assignRoom: async (data) => {
             const { showLoading, showError, showSuccess } = useStatusStore.getState();
@@ -93,11 +119,11 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
                 const res =
                     await axiosInstance.get(
-                        "/room-assignments"
+                        "/room-assignment/assigned-boarders"
                     );
 
                 set({
-                    assignments: res.data,
+                    assignedBoarders: res.data,
                 });
 
             } catch (error) {
