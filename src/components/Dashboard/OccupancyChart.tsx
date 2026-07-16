@@ -1,86 +1,92 @@
-"use client"
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
-import { useEffect } from "react"
-import { useRoom } from "@/hooks/useRoom"
+const data = [
+  { name: "Occupied", value: 42, color: "#475569" },
+  { name: "Available", value: 18, color: "#cbd5e1" },
+];
 
-const OccupancyChart = () => {
+const total = data.reduce((sum, d) => sum + d.value, 0);
 
-  const {
-    getDashboardStats,
-    dashboardStats,
-  } = useRoom()
-
-  useEffect(() => {
-    getDashboardStats()
-  }, [getDashboardStats])
-
-  const occupiedBeds =
-    dashboardStats?.occupiedBeds || 0
-
-  const availableBeds =
-    dashboardStats?.availableBeds || 0
-
-  const totalBeds =
-    occupiedBeds + availableBeds
-
-  const occupiedPercent =
-    totalBeds > 0
-      ? (occupiedBeds / totalBeds) * 100
-      : 0
-
-  const availablePercent =
-    totalBeds > 0
-      ? (availableBeds / totalBeds) * 100
-      : 0
-
-  return (
-    <div className="rounded-md border bg-background p-5 shadow-sm">
-
-      <h3 className="font-semibold mb-4">
-       Occupancy Overview
-      </h3>
-
-      <div className="space-y-4">
-
-        {/* OCCUPIED */}
-        <div>
-          <p className="text-sm">
-            Occupied ({occupiedBeds})
-          </p>
-
-          <div className="w-full bg-muted rounded-full h-2 mt-1">
-
-            <div
-              className="bg-slate-600 h-2 rounded-full transition-all"
-              style={{
-                width: `${occupiedPercent}%`,
-              }}
-            />
-
-          </div>
-        </div>
-
-        {/* AVAILABLE */}
-        <div>
-          <p className="text-sm">
-            Available ({availableBeds})
-          </p>
-
-          <div className="w-full bg-muted rounded-full h-2 mt-1">
-
-            <div
-              className="bg-slate-400 h-2 rounded-full transition-all"
-              style={{
-                width: `${availablePercent}%`,
-              }}
-            />
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-  )
+function formatRooms(v) {
+  return `${v} rooms`;
 }
 
-export default OccupancyChart
+function CustomTooltip({ active, payload }) {
+  if (!active || !payload || !payload.length) return null;
+  const item = payload[0];
+  const pct = ((item.value / total) * 100).toFixed(0);
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
+      <p className="text-[11px] font-medium text-slate-500">{item.name}</p>
+      <p className="text-[13px] font-semibold text-slate-900">
+        {formatRooms(item.value)}{" "}
+        <span className="font-normal text-slate-400">({pct}%)</span>
+      </p>
+    </div>
+  );
+}
+
+export default function RoomOccupancyChart() {
+  return (
+    <div className="w-full max-w-md ite rounded border border-slate-200 bg-white p-6">
+      <h3 className="mb-4 text-[15px] font-semibold text-slate-900">
+        Occupancy Status {" "}
+        <span className="font-normal text-slate-400">(Today)</span>
+      </h3>
+
+      <div className="flex items-center gap-6">
+        <div className="relative" style={{ width: 180, height: 180, flexShrink: 0 }}>
+          <PieChart width={180} height={180}>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              innerRadius={58}
+              outerRadius={82}
+              paddingAngle={3}
+              stroke="#fff"
+              strokeWidth={2}
+              labelLine={false}
+            >
+              {data.map((entry) => (
+                <Cell key={entry.name} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[11px] font-medium text-slate-400">Total rooms</span>
+            <span className="text-[20px] font-bold text-slate-900">{total}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-3">
+          {data.map((entry) => {
+            const pct = ((entry.value / total) * 100).toFixed(0);
+            return (
+              <div key={entry.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className="text-[13px] text-slate-600">{entry.name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] font-semibold text-slate-900">
+                    {entry.value}
+                  </span>
+                  <span className="text-[11px] text-slate-400">{pct}%</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

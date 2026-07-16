@@ -19,6 +19,13 @@ export const useAuth = () => {
   const getTotalBoarders = useAuthStore((state) => state.getTotalBoarders);
   const totalBoarders = useAuthStore((state) => state.totalBoarders);
   const updateProfileSettings = useAuthStore((state) => state.updateProfileSettings);
+  const createUserByStaff = useAuthStore((state) => state.createUserByStaff);
+  const deactivateUser = useAuthStore((state) => state.deactivateUser);
+  const activateUser = useAuthStore((state) => state.activateUser);
+  const updateUserStatus = useAuthStore((state) => state.updateUserStatus);
+  const availableBoarders = useAuthStore((state) => state.availableBoarders);
+  const getAvailableBorders = useAuthStore((state) => state.getAvailableBorders);
+
   return {
     user,
     token,
@@ -38,8 +45,13 @@ export const useAuth = () => {
     getTotalBoarders,
     totalBoarders,
     updateProfileSettings,
-
+    createUserByStaff,
     isAuthenticated: !!token,
     isAdmin: user?.user_type === "Admin",
+    deactivateUser,
+    activateUser,
+    updateUserStatus,
+    availableBoarders,
+    getAvailableBorders,
   };
 };

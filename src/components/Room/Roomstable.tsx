@@ -12,6 +12,13 @@ import type { Room } from "@/store/useRoomStore"
 import UpdateRoomModal from "../modal/UpdateRoomModal";
 import DeleteRoomModal from "../modal/DeleteRoomModal";
 import { toast } from "sonner"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 const RoomsTable = () => {
@@ -62,15 +69,16 @@ const RoomsTable = () => {
             className="w-52"
           />
 
-          <select
-            className="border rounded-lg px-3 py-2 text-sm bg-background"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-          >
-            <option value="All">All</option>
-            <option value="Available">Available</option>
-            <option value="Full">Full</option>
-          </select>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Filter status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">All</SelectItem>
+              <SelectItem value="Available">Available</SelectItem>
+              <SelectItem value="Full">Full</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* ✅ FIXED RESET BUTTON */}
           <Button onClick={handleReset}>
@@ -88,10 +96,10 @@ const RoomsTable = () => {
       </div>
 
       {/* 🔷 Table */}
-      <div className="rounded border overflow-visible">
+      <div className="rounded border">
         <table className="w-full text-sm">
 
-          <thead className="bg-slate-700 text-white">
+          <thead className="  text-slate-700">
             <tr>
               <th className="text-left px-4 py-3">
                 <div className="flex items-center gap-2">
@@ -156,7 +164,7 @@ const RoomsTable = () => {
                   key={room.id}
                   room={{
                     ...room,
-                    status: room.status as "Available" | "Full",
+                    status: room.status as "Available" | "Occupied" | "Under Maintenance",
                   }}
                   onView={(r) => {
                     setSelectedRoom(r);

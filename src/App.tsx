@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom'
-import { Toaster } from 'sonner'
 import './App.css'
 import Login from '@/pages/login'
 import Home from '@/pages/home'
@@ -28,8 +27,14 @@ import MyRoom from "@/pages/MyRoom"
 import ViewOwnAccount from "@/pages/ViewOwnAccount"
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
 import BoarderRoute from './route/BoarderRoute'
+import ViewUserPage from './pages/ViewUserAccount'
+import GlobalStatusModal from './components/StatusModal/GlobalStatusModal'
+import Documents from './pages/Documents'
+import BoarderDocumentPage from './pages/BoarderDocumentPage'
 
 function App() {
+ 
+
   return (
     <>
       <Routes>
@@ -53,7 +58,8 @@ function App() {
             <Route path='/reports' element={<Report />} />
             <Route path='/announcements' element={<Announcement />} />
             <Route path="/profile" element={<ProfilePage />} />
-
+            <Route path="/view-user/:id" element={<ViewUserPage />} />
+            <Route path='documents' element={<Documents />} />
           </Route>
         </Route>
 
@@ -62,6 +68,7 @@ function App() {
             <Route path="/boarder-dashboard" element={<BoarderDashboard />} />
             <Route path='/edit-account' element={<EditAccountPage />} />
             <Route path='/boarder/announcements' element={<BoardeAnnouncement />} />
+            <Route path='/boarder/documents' element={<BoarderDocumentPage />} />
             <Route path='/my-room' element={<MyRoom />} />
             <Route path="/view-account" element={<ViewOwnAccount />} />
             <Route path="/payment-history" element={<PaymentHistoryPage />} />
@@ -69,8 +76,8 @@ function App() {
         </Route>
 
       </Routes>
-
-      <Toaster position="top-center" />
+      
+       <GlobalStatusModal />
     </>
   )
 }

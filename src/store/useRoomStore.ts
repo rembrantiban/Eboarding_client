@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axiosInstance from "@/api/api";
 import axios from "axios";
+import { useStatusStore } from "./useStatusStore";
 
 
 export interface Room {
@@ -9,7 +10,7 @@ export interface Room {
   capacity: number;
   price_per_month: number;
   description?: string;
-  status: "Available" | "Occupied" | "Full";
+  status: "Available" | "Occupied" | "Under Maintenance";
   images?: string[];
 
   occupied_beds?: number;
@@ -27,7 +28,7 @@ interface CreateRoomPayload {
   capacity: number;
   bed_count: number;
   price_per_month: number;
-  status: "Available" | "Full";
+  status: "Available" | "Occupied" | "Under Maintenance";
   description?: string;
   images?: File[];
 }
@@ -39,6 +40,10 @@ interface UpdateRoomPayload {
   bed_count?: number;
   price_per_month?: number;
   description?: string;
+  status?:
+    | "Available"
+    | "Occupied"
+    | "Under Maintenance";
   images?: File[];
 }
 
@@ -49,18 +54,20 @@ export interface AvailableBed {
 
 export interface AvailableRoom {
   id: number;
+
   room_number: string;
+
   capacity: number;
+
   price_per_month: number;
 
+  description?: string;
+
+  images: string[];
+
   available_beds: number;
-  total_beds: number;
 
   beds: AvailableBed[];
-
-  images?: string[];
-  description?: string;
-  status?: "Available" | "Full";
 }
 
 export type OccupancyTrend = {
@@ -206,7 +213,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       set({ loading: true, error: null });
 
       const res = await axiosInstance.get(
-        "/rooms/available"
+        "/rooms/available-rooms"
       );
 
       set({
@@ -234,7 +241,9 @@ export const useRoomStore = create<RoomState>((set) => ({
 
 
   createRoom: async (data) => {
+    const { showLoading, showError, showSuccess } = useStatusStore.getState();
     try {
+      showLoading("Creating Room", "Please wait...");
       set({ loading: true, error: null });
 
       const formData = new FormData();
@@ -263,6 +272,9 @@ export const useRoomStore = create<RoomState>((set) => ({
         loading: false,
       });
 
+      showSuccess("Room Created", "Room created successfully");
+
+
     } catch (error: unknown) {
       let message = "Failed to create room";
 
@@ -272,6 +284,7 @@ export const useRoomStore = create<RoomState>((set) => ({
         message = error.message;
       }
 
+      showError("Failed to create room", message);
       set({ loading: false, error: message });
       throw new Error(message);
     }

@@ -5,7 +5,6 @@ import {
   Users,
   BedDouble,
   UserCheck,
-  CalendarDays,
   User,
   Settings,
   LogOut,
@@ -16,7 +15,7 @@ import {
   X,
   Wallet,
   ScrollText,
-  Warehouse,
+  FolderOpen, 
 } from "lucide-react"
 import { useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
@@ -38,7 +37,7 @@ export const MobileHeader = ({ onMenuOpen }: { onMenuOpen: () => void }) => (
     {/* Logo */}
     <div className="flex items-center gap-2">
       <div className="w-7 h-7 rounded-md bg-linear-to-r from-purple-600 to-teal-400 flex items-center justify-center shrink-0">
-        <span className="text-white font-black text-xs leading-none"><Warehouse size={20} /></span>
+        <span className="text-white font-black text-xs leading-none"><IoHomeSharp size={20} /></span>
       </div>
       <span className="text-[15px] font-bold tracking-tight text-slate-900">
         E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">boarding</span>
@@ -90,12 +89,15 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
       >
         <div className="px-5 py-5 border-b border-slate-200 flex items-center justify-between  w-full">
           <div className="flex items-center gap-2 ">
-            <div className="w-8 h-8 rounded-md  bg-linear-to-r from-slate-600 to-slate-700 flex items-center justify-center shrink-0">
-              <span className="text-white font-black text-sm leading-none"><IoHomeSharp size={17} className="text-white" /></span>
+            <div className="w-10 h-10 rounded-md  bg-linear-to-r from-slate-600 to-slate-700 flex items-center justify-center shrink-0">
+              <span className="text-white font-black text-sm leading-none"><IoHomeSharp size={20} className="text-white" /></span>
             </div>
-            <span className="text-[17px] font-bold tracking-tight text-slate-900">
-              E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">boarding</span>
+           <div className="flex flex-col">
+             <span className="text-[17px] font-bold tracking-tight text-slate-900">
+              E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">BOARDING</span>
             </span>
+            <p className="text-xs text-slate-500">Erming House</p>
+           </div>
           </div>
 
           {/* Close button — mobile only */}
@@ -112,10 +114,11 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
 
           <SectionLabel label="Main" />
           <SidebarItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/dashboard" onNavigate={closeAll} />
-          <SidebarItem icon={<CalendarDays size={16} />} label="Calendar" to="/calendar" onNavigate={closeAll} />
 
           <SectionLabel label="Account" />
           <SidebarItem icon={<Users size={16} />} label="User Management" to="/user" onNavigate={closeAll} />
+          <SidebarItem icon={<FolderOpen size={16} />} label="Documents" to="/documents" onNavigate={closeAll} />
+
 
           <SectionLabel label="Properties" />
           <SidebarItem icon={<UserCheck size={16} />} label="Rooms" to="/room" onNavigate={closeAll} />
@@ -123,6 +126,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           <SectionLabel label="Transactions" />
           <SidebarItem icon={<BedDouble size={16} />} label="Boarders" to="/boarders" onNavigate={closeAll} />
           <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/payments" onNavigate={closeAll} />
+          <SidebarItem icon={<Wallet size={16} />} label="Payment History" to="/payment-history" onNavigate={closeAll} />
           <SidebarItem icon={<ScrollText size={16} />} label="Reports" to="/reports" onNavigate={closeAll} />
 
           <SectionLabel label="Others" />

@@ -8,7 +8,8 @@ import {
     LogOut,
     Bed,
     Bell,
-    Layers
+    Layers,
+    FolderOpen
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnnouncement } from "@/hooks/useAnnouncement"
@@ -21,6 +22,7 @@ const navItems = [
     { label: "Edit profile", icon: User, path: "/edit-account" },
     { label: "Announcements", icon: Bell, path: "/boarder/announcements" },
     { label: "Payment History", icon: ReceiptSwissFranc, path: "/payment-history" },
+    { label: "Documents", icon: FolderOpen, path: "/boarder/documents" }
 ];
 
 export default function Sidebar() {

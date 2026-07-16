@@ -57,11 +57,6 @@ const UserTable = () => {
   setCurrentPage((prev) => (prev !== 1 ? 1 : prev));
 }, [search, filter]);
 
- const removeUserFromUI = (id: number) => {
-  useAuthStore.setState((state) => ({
-    users: state.users.filter((u) => u.id !== id),
-  }));
-};
 const handleUpdateSuccess = (updatedUser: User) => {
   useAuthStore.setState((state) => ({
     users: state.users.map((u) =>
@@ -81,14 +76,15 @@ const handleUpdateSuccess = (updatedUser: User) => {
 
       <div className="rounded border overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-700 text-white">
+          <thead className="text-slate-500 border-b hover:bg-slate-100">
             <tr>
-              <th className="text-left px-4 py-3">User</th>
+              <th className="text-left px-4 py-3">User ID</th>
+               <th className="text-left px-4 py-3">User</th>
               <th className="text-left px-4 py-3">Email</th>
               <th className="text-left px-4 py-3">Role</th>
-              <th className="text-left px-4 py-3">Created</th>
-              <th className="text-left px-4 py-3">Updated</th>
-              <th className="text-left px-4 py-3">Room Assignment</th>
+              <th className="text-left px-4 py-3">Account Approval</th>
+              <th className="text-left px-4 py-3">Status</th>
+              <th className="text-left px-4 py-3">Room</th>
               <th className="text-right px-4 py-3">Actions</th>
             </tr>
           </thead>
@@ -96,13 +92,13 @@ const handleUpdateSuccess = (updatedUser: User) => {
           <tbody>
             {isLoading ? (
               <tr>
-                <td colSpan={7} className="text-center py-6">
+                <td colSpan={8} className="text-center py-6">
                   Loading...
                 </td>
               </tr>
             ) : paginatedUsers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-6 text-muted-foreground">
+                <td colSpan={8} className="text-center py-6 text-muted-foreground">
                   {filter
                     ? `No ${filter.toLowerCase()} users found`
                     : "No users found"}
@@ -113,7 +109,6 @@ const handleUpdateSuccess = (updatedUser: User) => {
                 <UserTableRow
                   key={user.id}
                   user={user}
-                  onDeleteSuccess={removeUserFromUI}
                   onUpdateSuccess={handleUpdateSuccess}
                 />
               ))

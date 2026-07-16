@@ -1,20 +1,45 @@
 import axiosInstance from "@/api/api";
 import { create } from "zustand"
+import { useStatusStore } from "./useStatusStore";
 
 export type UserType = "Admin" | "Staff" | "Boarder";
 export type UpdateUserType = "Staff" | "Boarder";
 
+export type UserStatus = "Pending" | "Approved" | "Rejected";
+export type AccountStatus = "Active" | "Deactivate";
+type UserApprovalStatus =
+  | "Pending"
+  | "Approved"
+  | "Rejected";
+
 export interface User {
   id: number;
+  user_id_no: string;
+
   first_name: string;
   last_name: string;
+
   email: string;
   username: string;
-  contact_number: string,
-  user_type: UserType;
+  
+  contact_number: string;
   address?: string;
-  password: string;
+
   avatar_url?: string;
+
+  gender?: string;
+  age?: number;
+  valid_id_type?: string;
+  valid_id_image?: string;
+
+  emergency_contact_name?: string;
+  emergency_contact_number?: string;
+  emergency_contact_relationship?: string;
+
+  user_type: UserType;
+  status: "Pending" | "Approved" | "Rejected";
+  account_status: AccountStatus;
+
   created_at: string;
   updated_at: string;
 
@@ -27,6 +52,7 @@ type LoginPayload = {
   identifier: string;
   password: string;
 };
+
 type RegisterPayload = {
   first_name: string;
   last_name: string;
@@ -36,6 +62,59 @@ type RegisterPayload = {
   address: string;
   password: string;
   user_type: UserType;
+
+  gender?: string;
+  age?: number;
+  valid_id_type?: string;
+  emergency_contact_name?: string;
+  emergency_contact_number?: string;
+  emergency_contact_relationship?: string;
+
+  avatar?: File | null;
+  valid_id_image?: File | null;
+};
+
+type CreateUserByAdminPayload = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  username: string;
+  contact_number: string;
+  address: string;
+  password: string;
+  user_type: UserType;
+
+  gender?: string;
+  age?: number;
+  valid_id_type?: string;
+  emergency_contact_name?: string;
+  emergency_contact_number?: string;
+  emergency_contact_relationship?: string;
+
+  avatar?: File | null;
+  valid_id_image?: File | null;
+};
+
+type CreateUserByStaffPayload = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  username: string;
+  contact_number: string;
+  address: string;
+  password: string;
+  user_type: UserType;
+
+  gender?: string;
+  age?: string;
+  valid_id_type?: string;
+
+  emergency_contact_name?: string;
+  emergency_contact_number?: string;
+  emergency_contact_relationship?: string;
+
+  avatar?: File | null;
+  valid_id_image?: File | null;
 };
 
 type UpdateUserResponse = {
@@ -53,6 +132,8 @@ type UpdateUserPayload = {
   user_type: UserType;
   contact_number?: string;
   is_assigned?: boolean;
+  status?: UserStatus;
+  valid_id_type?: string;
 };
 
 type ApiError = {
@@ -79,6 +160,7 @@ type UpdateProfileSettingsResponse = {
 };
 
 
+
 type GetUsersResponse = {
   users: User[];
   total: number;
@@ -99,9 +181,9 @@ type ResetPasswordPayload = {
   newPassword: string;
 };
 
-  type totalBoardersResponse = {
-     total: number;
-  }
+type totalBoardersResponse = {
+  total: number;
+}
 
 interface AuthState {
   user: User | null;
@@ -109,12 +191,13 @@ interface AuthState {
   isLoading: boolean;
   users: User[];
   totalBoarders: number;
-
+  availableBoarders: User[];
 
   register: (data: RegisterPayload) => Promise<void>;
   login: (data: LoginPayload) => Promise<void>;
   deleteUser: (id: number) => Promise<void>;
-  createUserByAdmin: (data: RegisterPayload) => Promise<{ user: User }>;
+  createUserByAdmin: (data: CreateUserByAdminPayload) => Promise<{ user: User }>;
+  createUserByStaff: (data: CreateUserByStaffPayload) => Promise<{ user: User }>;
   getUsers: (params?: GetUsersParams) => Promise<GetUsersResponse>;
   updateUser: (id: number, data: UpdateUserPayload) => Promise<UpdateUserResponse>;
   checkAuth: () => Promise<void>;
@@ -123,100 +206,339 @@ interface AuthState {
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (data: ResetPasswordPayload) => Promise<void>;
   getTotalBoarders: () => Promise<number>;
-  updateProfileSettings: (  data: UpdateProfileSettingsData) => Promise<UpdateProfileSettingsResponse>;
-
+  updateProfileSettings: (data: UpdateProfileSettingsData) => Promise<UpdateProfileSettingsResponse>;
+  deactivateUser: (id: number) => Promise<User>;
+  activateUser: (id: number) => Promise<User>;
+  updateUserStatus: (id: number, status: UserApprovalStatus) => Promise<User>;
+  getAvailableBorders: () => Promise<User[]>;
 }
+
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: JSON.parse(localStorage.getItem("user") || "null"),
   token: localStorage.getItem("token"),
   isLoading: false,
   users: [],
   totalBoarders: 0,
+  availableBoarders: [],
 
-  updateProfileSettings: async ( data: UpdateProfileSettingsData ) => {
-  try {
-    set({ isLoading: true });
+  getAvailableBorders: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/available-boarders");
+      set({ availableBoarders: res.data });
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching available boarders:", error);
+      throw error;
+    }
+  },
+  
+  updateUserStatus: async (id, status) => {
+     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    try {
+      showLoading("Updating Status", "Please wait while we update the user's status...")
+      const res = await axiosInstance.put(
+        `/auth/update-user-status/${id}`,
+        { status }
+      );
 
-    const formData = new FormData();
+      const updatedUser = res.data.user;
 
-    if (data.first_name) {
-      formData.append(
-        "first_name",
-        data.first_name
+
+      set((state) => ({
+        users: state.users.map((user) =>
+          user.id === id
+            ? updatedUser
+            : user
+        ),
+      }));
+      
+      showSuccess("Status Updated", "The user's status has been updated successfully.");
+      return updatedUser;
+
+    } catch (error) {
+      const err = error as ApiError;
+      showError("Update Failed", err.response?.data?.message || "Failed to update status");
+      throw err.response?.data?.message || "Failed to update status";
+    }
+  },
+
+  activateUser: async (id: number) => {
+     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    try {
+
+      showLoading("Activating User", "Please wait while we activate the user...")
+
+      const res = await axiosInstance.put(
+        `/auth/activate-user/${id}`
+      );
+
+      const updatedUser = res.data.user;
+
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === updatedUser.id
+            ? { ...u, ...updatedUser }
+            : u
+        ),
+      }));
+
+      showSuccess(
+        "User Activated",
+        "The user account has been activated successfully."
+      );
+      return updatedUser;
+
+    } catch (error: unknown) {
+      const err = error as ApiError;
+      showError(
+        "Activation Failed",
+        err.response?.data?.message || "Failed to activate account"
+      );
+      throw (
+        err.response?.data?.message ||
+        "Failed to activate account"
       );
     }
+  },
 
-    if (data.last_name) {
-      formData.append(
-        "last_name",
-        data.last_name
+  deactivateUser: async (id: number) => {
+     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    try {
+      
+      showLoading(
+        "Deactivating User",
+        "Please wait while we deactivate the user..."
+      );
+
+      const res = await axiosInstance.put(
+        `/auth/deactivate-user/${id}`
+      );
+
+      const updatedUser = res.data.user;
+
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === updatedUser.id
+            ? { ...u, ...updatedUser }
+            : u
+        ),
+      }));
+
+      showSuccess(
+        "User Deactivated",
+        "The user account has been deactivated successfully."
+      );
+      return updatedUser;
+
+    } catch (error: unknown) {
+      const err = error as ApiError;
+      showError(
+        "Deactivation Failed",
+        err.response?.data?.message || "Failed to deactivate account"
+      );
+      throw (
+        err.response?.data?.message ||
+        "Failed to deactivate account"
       );
     }
+  },
 
-    if (data.email) {
-      formData.append(
-        "email",
-        data.email
+  createUserByStaff: async (data) => {
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    try {
+      showLoading(
+        "Creating User",
+        "Please wait while we create the user account..."
+      );
+
+      const formData = new FormData();
+
+      formData.append("first_name", data.first_name);
+      formData.append("last_name", data.last_name);
+      formData.append("username", data.username);
+      formData.append("contact_number", data.contact_number);
+      formData.append("email", data.email);
+      formData.append("address", data.address);
+      formData.append("password", data.password);
+      formData.append("user_type", data.user_type);
+
+      if (data.gender) {
+        formData.append("gender", data.gender);
+      }
+
+      if (data.valid_id_type) {
+        formData.append("valid_id_type", data.valid_id_type);
+      }
+
+      if (data.age !== undefined) {
+        formData.append("age", data.age.toString());
+      }
+
+      if (data.emergency_contact_name) {
+        formData.append(
+          "emergency_contact_name",
+          data.emergency_contact_name
+        );
+      }
+
+      if (data.emergency_contact_number) {
+        formData.append(
+          "emergency_contact_number",
+          data.emergency_contact_number
+        );
+      }
+
+      if (data.emergency_contact_relationship) {
+        formData.append(
+          "emergency_contact_relationship",
+          data.emergency_contact_relationship
+        );
+      }
+
+      if (data.avatar) {
+        formData.append("avatar", data.avatar);
+      }
+
+      if (data.valid_id_image) {
+        formData.append(
+          "valid_id_image",
+          data.valid_id_image
+        );
+      }
+
+      const res = await axiosInstance.post(
+        "/auth/staff/users",
+        formData
+      );
+
+      const newUser = res.data.user;
+
+      set((state) => ({
+        isLoading: false,
+        users: [newUser, ...state.users],
+      }));
+
+      showSuccess(
+        "User Created",
+        "The user account has been created successfully."
+      );
+
+      return res.data;
+
+    } catch (error) {
+      const err = error as ApiError;
+
+      set({
+        isLoading: false,
+      });
+
+      showError(
+        "Create Failed",
+        typeof error === "string"
+          ? error
+          : "Failed to create user."
+      );
+      throw (
+        err.response?.data?.message ||
+        "Failed to create user"
       );
     }
+  },
 
-     if (data.contact_number) {
-      formData.append(
-        "contact_number",
-        data.contact_number
+  updateProfileSettings: async (data: UpdateProfileSettingsData) => {
+     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    try {
+      showLoading("Updating Profile", "Please wait while we update your profile...");
+      set({ isLoading: true });
+
+      const formData = new FormData();
+
+      if (data.first_name) {
+        formData.append(
+          "first_name",
+          data.first_name
+        );
+      }
+
+      if (data.last_name) {
+        formData.append(
+          "last_name",
+          data.last_name
+        );
+      }
+
+      if (data.email) {
+        formData.append(
+          "email",
+          data.email
+        );
+      }
+
+      if (data.contact_number) {
+        formData.append(
+          "contact_number",
+          data.contact_number
+        );
+      }
+
+      if (data.password) {
+        formData.append(
+          "password",
+          data.password
+        );
+      }
+
+      if (data.avatar) {
+        console.log("📤 Appending avatar:", data.avatar.name, data.avatar.size, data.avatar.type);
+        formData.append(
+          "avatar",
+          data.avatar
+        );
+      }
+
+      console.log("📤 Sending formData to /auth/profile-settings");
+
+      const res = await axiosInstance.put<UpdateProfileSettingsResponse>(
+        "/auth/profile-settings",
+        formData
+        // Let axios handle the Content-Type header automatically for multipart/form-data
       );
-    }
 
-    if (data.password) {
-      formData.append(
-        "password",
-        data.password
+      const updatedUser = res.data.user;
+
+      console.log("✅ Profile updated:", updatedUser);
+
+      set({
+        user: updatedUser,
+        isLoading: false,
+      });
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(updatedUser)
       );
-    }
 
-    if (data.avatar) {
-      console.log("📤 Appending avatar:", data.avatar.name, data.avatar.size, data.avatar.type);
-      formData.append(
-        "avatar",
-        data.avatar
-      );
-    }
-
-    console.log("📤 Sending formData to /auth/profile-settings");
-
-    const res = await axiosInstance.put<UpdateProfileSettingsResponse>( 
-      "/auth/profile-settings",
-      formData
-      // Let axios handle the Content-Type header automatically for multipart/form-data
+    showSuccess(
+      "Profile Updated",
+      "Your profile has been updated successfully."
     );
+      return res.data;
 
-    const updatedUser = res.data.user;
+    } catch (error: unknown) {
+      const err = error as ApiError;
 
-    console.log("✅ Profile updated:", updatedUser);
-
-    set({
-      user: updatedUser,
-      isLoading: false,
-    });
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(updatedUser)
-    );
-
-    return res.data;
-
-  } catch (error: unknown) {
-    const err = error as ApiError;
-
-    set({ isLoading: false });
-
-    throw (
-      err.response?.data?.message ||
-      "Failed to update profile"
-    );
-  }
-},
+      set({ isLoading: false });
+    showError(
+        "Update Failed",
+        err.response?.data?.message || "Failed to update profile"
+      );
+      throw (
+        err.response?.data?.message ||
+        "Failed to update profile"
+      );
+    }
+  },
   getTotalBoarders: async () => {
     try {
       const res = await axiosInstance.get<totalBoardersResponse>("/auth/total-boarders");
@@ -248,21 +570,78 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       set({ isLoading: true });
 
-      const res = await axiosInstance.post("/auth/register", data);
+      const formData = new FormData();
+
+      formData.append("first_name", data.first_name);
+      formData.append("last_name", data.last_name);
+      formData.append("email", data.email);
+      formData.append("username", data.username);
+      formData.append("contact_number", data.contact_number);
+      formData.append("address", data.address);
+      formData.append("password", data.password);
+      formData.append("user_type", data.user_type);
+
+      if (data.gender) {
+        formData.append("gender", data.gender);
+      }
+
+      if (data.age !== undefined) {
+        formData.append("age", data.age.toString());
+      }
+
+      if (data.valid_id_type) {
+        formData.append("valid_id_type", data.valid_id_type);
+      }
+
+      if (data.emergency_contact_name) {
+        formData.append(
+          "emergency_contact_name",
+          data.emergency_contact_name
+        );
+      }
+
+      if (data.emergency_contact_number) {
+        formData.append(
+          "emergency_contact_number",
+          data.emergency_contact_number
+        );
+      }
+
+      if (data.emergency_contact_relationship) {
+        formData.append(
+          "emergency_contact_relationship",
+          data.emergency_contact_relationship
+        );
+      }
+
+      if (data.avatar) {
+        formData.append("avatar", data.avatar);
+      }
+
+      if (data.valid_id_image) {
+        formData.append(
+          "valid_id_image",
+          data.valid_id_image
+        );
+      }
+
+        await axiosInstance.post(
+        "/auth/register",
+        formData
+      );
 
       set({
-        user: res.data.user,
         isLoading: false,
       });
 
-    } catch (error: unknown) {
+    } catch (error) {
       const err = error as ApiError;
 
       set({ isLoading: false });
+
       throw err.response?.data?.message || "Register failed";
     }
   },
-
   login: async (data) => {
     try {
       set({ isLoading: true });
@@ -291,8 +670,10 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   updateProfile: async (data: FormData) => {
+     const { showLoading, showSuccess, showError } = useStatusStore.getState();
     try {
       set({ isLoading: true });
+      showLoading("Updating Profile", "Please wait while we update your profile...");
 
       const res = await axiosInstance.put("/auth/updateProfile", data);
 
@@ -307,60 +688,159 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
-
+      showSuccess("Profile Updated", "Your profile has been updated successfully.");
       return res.data;
 
     } catch (error: unknown) {
       const err = error as ApiError;
 
       set({ isLoading: false });
+      showError("Update Failed", err.response?.data?.message || "Failed to update profile");
 
       throw err.response?.data?.message || "Profile update failed";
     }
   },
 
-  createUserByAdmin: async (data) => {
+ createUserByAdmin: async (data) => {
+  const {
+    showLoading,
+    showSuccess,
+    showError,
+  } = useStatusStore.getState();
+
+  try {
+    set({ isLoading: true });
+
+    showLoading(
+      "Creating User",
+      "Please wait while we create the account..."
+    );
+
+    const formData = new FormData();
+
+    formData.append("first_name", data.first_name);
+    formData.append("last_name", data.last_name);
+    formData.append("username", data.username);
+    formData.append("contact_number", data.contact_number);
+    formData.append("email", data.email);
+    formData.append("address", data.address);
+    formData.append("password", data.password);
+    formData.append("user_type", data.user_type);
+
+    if (data.gender) {
+      formData.append("gender", data.gender);
+    }
+
+    if (data.age !== undefined) {
+      formData.append("age", data.age.toString());
+    }
+
+    if (data.emergency_contact_name) {
+      formData.append(
+        "emergency_contact_name",
+        data.emergency_contact_name
+      );
+    }
+
+    if (data.emergency_contact_number) {
+      formData.append(
+        "emergency_contact_number",
+        data.emergency_contact_number
+      );
+    }
+
+    if (data.emergency_contact_relationship) {
+      formData.append(
+        "emergency_contact_relationship",
+        data.emergency_contact_relationship
+      );
+    }
+
+    if (data.avatar) {
+      formData.append("avatar", data.avatar);
+    }
+
+    if (data.valid_id_image) {
+      formData.append(
+        "valid_id_image",
+        data.valid_id_image
+      );
+    }
+
+    if (data.valid_id_type) {
+      formData.append("valid_id_type", data.valid_id_type);
+    }
+
+    const res = await axiosInstance.post(
+      "/auth/admin/users",
+      formData
+    );
+
+    const newUser = res.data.user;
+
+    set((state) => ({
+      isLoading: false,
+      users: [newUser, ...state.users],
+    }));
+
+    showSuccess(
+      "User Created",
+      "The user account has been created successfully."
+    );
+
+    return res.data;
+
+  } catch (error) {
+    const err = error as ApiError;
+
+    set({
+      isLoading: false,
+    });
+
+    showError(
+      "Creation Failed",
+      err.response?.data?.message ||
+      "Failed to create user."
+    );
+
+    throw err.response?.data?.message || "Failed to create user";
+  }
+},
+  updateUser: async (id: number, data: UpdateUserPayload) => {
+    const { showSuccess, showError, showLoading } = useStatusStore.getState();
     try {
-      set({ isLoading: true });
+      showLoading("Updating User", "Please wait while we update the user...");
+      const res = await axiosInstance.put<UpdateUserResponse>(
+        `/auth/updateUser/${id}`,
+        data
+      );
 
-      const res = await axiosInstance.post("/auth/admin/users", data);
+      const updatedUser = res.data.user;
 
-      set({ isLoading: false });
+      set((state) => ({
+        users: state.users.map((u) =>
+          u.id === updatedUser.id
+            ? { ...u, ...updatedUser }
+            : u
+        ),
+      }));  
+
+      showSuccess(
+        "User Updated",
+        "The user account has been updated successfully."
+      );
 
       return res.data;
 
     } catch (error: unknown) {
       const err = error as ApiError;
-
-      set({ isLoading: false });
-      throw err.response?.data?.message;
+      showError(
+        "Update Failed",
+        err.response?.data?.message || "Failed to update user"
+      );
+      throw err.response?.data?.message || "Update failed";
     }
   },
-
-  updateUser: async (id: number, data: UpdateUserPayload) => {
-  try {
-    const res = await axiosInstance.put<UpdateUserResponse>(
-      `/auth/updateUser/${id}`,
-      data
-    );
-
-    const updatedUser = res.data.user;
-
-    set((state) => ({
-      users: state.users.map((u) =>
-        u.id === updatedUser.id
-          ? { ...u, ...updatedUser }
-          : u
-      ),
-    }));
-
-    return res.data;
-
-  } catch (error: unknown) {
-    const err = error as ApiError;
-    throw err.response?.data?.message || "Update failed";
-  }
-},
 
   deleteUser: async (id) => {
     try {
@@ -368,12 +848,16 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       await axiosInstance.delete(`/auth/deleteUser/${id}`);
 
-      set({ isLoading: false });
+      set((state) => ({
+        isLoading: false,
+        users: state.users.filter((user) => user.id !== id),
+      }));
 
-    } catch (error: unknown) {
+    } catch (error) {
       const err = error as ApiError;
 
       set({ isLoading: false });
+
       throw err.response?.data?.message || "Failed to delete user";
     }
   },

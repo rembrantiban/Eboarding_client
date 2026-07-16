@@ -52,7 +52,7 @@ const Login = () => {
       await login({ identifier: form.identifier, password: form.password });
       setModal({ type: "success", message: "Login successful 🎉" });
       setTimeout(() => {
-        if (user?.user_type === "Boarder") navigate("/");
+        if (user?.user_type === "Boarder") navigate("/boarder-dashboard");
         else navigate("/dashboard");
       }, 1200);
     } catch (err: unknown) {

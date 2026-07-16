@@ -10,6 +10,7 @@ import { Loader2, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import { useStatus } from "@/hooks/useStatus";
 
 
 type Props = {
@@ -23,6 +24,7 @@ type Status = "idle" | "loading" | "success" | "error";
 
 const DeleteUserModal = ({ open, onClose, userId, onSuccess }: Props) => {
   const { deleteUser } = useAuth();
+  const { showLoading, showSuccess, showError } = useStatus();
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -38,32 +40,40 @@ const handleDelete = async () => {
   if (!userId) return;
 
   try {
-    setStatus("loading");
-    setError(null);
+    showLoading(
+      "Deleting User",
+      "Please wait while we delete the user account..."
+    );
 
     await deleteUser(userId);
 
-    setStatus("success");
+    showSuccess(
+      "User Deleted",
+      "The user account has been deleted successfully."
+    );
 
-    setTimeout(() => {
-      onSuccess?.();
-      onClose();
-    }, 1200);
+    onSuccess?.();
 
-  } catch (err: unknown) {
-    setStatus("error");
+    onClose();
 
-    if (typeof err === "string") setError(err);
-    else setError("Failed to delete user");
+  } catch (err) {
+    showError(
+      "Delete Failed",
+      typeof err === "string"
+        ? err
+        : "Failed to delete user."
+    );
   }
 };
+
+
   return (
-   <Dialog
-  open={open}
-  onOpenChange={(val) => {
-    if (!val) onClose();
-  }}
->
+    <Dialog
+      open={open}
+      onOpenChange={(val) => {
+        if (!val) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-md text-center space-y-4">
 
         {/* 🔷 LOADING */}

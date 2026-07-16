@@ -1,4 +1,4 @@
-import { MoreVertical, Mail, Eye, UserRoundPen, Trash2, DoorOpen } from "lucide-react"
+import { MoreVertical, Mail, Eye, UserRoundPen, Trash2,  UserCheck, Ban, } from "lucide-react"
 import type { User } from "@/store/useAuthStore"
 import {
   DropdownMenu,
@@ -6,166 +6,190 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { useEffect, useState } from "react";
-import DeleteUserModal from "../modal/DeleteUserModal";
-import ViewUserModal from "../modal/ViewUserModal";
-import UpdateUserModal from "../modal/UpdateUserModal";
-import AssignBoarderModal from "../modal/AssignBoarderModal";
+} from "@/components/ui/dropdown-menu"
+import { useState } from "react"
+import DeleteUserModal from "../modal/DeleteUserModal"
+import UpdateUserModal from "../modal/UpdateUserModal"
+import { useNavigate } from "react-router-dom"
+import DeactivateUserModal from "../modal/DeactivateUserModal"
+import ActivateUserModal from "../modal/ActivateUserModal"
+import StatusReviewModal from "../modal/StatusReviewModal"
+
 
 type Props = {
-  user: User;
-  onDeleteSuccess: (id: number) => void;
-  onUpdateSuccess: (updatedUser: User) => void;
+  user: User
+  onUpdateSuccess: (updatedUser: User) => void
+}
+
+const UserTableRow = ({ user,  onUpdateSuccess }: Props) => {
+  const [openDelete, setOpenDelete] = useState(false)
+  const [openEdit, setOpenEdit] = useState(false)
+  const [openActivate, setOpenActivate] = useState(false);
+  const [openDeactivate, setOpenDeactivate] = useState(false);
+  const [openStatusReview, setOpenStatusReview] = useState(false);
+  const navigate = useNavigate()
+
+  const formatDate = (date: string) => {
+  return new Date(date).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
-const UserTableRow = ({ user, onDeleteSuccess, onUpdateSuccess }: Props) => {
-  const [openDelete, setOpenDelete] = useState(false);
-  const [openView, setOpenView] = useState(false);
-  const [openEdit, setOpenEdit] = useState(false);
-  const [openAssign, setOpenAssign] = useState(false);
-
-  useEffect(() => {
-    console.log("USER:", user);
-    console.log("IS ARRAY:", Array.isArray(user));
-  }, [user]);
+  const statusClass =
+    user.status === "Approved"
+      ? "bg-emerald-50 text-emerald-700"
+      : user.status === "Pending"
+        ? "bg-amber-50 text-amber-700"
+        : "bg-rose-50 text-rose-700"
 
   return (
-    <tr className="border-t hover:bg-muted/50 transition">
+    <>
+      <tr className="transition hover:bg-slate-50/80">
+        <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">#{user.user_id_no}</td>
 
-      {/* 🔷 USER */}
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-3">
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            {user.avatar_url ? (
+              <img
+                onClick={() => navigate(`/view-user/${user.id}`)}
+                src={user.avatar_url}
+                alt={user.username}
+                className="h-10 w-10 rounded-2xl object-cover ring-1 ring-slate-200 cursor-pointer hover:ring-slate-400 transition"
+              />
+            ) : (
+              <div
+                onClick={() => navigate(`/view-user/${user.id}`)}
+                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl bg-slate-800 text-sm font-semibold text-blue-100 hover:bg-slate-700 transition"
+              >
+                {user.first_name?.charAt(0)}
+              </div>
+            )}
 
-          {/* Avatar */}
-          {user.avatar_url ? (
-            <img
-              src={user.avatar_url}
-              alt={user.username}
-              className="w-9 h-9 rounded-2xl object-cover"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-full flex bg-slate-700 text-blue-100 items-center justify-center text-sm font-semibold">
-              {user.first_name?.charAt(0)}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-800">
+                {user.first_name} {user.last_name}
+              </p>
+              <p className="truncate text-xs text-slate-500">@{user.username}</p>
             </div>
-          )}
-
-          <div>
-            <p className="text-sm font-medium">
-              {user.first_name} {user.last_name}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              @{user.username}
-            </p>
           </div>
+        </td>
 
-        </div>
-      </td>
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <Mail size={14} className="text-slate-400" />
+            <span className="truncate">{user.email}</span>
+          </div>
+        </td>
 
-      {/* 🔷 EMAIL */}
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Mail size={14} />
-          {user.email}
-        </div>
-      </td>
-
-      {/* 🔷 ROLE */}
-      <td className="px-4 py-3">
-        <span
-          className={`px-2 py-1 text-xs rounded-full font-medium ${user.user_type === "Admin"
-            ? "bg-purple-100 text-purple-600"
-            : user.user_type === "Staff"
-              ? "bg-blue-100 text-blue-600"
-              : "bg-green-100 text-green-600"
-            }`}
-        >
-          {user.user_type}
-        </span>
-      </td>
-
-      {/* 🔷 CREATED */}
-      <td className="px-4 py-3 text-xs text-muted-foreground">
-        {user.created_at
-          ? new Date(user.created_at).toLocaleDateString()
-          : "N/A"}
-      </td>
-
-      <td className="px-4 py-3 text-xs text-muted-foreground">
-        {user.updated_at
-          ? new Date(user.updated_at).toLocaleDateString()
-          : "N/A"}
-      </td>
-
-      <td className="px-4 py-3">
-        {user.is_assigned ? (
-          <span className="font-medium text-gray-800">
-            {user.room_number} • {user.bed_number}
+        <td className="px-4 py-3">
+          <span
+            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${user.user_type === "Admin"
+              ? "bg-purple-100 text-purple-700"
+              : user.user_type === "Staff"
+                ? "bg-blue-100 text-blue-700"
+                : "bg-emerald-100 text-emerald-700"
+              }`}
+          >
+            {user.user_type}
           </span>
-        ) : user.user_type === "Staff" ? (
-          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-50 text-red-600">
-            not Available for assignment
+        </td>
+
+        <td className="px-4 py-3">
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}>
+            {user.status}
           </span>
-        ) : (
-          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-500">
-            — Not Assigned
-          </span>
-        )}
-      </td>
+        </td>
 
-      {/* 🔷 ACTIONS */}
-      <td className="px-4 py-3 text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="p-2 rounded-lg hover:bg-muted">
-              <MoreVertical size={16} />
-            </button>
-          </DropdownMenuTrigger>
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            {user.account_status === "Active" ? (
+              <>
+                <UserCheck size={14} className="text-emerald-500" />
+                <span className="text-emerald-500">Active</span>
+              </>
+            ) : (
+              <>
+                <Ban size={14} className="text-rose-500" />
+                <span className="text-rose-500">Deactivated</span>
+              </>
+            )}
+          </div>
+        </td>
 
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => setOpenView(true)}>
-              <Eye /> View
-            </DropdownMenuItem>
+        <td className="px-4 py-3">
+          {formatDate(user.created_at)}
+        </td>
 
-            <DropdownMenuItem onClick={() => setOpenEdit(true)}>
-              <UserRoundPen /> Update
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuItem
-              onClick={() => setOpenDelete(true)}
-              className="text-red-500 focus:text-red-500"
-            >
-              <Trash2 /> Delete
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              disabled={user.is_assigned}
-              onClick={() => !user.is_assigned && setOpenAssign(true)}
-              className={user.is_assigned ? "opacity-50 cursor-not-allowed" : ""}
-            >
-              <DoorOpen />
-              {user.is_assigned ? "Already Assigned" : "Assign Room"}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </td>
-
-      {/* 🔥 MODALS */}
+        <td className="px-4 py-3 text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
+                <MoreVertical size={16} />
+              </button>
+            </DropdownMenuTrigger>
 
 
-      <DeleteUserModal
+            <DropdownMenuContent align="end" className="w-44 rounded-xl border-slate-200 p-1">
+              {user.user_type === "Boarder" &&
+                user.status === "Pending" && (
+                  <DropdownMenuItem
+                    onClick={() => setOpenStatusReview(true)}
+                    className="gap-2 text-blue-600"
+                  >
+                    <UserCheck size={14} />
+                    Review Application
+                  </DropdownMenuItem>
+                )}
+              <DropdownMenuItem onClick={() => navigate(`/view-user/${user.id}`)} className="gap-2">
+                <Eye size={14} /> View
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => setOpenEdit(true)} className="gap-2">
+                <UserRoundPen size={14} /> Update
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={() => setOpenDelete(true)}
+                className="gap-2 text-red-500 focus:text-red-500"
+              >
+                <Trash2 size={14} /> Delete
+              </DropdownMenuItem>
+              {user.status === "Approved" && (
+                <>
+                  {user.account_status === "Active" ? (
+                    <DropdownMenuItem
+                      onClick={() => setOpenDeactivate(true)}
+                      className="gap-2 text-orange-600 focus:text-orange-600"
+                    >
+                      <Ban size={14} />
+                      Deactivate
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem
+                      onClick={() => setOpenActivate(true)}
+                      className="gap-2 text-emerald-600 focus:text-emerald-600"
+                    >
+                      <UserCheck size={14} />
+                      Activate
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
+              
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </td>
+      </tr>
+
+        <DeleteUserModal
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         userId={user.id}
-        onSuccess={() => onDeleteSuccess(user.id)}
-      />
-
-      <ViewUserModal
-        open={openView}
-        onClose={() => setOpenView(false)}
-        user={user}
-      />
+    />
 
       <UpdateUserModal
         open={openEdit}
@@ -173,15 +197,33 @@ const UserTableRow = ({ user, onDeleteSuccess, onUpdateSuccess }: Props) => {
         user={user}
         onSuccess={(updatedUser: User) => onUpdateSuccess(updatedUser)}
       />
-      <AssignBoarderModal
-        open={openAssign}
-        onClose={() => setOpenAssign(false)}
-        user={user}
+  
+      <DeactivateUserModal
+        open={openDeactivate}
+        onClose={() => setOpenDeactivate(false)}
+        userId={user.id}
+        userName={`${user.first_name} ${user.last_name}`}
+      />
+
+      <ActivateUserModal
+        open={openActivate}
+        onClose={() => setOpenActivate(false)}
+        userId={user.id}
+        userName={`${user.first_name} ${user.last_name}`}
       />
 
 
+      <StatusReviewModal
+        open={openStatusReview}
+        onClose={() => setOpenStatusReview(false)}
+        userId={user.id}
+        userName={`${user.first_name} ${user.last_name}`}
+        currentStatus={user.status}
+        onSuccess={(updatedUser) => onUpdateSuccess(updatedUser)}
+      />
 
-    </tr>
+
+    </>
   )
 }
 
