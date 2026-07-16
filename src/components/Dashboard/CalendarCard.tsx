@@ -1,20 +1,37 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+
+type CalendarCell = {
+  day: number;
+  current: boolean;
+  year: number;
+  month: number;
+};
+
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
 ];
 
-const EVENTS = {
+const EVENTS: Record<
+  string,
+  {
+    label: string;
+    color: string;
+  }
+> = {
   "2025-5-5": { label: "Payment Due", color: "#a855f7" },
   "2025-5-12": { label: "Inspection", color: "#22c55e" },
   "2025-5-20": { label: "House Meeting", color: "#eab308" },
   "2025-5-28": { label: "Deadline", color: "#ef4444" },
 };
 
-function getCalendarGrid(year, month) {
+function getCalendarGrid(
+  year: number,
+  month: number
+): CalendarCell[] {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
@@ -28,7 +45,7 @@ function getCalendarGrid(year, month) {
     cells.push({ day: d, current: true, year, month });
   }
   while (cells.length % 7 !== 0) {
-    const day = cells.length - (firstDay + daysInMonth) + 1;
+  const day: number = cells.length - (firstDay + daysInMonth) + 1;
     cells.push({ day, current: false, year, month: month + 1 });
   }
 
@@ -41,13 +58,13 @@ export default function CalendarCard() {
 
   const cells = getCalendarGrid(view.year, view.month);
 
-  const isToday = (cell) =>
+  const isToday = (cell: CalendarCell) =>
     cell.current &&
     cell.year === today.getFullYear() &&
     cell.month === today.getMonth() &&
     cell.day === today.getDate();
 
-  function goToMonth(offset) {
+function goToMonth(offset: number) {
     const d = new Date(view.year, view.month + offset, 1);
     setView({ year: d.getFullYear(), month: d.getMonth() });
   }

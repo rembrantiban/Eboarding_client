@@ -27,10 +27,10 @@ export default function Room() {
 
         {/* Tabs */}
         <Tabs defaultValue="rooms" className="space-y-2">
-          <TabsList className="h-10 w-full justify-start gap-1 rounded-lg bg-muted/60 p-1 sm:w-auto">
+          <TabsList variant="line" className="h-10 w-full max-w-sm justify-start gap-1 p-1 sm:w-auto">
             <TabsTrigger
               value="rooms"
-              className="gap-1.5 rounded-md px-3 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              className="gap-1.5 px-3 pb-5 text-sm font-medium"
             >
               <BedDouble className="h-4 w-4" />
               Rooms
@@ -38,7 +38,7 @@ export default function Room() {
 
             <TabsTrigger
               value="assignments"
-              className="gap-1.5 rounded-md px-3 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              className="gap-1.5 pb-5 px-3 text-sm font-medium "
             >
               <Users className="h-4 w-4" />
               Assignments
@@ -46,7 +46,7 @@ export default function Room() {
 
             <TabsTrigger
               value="history"
-              className="gap-1.5 rounded-md px-3 text-sm font-medium data-[state=active]:bg-background data-[state=active]:shadow-sm"
+              className="gap-1.5 pb-5 px-3 text-sm font-medium "
             >
               <History className="h-4 w-4" />
               Occupancy History

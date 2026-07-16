@@ -1,27 +1,59 @@
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+} from "recharts";
 
-const data = [
+
+type ChartData = {
+  name: string;
+  value: number;
+  color: string;
+};
+
+const data: ChartData[] = [
   { name: "Occupied", value: 42, color: "#475569" },
   { name: "Available", value: 18, color: "#cbd5e1" },
 ];
 
+
 const total = data.reduce((sum, d) => sum + d.value, 0);
 
-function formatRooms(v) {
+function formatRooms(v: number) {
   return `${v} rooms`;
 }
 
-function CustomTooltip({ active, payload }) {
-  if (!active || !payload || !payload.length) return null;
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    name: string;
+  }>;
+};
+
+function CustomTooltip({
+  active,
+  payload,
+}: CustomTooltipProps) {
+  if (!active || !payload?.length) return null;
+
   const item = payload[0];
-  const pct = ((item.value / total) * 100).toFixed(0);
+
+  const value = Number(item.value);
+  const pct = ((value / total) * 100).toFixed(0);
 
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm">
-      <p className="text-[11px] font-medium text-slate-500">{item.name}</p>
+      <p className="text-[11px] font-medium text-slate-500">
+        {item.name}
+      </p>
+
       <p className="text-[13px] font-semibold text-slate-900">
-        {formatRooms(item.value)}{" "}
-        <span className="font-normal text-slate-400">({pct}%)</span>
+        {formatRooms(value)}
+        <span className="font-normal text-slate-700">
+          {" "}({pct}%)
+        </span>
       </p>
     </div>
   );

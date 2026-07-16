@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+
 const data = [
   { date: "May 1", value: 18000 },
   { date: "May 3", value: 42000 },
@@ -26,42 +27,8 @@ const data = [
 
 const lastValue = data[data.length - 1];
 
-function formatCurrency(v) {
-  return `\u20B1${(v / 1000).toFixed(0)}K`;
-}
-
-function ChartDot({ cx, cy, index }) {
-  const isLast = index === data.length - 1;
-
-  if (!isLast) {
-    return <circle cx={cx} cy={cy} r={3.5} fill="#475569" stroke="#fff" strokeWidth={1.5} />;
-  }
-
-  const label = `\u20B1${lastValue.value.toLocaleString()}`;
-  const labelWidth = label.length * 7 + 20;
-
-  return (
-    <g>
-      <circle cx={cx} cy={cy} r={5} fill="#475569" stroke="#fff" strokeWidth={2} />
-      <g transform={`translate(${cx - labelWidth / 2}, ${cy - 38})`}>
-        <rect width={labelWidth} height={24} rx={12} fill="#475569" />
-        <polygon
-          points={`${labelWidth / 2 - 5},24 ${labelWidth / 2 + 5},24 ${labelWidth / 2},31`}
-          fill="#475569"
-        />
-        <text
-          x={labelWidth / 2}
-          y={16}
-          textAnchor="middle"
-          fill="#fff"
-          fontSize={12}
-          fontWeight={600}
-        >
-          {label}
-        </text>
-      </g>
-    </g>
-  );
+function formatCurrency(v: number) {
+  return `₱${(v / 1000).toFixed(0)}K`;
 }
 
 export default function PaymentsOverviewChart() {
@@ -108,7 +75,76 @@ export default function PaymentsOverviewChart() {
               stroke="#475569"
               strokeWidth={2.5}
               fill="url(#paymentsFill)"
-              dot={<ChartDot />}
+              dot={(props) => {
+                const { cx, cy, payload } = props as {
+                  cx?: number;
+                  cy?: number;
+                  payload?: {
+                    date: string;
+                    value: number;
+                  };
+                };
+
+                if (cx == null || cy == null || !payload) {
+                  return null;
+                }
+
+                const isLast = payload.date === lastValue.date;
+
+                if (!isLast) {
+                  return (
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={3.5}
+                      fill="#475569"
+                      stroke="#fff"
+                      strokeWidth={1.5}
+                    />
+                  );
+                }
+
+                const label = `₱${lastValue.value.toLocaleString()}`;
+                const labelWidth = label.length * 7 + 20;
+
+                return (
+                  <g>
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={5}
+                      fill="#475569"
+                      stroke="#fff"
+                      strokeWidth={2}
+                    />
+
+                    <g transform={`translate(${cx - labelWidth / 2}, ${cy - 38})`}>
+                      <rect
+                        width={labelWidth}
+                        height={24}
+                        rx={12}
+                        fill="#475569"
+                      />
+
+                      <polygon
+                        points={`${labelWidth / 2 - 5},24 ${labelWidth / 2 + 5},24 ${labelWidth / 2},31`}
+                        fill="#475569"
+                      />
+
+                      <text
+                        x={labelWidth / 2}
+                        y={16}
+                        textAnchor="middle"
+                        fill="#fff"
+                        fontSize={12}
+                        fontWeight={600}
+                      >
+                        {label}
+                      </text>
+                    </g>
+                  </g>
+                );
+              }}
               activeDot={false}
             />
           </AreaChart>

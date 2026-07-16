@@ -8,7 +8,7 @@ import { MOCK_ASSIGNMENTS } from "./Data";
 import type { EnrichedAssignment, StatusFilter } from "./types";
 
 import StatsCards from "./StatsCard";
-import AssignmentToolbar from "./Assignmenttoolbar";
+import AssignmentToolbar from "./AssignmentToolbar";
 import AssignmentTable from "./AssignmentTable";
 import AssignmentFormModal from "./AssignmentFormModal";
 import AssignmentDetailsModal from "./AssignmentDetailsModal";

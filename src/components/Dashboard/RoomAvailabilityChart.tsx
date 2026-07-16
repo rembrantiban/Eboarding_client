@@ -5,7 +5,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import { DoorOpen, TrendingUp } from "lucide-react";
+import { TrendingUp } from "lucide-react";
 
 const data = [
   { room: "Room 101", available: 14, occupied: 6 },

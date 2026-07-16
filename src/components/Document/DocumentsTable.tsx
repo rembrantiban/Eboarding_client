@@ -32,7 +32,7 @@ const DocumentsTable = ({ documents }: DocumentsTableProps) => {
           {documents.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-slate-500">
-                No documents uploaded yet
+                No documents match your search or filters
               </td>
             </tr>
           ) : (

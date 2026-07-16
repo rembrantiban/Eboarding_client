@@ -8,7 +8,6 @@ import {
     User,
     CalendarDays,
     Clock,
-    Users,
 } from "lucide-react";
 
 export interface RoomAssignment {

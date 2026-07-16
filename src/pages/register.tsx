@@ -10,7 +10,7 @@ import {
   User,
   AtSign,
   Phone,
-  MapPin,
+  MapPin, 
   Mail,
   Lock,
   Loader2,
@@ -576,7 +576,7 @@ const Register = () => {
                   </Field>
                 </div>
 
-                <div className="flex-1">
+                <div className="space-y-2">
                   <Field icon={ShieldCheck} error={errors.valid_id_type}>
                     <select
                       name="valid_id_type"
@@ -602,7 +602,7 @@ const Register = () => {
                       <option value="Other">Other</option>
                     </select>
                   </Field>
-                <div className="flex flex-col gap-3 rounded-xl border border-slate-200 mb-3 bg-white p-3">
+                <div className="flex flex-col gap-3 rounded-xl border mt-3 border-slate-200 mb-3 bg-white p-3">
                   <div className="mt-3">
                     <SmallUpload
                       label="Valid ID"

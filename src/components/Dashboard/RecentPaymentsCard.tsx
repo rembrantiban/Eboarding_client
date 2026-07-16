@@ -1,6 +1,18 @@
 import { ChevronRight } from  "lucide-react"
 
-const payments = [
+type PaymentStatus = "Paid" | "Pending" | "Overdue";
+
+type Payment = {
+  id: number;
+  name: string;
+  room: string;
+  status: PaymentStatus;
+  amount: number;
+  date: string;
+  initials: string;
+};
+
+const payments: Payment[] = [
   {
     id: 1,
     name: "Maria Santos",
@@ -39,14 +51,14 @@ const payments = [
   },
 ];
 
-const STATUS_STYLES = {
+const STATUS_STYLES : Record<PaymentStatus, string> = {
   Paid: "bg-gray-100 text-gray-700",
   Pending: "bg-gray-900 text-white",
   Overdue: "bg-gray-500 text-white",
 };
 
-function formatCurrency(v) {
-  return `\u20B1${v.toLocaleString()}`;
+function formatCurrency(v: number) {
+  return `₱${v.toLocaleString()}`;
 }
 
 export default function RecentPaymentsCard() {
@@ -65,7 +77,7 @@ export default function RecentPaymentsCard() {
       <div className="flex flex-col divide-y divide-gray-100">
         {payments.map((p) => (
           <div key={p.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gray-900 text-[12px] font-semibold text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-900 text-[12px] font-semibold text-white">
               {p.initials}
             </div>
 
@@ -77,12 +89,12 @@ export default function RecentPaymentsCard() {
             </div>
 
             <span
-              className={`flex-shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLES[p.status]}`}
+              className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLES[p.status]}`}
             >
               {p.status}
             </span>
 
-            <div className="flex flex-shrink-0 flex-col items-end gap-0.5">
+            <div className="flex shrink-0 flex-col items-end gap-0.5">
               <span className="text-[13px] font-semibold text-gray-900">
                 {formatCurrency(p.amount)}
               </span>

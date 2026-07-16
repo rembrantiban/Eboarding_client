@@ -13,12 +13,11 @@ import {
 interface RowMenuProps {
     assignment: EnrichedAssignment;
     onView: (a: EnrichedAssignment) => void;
-    onEdit: (a: EnrichedAssignment) => void;
     onCheckout: (a: EnrichedAssignment) => void;
     onDelete: (a: EnrichedAssignment) => void;
 }
 
-export default function RowMenu({ assignment, onView, onEdit, onCheckout, onDelete }: RowMenuProps) {
+export default function RowMenu({ assignment, onView, onCheckout, onDelete }: RowMenuProps) {
     const { user } = useAuth();
 
     return (
@@ -39,7 +38,7 @@ export default function RowMenu({ assignment, onView, onEdit, onCheckout, onDele
                         <Eye size={14} className="mr-2" /> View
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => onEdit(assignment)}>
+                    <DropdownMenuItem onClick={() => console.log(assignment)}>
                         <Pencil size={14} className="mr-2" /> Edit
                     </DropdownMenuItem>
 

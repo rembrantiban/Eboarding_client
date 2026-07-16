@@ -58,7 +58,7 @@ export interface AvailableRoom {
   room_number: string;
 
   capacity: number;
-
+  total_beds: number;
   price_per_month: number;
 
   description?: string;
