@@ -1,6 +1,6 @@
 "use client";
 
-import { BedDouble, DoorOpen, User } from "lucide-react";
+import { BedDouble, DoorOpen } from "lucide-react";
 import { statusConfig } from "./Data";
 import { formatDate } from "./Utils";
 import RowMenu from "./Rowmenu";
@@ -8,13 +8,18 @@ import type { AssignedBoarder } from "@/store/useRoomAssignmentStore";
 
 interface AssignmentTableProps {
     assignments: AssignedBoarder[];
+    onTransfer: (assignment: AssignedBoarder) => void;
+    onCheckout: (assignment: AssignedBoarder) => void;
+
 }
 
 export default function AssignmentTable({
     assignments,
+    onTransfer,
+    onCheckout
 }: AssignmentTableProps) {
     return (
-      <div className="overflow-visible rounded border border-slate-200 bg-white">
+        <div className="overflow-visible rounded border border-slate-200 bg-white">
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm">
                     <thead>
@@ -33,9 +38,18 @@ export default function AssignmentTable({
                             <tr key={a.id} className="border-t border-slate-100 transition hover:bg-slate-50/60">
                                 <td className="px-4 py-3">
                                     <div className="flex items-center gap-2.5">
-                                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                                            <User size={14} />
-                                        </span>
+                                        {a.avatar_url ? (
+                                            <img
+                                                src={a.avatar_url}
+                                                alt={`${a.first_name} ${a.last_name}`}
+                                                className="h-8 w-8 rounded-full"
+                                            />
+                                        ) : (
+                                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-700 text-slate-100 border border-slate-300">
+                                                {(a.first_name ?? "").charAt(0).toUpperCase()}
+                                                {(a.last_name ?? "").charAt(0).toUpperCase()}
+                                            </div>
+                                        )}
                                         <span className="font-medium text-slate-900">{a.first_name} {a.last_name}</span>
                                     </div>
                                 </td>
@@ -65,6 +79,8 @@ export default function AssignmentTable({
                                 <td className="px-4 py-3 text-right">
                                     <RowMenu
                                         assignment={a}
+                                        onTransfer={onTransfer}
+                                        onCheckout={onCheckout}
                                     />
                                 </td>
                             </tr>

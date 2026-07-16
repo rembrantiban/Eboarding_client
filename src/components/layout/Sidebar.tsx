@@ -3,7 +3,6 @@
 import {
   LayoutDashboard,
   Users,
-  BedDouble,
   UserCheck,
   User,
   Settings,
@@ -93,7 +92,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
               <span className="text-white font-black text-sm leading-none"><IoHomeSharp size={20} className="text-white" /></span>
             </div>
            <div className="flex flex-col">
-             <span className="text-[17px] font-bold tracking-tight text-slate-900">
+             <span className="text-[15px] font-bold tracking-tight text-slate-900">
               E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">BOARDING</span>
             </span>
             <p className="text-xs text-slate-500">Erming House</p>
@@ -124,8 +123,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           <SidebarItem icon={<UserCheck size={16} />} label="Rooms" to="/room" onNavigate={closeAll} />
 
           <SectionLabel label="Transactions" />
-          <SidebarItem icon={<BedDouble size={16} />} label="Boarders" to="/boarders" onNavigate={closeAll} />
-          <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/payments" onNavigate={closeAll} />
+          <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/billing" onNavigate={closeAll} />
           <SidebarItem icon={<Wallet size={16} />} label="Payment History" to="/payment-history" onNavigate={closeAll} />
           <SidebarItem icon={<ScrollText size={16} />} label="Reports" to="/reports" onNavigate={closeAll} />
 

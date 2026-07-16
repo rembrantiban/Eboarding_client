@@ -15,7 +15,7 @@ import ResetPassword from "./pages/resetPassword"
 import AdminRoute from "./route/AdminRoute"
 import Viewroom from './pages/viewroom'
 import Boarders from "./pages/boarders"
-import Payment from "./pages/Payment"
+import Billing from "./pages/Billing"
 import ProfilePage from './pages/ProfilePage'
 import Report from "@/pages/Report"
 import Announcement from "@/pages/announcement"
@@ -54,7 +54,7 @@ function App() {
             <Route path="/room" element={<Room />} />
             <Route path="/boarders" element={<Boarders />} />
             <Route path='/rules' element={<Rules />} />
-            <Route path='/payments' element={<Payment />} />
+            <Route path='/billing' element={<Billing />} />
             <Route path='/reports' element={<Report />} />
             <Route path='/announcements' element={<Announcement />} />
             <Route path="/profile" element={<ProfilePage />} />

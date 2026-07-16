@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, LogOut, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { ArrowRightLeft, Eye, LogOut, MoreVertical, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
     DropdownMenu,
@@ -12,9 +12,11 @@ import type { AssignedBoarder } from "@/store/useRoomAssignmentStore"
 
 interface RowMenuProps {
     assignment: AssignedBoarder;
+    onTransfer: (assignment: AssignedBoarder) => void;
+    onCheckout: (assignment: AssignedBoarder) => void;
 }
 
-export default function RowMenu({ assignment}: RowMenuProps) {
+export default function RowMenu({ assignment, onTransfer, onCheckout }: RowMenuProps) {
     const { user } = useAuth();
 
     return (
@@ -35,13 +37,13 @@ export default function RowMenu({ assignment}: RowMenuProps) {
                         <Eye size={14} className="mr-2" /> View
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => console.log(assignment)}>
-                        <Pencil size={14} className="mr-2" /> Edit
+                    <DropdownMenuItem onClick={() => onTransfer(assignment)}>
+                        <ArrowRightLeft  size={14} className="mr-2" /> Transfer
                     </DropdownMenuItem>
 
                     {assignment.status === "Active" && (
                         <DropdownMenuItem
-                            onClick={() => console.log(assignment)}
+                            onClick={() => onCheckout(assignment)}
                             className="text-amber-700 focus:bg-amber-50 focus:text-amber-700"
                         >
                             <LogOut size={14} className="mr-2" /> Check out

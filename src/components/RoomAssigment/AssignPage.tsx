@@ -12,17 +12,21 @@ import AssignmentTable from "./AssignmentTable";
 import AssignmentFormModal from "./AssignmentFormModal";
 import AssignmentDetailsModal from "./AssignmentDetailsModal";
 import { useRoomAssignment } from "@/hooks/useRoomAssignment";
+import TransferRoomModal from "./TransferoomModal";
+import CheckoutModal from "./CheckoutModal";
 
 export default function RoomAssignmentPage() {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
     const [selected, setSelected] = useState<AssignedBoarder | null>(null);
     const [showAssignModal, setShowAssignModal] = useState(false);
-    const { assignedBoarders, getAssignments } = useRoomAssignment();
+    const { assignedBoarders, getAssignments, checkoutAssignment, loading } = useRoomAssignment();
+    const [transferAssignment, setTransferAssignment] = useState<AssignedBoarder | null>(null);
+    const [checkout, setCheckout] = useState<AssignedBoarder | null>(null);
 
     useEffect(() => {
         getAssignments();
-      // eslint-disable-next-line
+        // eslint-disable-next-line
     }, []);
 
     const filtered = useMemo(() => {
@@ -49,6 +53,14 @@ export default function RoomAssignmentPage() {
         [assignedBoarders]
     );
 
+
+    const handleTransfer = (assignment: AssignedBoarder) => {
+        setTransferAssignment(assignment);
+    };
+
+    const handleCheckout = (assignment: AssignedBoarder) => {
+        setCheckout(assignment);
+    };
     return (
         <div className="min-h-screen bg-slate-50 px-6 py-8">
             <div className="mx-auto max-w-6xl space-y-2">
@@ -79,6 +91,8 @@ export default function RoomAssignmentPage() {
 
                 <AssignmentTable
                     assignments={filtered}
+                    onTransfer={handleTransfer}
+                    onCheckout={handleCheckout}
                 />
             </div>
 
@@ -89,6 +103,52 @@ export default function RoomAssignmentPage() {
 
 
             <AssignmentDetailsModal assignment={selected} onClose={() => setSelected(null)} />
+            <TransferRoomModal
+                open={transferAssignment !== null}
+                assignment={
+                    transferAssignment
+                        ? {
+                            assignment_id:
+                                transferAssignment.assignment_id,
+
+                            user_id: transferAssignment.id,
+
+                            boarder_name:
+                                `${transferAssignment.first_name} ${transferAssignment.last_name}`,
+
+                            room_number:
+                                transferAssignment.room_number,
+
+                            bed_number:
+                                transferAssignment.bed_number,
+                        }
+                        : null
+                }
+                onClose={() => {
+                    setTransferAssignment(null);
+                    getAssignments();
+                }}
+            />
+
+
+            <CheckoutModal
+                open={checkout !== null}
+                assignment={checkout}
+                loading={loading}
+                onClose={() => setCheckout(null)}
+                onConfirm={async () => {
+                    if (!checkout) return;
+
+                    const success = await checkoutAssignment(
+                        checkout.assignment_id
+                    );
+
+                    if (success) {
+                        setCheckout(null);
+                        getAssignments();
+                    }
+                }}
+            />
         </div>
     );
 }

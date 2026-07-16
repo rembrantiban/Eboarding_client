@@ -6,10 +6,20 @@ export const useRoomAssignment = () => {
     const getAssignments = useRoomAssignmentStore((state) => state.getAssignments);
     const loading = useRoomStore((state) => state.loading);
     const assignedBoarders = useRoomAssignmentStore((state) => state.assignedBoarders);
+    const transferAssignment = useRoomAssignmentStore((state) => state.transferAssignment);
+    const checkoutAssignment = useRoomAssignmentStore((state) => state.checkoutAssignment);
+    const getOccupancyHistory = useRoomAssignmentStore((state) => state.getOccupancyHistory);
+    const occupancyHistory = useRoomAssignmentStore((state) => state.occupancyHistory);
+
     return {
         assignRoom,
         getAssignments,
         loading,
         assignedBoarders,
+        transferAssignment,
+        checkoutAssignment,
+        getOccupancyHistory,
+        occupancyHistory,
+
     };
 };
