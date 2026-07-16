@@ -27,7 +27,7 @@ const penalties = [
   },
 ];
 
-function formatCurrency(v) {
+function formatCurrency(v: number) {
   return `\u20B1${v.toLocaleString()}`;
 }
 
