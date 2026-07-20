@@ -4,7 +4,6 @@ import {
     Wallet,
     Calendar,
     Home,
-
     Clock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,16 +12,18 @@ import OutstandingBalance from "@/components/BoarderDashboard/OutstandingBalance
 import ActivePenalties from "@/components/BoarderDashboard/ActivePenalties"
 import FullCalendar from "@/components/BoarderDashboard/FullCalendar";
 import { useRoomAssignment } from "@/hooks/useRoomAssignment";
-
+import { useBilling } from "@/hooks/useBilling";
 
 
 export default function BoarderDashboard() {
     const { user } = useAuth();
     const { getDashboard, dashboard } = useRoomAssignment();
+    const { outstandingBalance, getOutstandingBalance } = useBilling();
 
     useEffect(() => {
         getDashboard();
-    }, [getDashboard]);
+        getOutstandingBalance();
+    }, [getDashboard, getOutstandingBalance]);
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString("en-US", {
@@ -128,8 +129,8 @@ export default function BoarderDashboard() {
                     <PaymentDueDates />
 
                     <OutstandingBalance
-                        amount={1250}
-                        pendingCount={2}
+                        amount={outstandingBalance?.outstanding_balance ?? 0}
+                        pendingCount={outstandingBalance?.pending_count ?? 0}
                     />
 
                     <ActivePenalties />

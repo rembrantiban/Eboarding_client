@@ -9,7 +9,10 @@ export const useBilling = ( ) => {
             applyLateFee,
             paymentHistory,
             getPaymentHistory,
+            outstandingBalance,
+            getOutstandingBalance,
         } = useBillingStore();
+
     
     return { 
             billings,
@@ -19,6 +22,8 @@ export const useBilling = ( ) => {
             applyDiscount,
             applyLateFee,
             paymentHistory,
-            getPaymentHistory
+            getPaymentHistory,
+            outstandingBalance,
+            getOutstandingBalance
         };
 };

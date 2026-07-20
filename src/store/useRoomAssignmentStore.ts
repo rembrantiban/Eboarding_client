@@ -169,6 +169,21 @@ export interface BoarderDashboard {
     } | null;
 }
 
+export interface UpcomingPayment {
+    id: number;
+    billing_no: string;
+    billing_month: string;
+    due_date: string;
+
+    total_amount: number;
+    paid_amount: number;
+    balance: number;
+
+    status: "Pending" | "Partial" | "Paid";
+
+    due_label: string;
+}
+
 interface RoomAssignmentStore {
     loading: boolean;
 
@@ -176,6 +191,9 @@ interface RoomAssignmentStore {
     occupancyHistory: OccupancyHistory[];
     boarderAssignedRoom: BoarderAssignedRoom | null;
     dashboard: BoarderDashboard | null;
+
+    upcomingPayments: UpcomingPayment[];
+
 
 
     assignRoom: (data: AssignRoomPayload) => Promise<boolean>;
@@ -187,6 +205,8 @@ interface RoomAssignmentStore {
     getBoarderAssignedRoom: (userId: number) => Promise<boolean>;
     getDashboard: () => Promise<boolean>;
 
+    getUpcomingPayments: () => Promise<boolean>;
+
 
 }
 
@@ -197,6 +217,60 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
     occupancyHistory: [],
     boarderAssignedRoom: null,
     dashboard: null,
+    upcomingPayments: [],
+    
+    getUpcomingPayments: async () => {
+
+    const { showError } = useStatusStore.getState();
+
+    try {
+
+        set({
+            loading: true,
+        });
+
+        const res =
+            await axiosInstance.get(
+                "/room-assignment/get-my-upcoming-payments"
+            );
+        
+
+        set({
+            upcomingPayments: res.data,
+        });
+
+        return true;
+
+    } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+
+            showError(
+                "Unable to Load Dashboard",
+                error.response?.data?.message ??
+                "Failed to retrieve dashboard."
+            );
+
+        } else {
+
+            showError(
+                "Unable to Load Dashboard",
+                "Failed to retrieve dashboard."
+            );
+
+        }
+
+        return false;
+
+    } finally {
+
+        set({
+            loading: false,
+        });
+
+    }
+
+},
 
     getDashboard: async () => {
 

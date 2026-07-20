@@ -27,6 +27,16 @@ const MyRooms = () => {
 
     const images = boarderAssignedRoom?.room_images || [];
 
+    const formatDate = (date?: string | null) => {
+        if (!date) return "—";
+
+        return new Date(date).toLocaleDateString("en-PH", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
+
     return (
         <div className="w-full space-y-6">
             {/* HEADER */}
@@ -121,8 +131,8 @@ const MyRooms = () => {
                                         key={i}
                                         onClick={() => setCurrentIndex(i)}
                                         className={`h-1.5 rounded-full transition-all ${i === currentIndex
-                                                ? "w-4 bg-white"
-                                                : "w-1.5 bg-white/50"
+                                            ? "w-4 bg-white"
+                                            : "w-1.5 bg-white/50"
                                             }`}
                                         aria-label={`Go to photo ${i + 1}`}
                                     />
@@ -169,9 +179,7 @@ const MyRooms = () => {
                             <Info
                                 icon={<Calendar size={15} />}
                                 label="Since"
-                                value={new Date(
-                                    boarderAssignedRoom?.assigned_date
-                                ).toLocaleDateString("en-PH")}
+                                value={formatDate(boarderAssignedRoom?.assigned_date)}
                             />
                         </div>
                     </div>

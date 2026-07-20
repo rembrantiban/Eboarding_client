@@ -14,8 +14,10 @@ export const useRoomAssignment = () => {
     const getBoarderAssignedRoom = useRoomAssignmentStore((state) => state.getBoarderAssignedRoom);
     const getDashboard = useRoomAssignmentStore((state) => state.getDashboard);
     const dashboard = useRoomAssignmentStore((state) => state.dashboard);
-    
-    
+    const upcomingPayments = useRoomAssignmentStore((state) => state.upcomingPayments);
+    const  getUpcomingPayments = useRoomAssignmentStore((state) => state.getUpcomingPayments);
+
+
     return {
         assignRoom,
         getAssignments,
@@ -29,5 +31,7 @@ export const useRoomAssignment = () => {
         boarderAssignedRoom,
         getDashboard,
         dashboard,
+        upcomingPayments,
+        getUpcomingPayments,
     };
 };

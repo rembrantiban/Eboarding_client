@@ -69,6 +69,7 @@ interface ApplyLateFeeData {
     lateFee: number;
 }
 
+
 export interface PaymentHistory {
     id: number;
     billing_id: number;
@@ -118,18 +119,25 @@ export interface PaymentHistory {
     avatar_url: string | null;
 }
 
+export interface OutstandingBalance {
+    outstanding_balance: number;
+    pending_count: number;
+}
 
 interface BillingStore {
 
     loading: boolean;
     billings: Billing[];
     paymentHistory: PaymentHistory[];
+    outstandingBalance: OutstandingBalance | null;
 
     getAllBillings: () => Promise<void>;
     recordPayment: (data: RecordPaymentData) => Promise<boolean>;
     applyDiscount: (data: ApplyDiscountData) => Promise<boolean>;
     applyLateFee: (data: ApplyLateFeeData) => Promise<boolean>;
     getPaymentHistory: () => Promise<boolean>;
+    getOutstandingBalance: () => Promise<boolean>;
+
 
 }
 
@@ -139,6 +147,49 @@ export const useBillingStore = create<BillingStore>((set) => ({
     billings: [],
     paymentHistory: [],
 
+    outstandingBalance: null,
+
+    getOutstandingBalance: async () => {
+    try {
+
+        set({
+            loading: true,
+        });
+
+        const res = await axiosInstance.get(
+            "/billing/outstanding-balance"
+        );
+
+        set({
+            outstandingBalance: {
+                outstanding_balance: Number(
+                    res.data.outstanding_balance
+                ),
+                pending_count: Number(
+                    res.data.pending_count
+                ),
+            },
+        });
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Get Outstanding Balance Error:",
+            error
+        );
+
+        return false;
+
+    } finally {
+
+        set({
+            loading: false,
+        });
+
+    }
+},
     getPaymentHistory: async () => {
 
         const {

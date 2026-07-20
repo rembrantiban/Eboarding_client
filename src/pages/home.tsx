@@ -28,7 +28,7 @@ const Home = () => {
   return (  
     <div className="min-h-screen bg-background text-foreground">
       <Header />
-      <img src="/Background.png" alt="Hero" className="w-full h-screen object-fit" />
+      <img src="./Ermings.png" alt="Hero" className="w-full h-screen object-fit" />
       <Features />
       <LocationSection />
       <Separator className="my-12" />
