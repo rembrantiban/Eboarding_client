@@ -9,7 +9,8 @@ import {
     Bed,
     Bell,
     Layers,
-    FolderOpen
+    FolderOpen,
+    Wallet2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnnouncement } from "@/hooks/useAnnouncement"
@@ -22,8 +23,10 @@ const navItems = [
     { label: "Profile", icon: Layers, path: "/view-account" },
     { label: "Bed & Room", icon: Bed, path: "/my-room" },
     { label: "Edit profile", icon: User, path: "/edit-account" },
+     { label: "Billing", icon: Wallet2, path: "/boarder-billing" },
+    { label: "History", icon: ReceiptSwissFranc, path: "/payment-history" },
     { label: "Announcements", icon: Bell, path: "/boarder/announcements" },
-    { label: "Payment History", icon: ReceiptSwissFranc, path: "/payment-history" },
+
     { label: "Documents", icon: FolderOpen, path: "/boarder/documents" }
 ];
 
@@ -53,7 +56,7 @@ export default function Sidebar() {
         }
     };
 
-    
+
     return (
         <aside className="sticky top-8 w-64 shrink-0 px-5 py-8">
             {/* User */}

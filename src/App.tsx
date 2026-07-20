@@ -31,6 +31,7 @@ import GlobalStatusModal from './components/StatusModal/GlobalStatusModal'
 import Documents from './pages/Documents'
 import BoarderDocumentPage from './pages/BoarderDocumentPage'
 import History from './pages/History'
+import BoarderBilling from './pages/BoarderBilling'
 
 function App() {
  
@@ -72,6 +73,7 @@ function App() {
             <Route path='/my-room' element={<MyRoom />} />
             <Route path="/view-account" element={<ViewOwnAccount />} />
             <Route path="/payment-history" element={<PaymentHistoryPage />} />
+            <Route path="/boarder-billing" element={<BoarderBilling />} />
           </Route>
 
       </Routes>
