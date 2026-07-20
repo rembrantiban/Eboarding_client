@@ -44,6 +44,8 @@ interface BillingTableProps {
     onViewBilling?: (billing: Billing) => void;
     onRecordPayment?: (billing: Billing) => void;
     onDeleteBilling?: (billing: Billing) => void;
+    onApplyDiscount?: (billing: Billing) => void;
+    onApplyLateFee?: (billing: Billing) => void;
 }
 
 function formatCurrency(value: number) {
@@ -116,6 +118,8 @@ export default function BillingTable({
     onExport,
     onViewBilling,
     onRecordPayment,
+    onApplyDiscount,
+    onApplyLateFee,
     //onDeleteBilling,
 }: BillingTableProps) {
     const [search, setSearch] = useState("");
@@ -191,10 +195,8 @@ export default function BillingTable({
                         <SelectContent>
                             <SelectItem value="all">All</SelectItem>
                             <SelectItem value="Pending">Pending</SelectItem>
-                            <SelectItem value="Paid">Paid</SelectItem>
                             <SelectItem value="Partial">Partial</SelectItem>
                             <SelectItem value="Overdue">Overdue</SelectItem>
-                            <SelectItem value="Cancelled">Cancelled</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -231,6 +233,7 @@ export default function BillingTable({
                             <TableHead className="whitespace-nowrap">Total Amount</TableHead>
                             <TableHead className="whitespace-nowrap">Paid</TableHead>
                             <TableHead className="whitespace-nowrap">Balance</TableHead>
+                            <TableHead className="whitespace-nowrap">Discount</TableHead>
                             <TableHead className="whitespace-nowrap">Status</TableHead>
                             <TableHead className="whitespace-nowrap text-right">
                                 Actions
@@ -241,7 +244,7 @@ export default function BillingTable({
                         {loading &&
                             Array.from({ length: 5 }).map((_, i) => (
                                 <TableRow key={i}>
-                                    {Array.from({ length: 10 }).map((__, j) => (
+                                    {Array.from({ length: 11 }).map((__, j) => (
                                         <TableCell key={j}>
                                             <Skeleton className="h-3.5 w-full max-w-20" />
                                         </TableCell>
@@ -252,7 +255,7 @@ export default function BillingTable({
                         {!loading && filtered.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={10}
+                                    colSpan={11}
                                     className="py-10 text-center text-sm text-slate-400"
                                 >
                                     No billings match your search.
@@ -295,6 +298,9 @@ export default function BillingTable({
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap text-slate-700">
                                         {formatCurrency(b.balance)}
+                                    </TableCell>
+                                    <TableCell className="whitespace-nowrap text-green-700">
+                                        {formatCurrency(b.discount)}
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap">
                                         <StatusBadge status={b.status} />
@@ -345,14 +351,14 @@ export default function BillingTable({
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem
-                                                    onClick={() => console.log?.(b)}
+                                                    onClick={() => onApplyDiscount?.(b)}
                                                 >
                                                     <Tag className="text-blue-600"/>
                                                     Apply Discount
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem
-                                                    onClick={() => console.log?.(b)}
+                                                    onClick={() => onApplyLateFee?.(b)}
                                                 >
                                                     <BanknoteArrowUp className="text-red-700" />
                                                     Apply Late Payment Fee

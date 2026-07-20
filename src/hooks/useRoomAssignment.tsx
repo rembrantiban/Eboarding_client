@@ -10,6 +10,8 @@ export const useRoomAssignment = () => {
     const checkoutAssignment = useRoomAssignmentStore((state) => state.checkoutAssignment);
     const getOccupancyHistory = useRoomAssignmentStore((state) => state.getOccupancyHistory);
     const occupancyHistory = useRoomAssignmentStore((state) => state.occupancyHistory);
+    const boarderAssignedRoom = useRoomAssignmentStore((state) => state.boarderAssignedRoom);   
+    const getBoarderAssignedRoom = useRoomAssignmentStore((state) => state.getBoarderAssignedRoom);
 
     return {
         assignRoom,
@@ -20,6 +22,7 @@ export const useRoomAssignment = () => {
         checkoutAssignment,
         getOccupancyHistory,
         occupancyHistory,
-
+        getBoarderAssignedRoom,
+        boarderAssignedRoom,
     };
 };

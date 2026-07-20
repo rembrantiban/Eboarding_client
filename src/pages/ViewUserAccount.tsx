@@ -204,7 +204,8 @@ const ViewUserPage = () => {
                             </div>
                         </SectionCard>
 
-                        <SectionCard title="Emergency contact" icon={UserPlus}>
+                      { user.user_type === "Boarder" && (
+                          <SectionCard title="Emergency contact" icon={UserPlus}>
                             {user.emergency_contact_name ? (
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                                     <Stat icon={UserPlus} label="Name" value={user.emergency_contact_name} />
@@ -215,7 +216,10 @@ const ViewUserPage = () => {
                                 <EmptyRow label="No emergency contact on file" />
                             )}
                         </SectionCard>
+                      )}
 
+                            {user.user_type === "Boarder" && (
+                                
                         <SectionCard title="Identity verification" icon={ShieldCheck}>
                             {user.valid_id_image ? (
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
@@ -226,7 +230,7 @@ const ViewUserPage = () => {
                                     />
                                     <div className="flex flex-1 flex-col gap-2">
                                         <span className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${status.badge}`}>
-                                            {user.status === "Approved" ? "ID verified" : status.label}
+                                            {user.valid_id_status === "Approved" ? "ID verified" : "Unverified"}
                                         </span>
                                         <a
                                             href={user.valid_id_image}
@@ -242,6 +246,7 @@ const ViewUserPage = () => {
                                 <EmptyRow icon={ImageOff} label="No ID document uploaded" />
                             )}
                         </SectionCard>
+                            )}
 
                         <SectionCard title="Account activity" icon={Clock}>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

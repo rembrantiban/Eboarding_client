@@ -31,6 +31,7 @@ import ViewUserPage from './pages/ViewUserAccount'
 import GlobalStatusModal from './components/StatusModal/GlobalStatusModal'
 import Documents from './pages/Documents'
 import BoarderDocumentPage from './pages/BoarderDocumentPage'
+import History from './pages/History'
 
 function App() {
  
@@ -60,6 +61,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/view-user/:id" element={<ViewUserPage />} />
             <Route path='documents' element={<Documents />} />
+            <Route path="/history" element={<History />} />
           </Route>
         </Route>
 

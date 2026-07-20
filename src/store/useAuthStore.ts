@@ -39,7 +39,7 @@ export interface User {
   user_type: UserType;
   status: "Pending" | "Approved" | "Rejected";
   account_status: AccountStatus;
-
+  valid_id_status: "Pending" | "Approved" | "Rejected";
   created_at: string;
   updated_at: string;
 

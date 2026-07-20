@@ -9,19 +9,23 @@ import {
     ChevronRight,
     X,
 } from "lucide-react";
-import { useBoarder } from "@/hooks/useBoarder";
+import { useRoomAssignment } from "@/hooks/useRoomAssignment";
+import { useAuth } from "@/hooks/useAuth";
+
 
 const MyRooms = () => {
-    const { getMyBoarding, myBoarding, loading } = useBoarder();
-
+    const { boarderAssignedRoom, getBoarderAssignedRoom, loading } = useRoomAssignment();
+    const { user } = useAuth();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
-        getMyBoarding();
-    }, [getMyBoarding]);
+        if (!user) return;
+        getBoarderAssignedRoom(user.id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
-    const images = myBoarding?.images || [];
+    const images = boarderAssignedRoom?.room_images || [];
 
     return (
         <div className="w-full space-y-6">
@@ -36,7 +40,7 @@ const MyRooms = () => {
                     </p>
                 </div>
 
-                {myBoarding && (
+                {boarderAssignedRoom && (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700">
                         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                         Active
@@ -58,7 +62,7 @@ const MyRooms = () => {
                         ))}
                     </div>
                 </div>
-            ) : myBoarding ? (
+            ) : boarderAssignedRoom ? (
                 <div className="overflow-hidden rounded-2xl bg-white">
                     {/* IMAGE */}
                     <div className="group relative h-72 w-full overflow-hidden bg-slate-100">
@@ -116,11 +120,10 @@ const MyRooms = () => {
                                     <button
                                         key={i}
                                         onClick={() => setCurrentIndex(i)}
-                                        className={`h-1.5 rounded-full transition-all ${
-                                            i === currentIndex
+                                        className={`h-1.5 rounded-full transition-all ${i === currentIndex
                                                 ? "w-4 bg-white"
                                                 : "w-1.5 bg-white/50"
-                                        }`}
+                                            }`}
                                         aria-label={`Go to photo ${i + 1}`}
                                     />
                                 ))}
@@ -130,10 +133,10 @@ const MyRooms = () => {
                         {/* LABEL */}
                         <div className="absolute bottom-4 left-5 text-white">
                             <p className="text-xl font-semibold">
-                                Room {myBoarding.room_number}
+                                Room {boarderAssignedRoom?.room_number}
                             </p>
                             <p className="text-xs text-white/70">
-                                Bed {myBoarding.bed_number}
+                                Bed {boarderAssignedRoom?.bed_number}
                             </p>
                         </div>
                     </div>
@@ -149,25 +152,25 @@ const MyRooms = () => {
                             <Info
                                 icon={<DoorOpen size={15} />}
                                 label="Room"
-                                value={myBoarding.room_number}
+                                value={boarderAssignedRoom?.room_number}
                             />
                             <Info
                                 icon={<BedDouble size={15} />}
                                 label="Bed"
-                                value={myBoarding.bed_number}
+                                value={boarderAssignedRoom?.bed_number}
                             />
                             <Info
                                 icon={<Wallet size={15} />}
                                 label="Monthly"
                                 value={`₱${Number(
-                                    myBoarding.price_per_month
+                                    boarderAssignedRoom.price_per_month
                                 ).toLocaleString()}`}
                             />
                             <Info
                                 icon={<Calendar size={15} />}
                                 label="Since"
                                 value={new Date(
-                                    myBoarding.start_date
+                                    boarderAssignedRoom?.assigned_date
                                 ).toLocaleDateString("en-PH")}
                             />
                         </div>

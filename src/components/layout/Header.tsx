@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link } from "react-router-dom";
-import { Bell, Home, LayoutDashboard, Megaphone, Phone, Star, User, Wallet, Wrench } from "lucide-react";
+import { Bell, Home, LayoutDashboard, Megaphone, Phone, Rocket, Star, User, Wallet, Wrench } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -301,17 +301,11 @@ const Header = () => {
           ) : (
             <div className="flex items-center gap-2">
               <Button
-                variant="ghost"
                 onClick={() => navigate("/login")}
-                className="text-slate-600 hover:text-slate-900"
+                className="text-slate-100 hover:text-slate-100"
               >
-                Login
-              </Button>
-              <Button
-                onClick={() => navigate("/register")}
-                className="bg-slate-900 text-white hover:bg-slate-800"
-              >
-                Register
+                <Rocket />
+                Get Started
               </Button>
             </div>
           )}

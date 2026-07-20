@@ -29,6 +29,48 @@ export interface AssignedBoarder {
     remarks: string;
 }
 
+export interface BoarderAssignedRoom {
+    assignment_id: number;
+
+    assigned_date: string;
+    expected_checkout: string | null;
+    actual_checkout: string | null;
+
+    status: "Active" | "Transferred" | "Checked-Out";
+    remarks: string | null;
+
+    
+    user_id: number;
+    user_id_no: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    contact_number: string;
+    avatar_url: string | null;
+
+    // Room
+    room_id: number;
+    room_number: string;
+    price_per_month: number;
+    capacity: number;
+    room_status: string;
+
+    // Room Images
+    room_images: string[];
+
+    // Bed
+    bed_id: number;
+    bed_number: string;
+    bed_status: string;
+
+    // Assigned By
+    assigned_by_id: number | null;
+    assigned_by_first_name: string | null;
+    assigned_by_last_name: string | null;
+
+    created_at: string;
+}
+
 
 export interface RoomAssignment {
     id: number;
@@ -99,7 +141,6 @@ export interface OccupancyHistory {
     assigned_by: number | null;
     assigned_by_name: string | null;
 
-    created_at: string;
 }
 
 interface RoomAssignmentStore {
@@ -107,7 +148,7 @@ interface RoomAssignmentStore {
 
     assignedBoarders: AssignedBoarder[];
     occupancyHistory: OccupancyHistory[];
-
+    boarderAssignedRoom: BoarderAssignedRoom | null;
 
     assignRoom: (data: AssignRoomPayload) => Promise<boolean>;
 
@@ -115,6 +156,7 @@ interface RoomAssignmentStore {
     transferAssignment: (data: TransferAssignmentPayload) => Promise<boolean>;
     checkoutAssignment: (assignmentId: number) => Promise<boolean>;
     getOccupancyHistory: () => Promise<void>;
+    getBoarderAssignedRoom: (userId: number) => Promise<boolean>;
 }
 
 export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
@@ -122,7 +164,59 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
     loading: false,
     assignedBoarders: [],
     occupancyHistory: [],
+    boarderAssignedRoom: null,
 
+    getBoarderAssignedRoom: async (userId) => {
+
+        const {
+            showError,
+        } = useStatusStore.getState();
+
+        try {
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                `/room-assignment/boarder-assigned-room/${userId}`
+            );
+
+            set({
+                boarderAssignedRoom: res.data,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            if (axios.isAxiosError(error)) {
+
+                showError(
+                    "Unable to Load",
+                    error.response?.data?.message ??
+                    "Unable to retrieve assigned room."
+                );
+
+            } else {
+
+                showError(
+                    "Unable to Load",
+                    "Unable to retrieve assigned room."
+                );
+
+            }
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
+
+        }
+
+    },
     getOccupancyHistory: async () => {
         try {
 

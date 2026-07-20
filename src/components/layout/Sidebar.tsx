@@ -14,7 +14,8 @@ import {
   X,
   Wallet,
   ScrollText,
-  FolderOpen, 
+  FolderOpen,
+  NotepadText, 
 } from "lucide-react"
 import { useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
@@ -124,7 +125,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
 
           <SectionLabel label="Transactions" />
           <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/billing" onNavigate={closeAll} />
-          <SidebarItem icon={<Wallet size={16} />} label="Payment History" to="/payment-history" onNavigate={closeAll} />
+          <SidebarItem icon={<NotepadText size={16} />} label="History" to="/history" onNavigate={closeAll} />
           <SidebarItem icon={<ScrollText size={16} />} label="Reports" to="/reports" onNavigate={closeAll} />
 
           <SectionLabel label="Others" />
