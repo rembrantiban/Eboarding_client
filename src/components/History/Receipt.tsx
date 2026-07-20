@@ -53,6 +53,8 @@ const statusClasses = {
   Cancelled: { text: "text-stone-500", border: "border-stone-500" },
 };
 
+
+
 function Stamp({ status }: { status: PaymentHistory["status"] }) {
   const c = statusClasses[status] || statusClasses.Paid;
   return (
