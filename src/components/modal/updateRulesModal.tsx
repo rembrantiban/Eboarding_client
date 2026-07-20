@@ -17,8 +17,6 @@ import {
   XCircle,
   Pencil,
 } from "lucide-react";
-
-import { useRules } from "@/hooks/useRules";
 import type { Rule } from "@/store/useRulesStore";
 
 type Props = {
@@ -39,7 +37,6 @@ const UpdateRuleModal = ({
   rule,
 }: Props) => {
 
-  const { updateRule } = useRules();
 
   const [status, setStatus] =
     useState<Status>("idle");
@@ -48,18 +45,20 @@ const UpdateRuleModal = ({
     useState("");
 
   const [form, setForm] = useState({
-    title: "",
-    description: "",
-  });
+  title: "",
+  description: "",
+  status: "Unpublished" as "Published" | "Unpublished",
+});
 
   useEffect(() => {
     if (!rule || !open) return;
     
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setForm({
-      title: rule.title,
-      description: rule.description,
-    });
+      setForm({
+        title: rule.title,
+        description: rule.description,
+        status: rule.status,
+      });
 
   }, [rule, open]);
 
@@ -81,10 +80,11 @@ const UpdateRuleModal = ({
     setStatus("loading");
     setError("");
 
-    await updateRule(rule.id, {
-      ...form,
-      is_active: rule.is_active,
-    });
+   setForm({
+  title: rule.title,
+  description: rule.description,
+  status: rule.status,
+});
 
     setStatus("success");
 
