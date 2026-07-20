@@ -9,12 +9,11 @@ import {
     AtSign,
     BadgeCheck,
     Pencil,
+    HeartHandshake,
+    Users,
     type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-
-
-
 
 type InfoRowProps = {
     icon: LucideIcon;
@@ -22,7 +21,7 @@ type InfoRowProps = {
     value: string | undefined;
     sub?: string;
 };
-function InfoRow({ icon: Icon, label, value, sub }  : InfoRowProps) {
+function InfoRow({ icon: Icon, label, value, sub }: InfoRowProps) {
     return (
         <div className="flex items-start gap-3 py-3.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100">
@@ -30,9 +29,13 @@ function InfoRow({ icon: Icon, label, value, sub }  : InfoRowProps) {
             </div>
             <div className="min-w-0 flex-1">
                 <p className="text-xs font-medium text-slate-500">{label}</p>
-                <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
-                    {value}
-                </p>
+                {value ? (
+                    <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
+                        {value}
+                    </p>
+                ) : (
+                    <p className="mt-0.5 text-sm italic text-slate-400">Not provided</p>
+                )}
                 {sub && <p className="mt-0.5 text-xs text-slate-400">{sub}</p>}
             </div>
         </div>
@@ -40,13 +43,18 @@ function InfoRow({ icon: Icon, label, value, sub }  : InfoRowProps) {
 }
 
 export default function PersonalInformation() {
-   const { user } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const fullName = `${user?.first_name} ${user?.last_name}`;
     const initials = `${user?.first_name[0] ?? ""}${
         user?.last_name[0] ?? ""
     }`.toUpperCase();
+
+    const hasEmergencyContact =
+        user?.emergency_contact_name ||
+        user?.emergency_contact_number ||
+        user?.emergency_contact_relationship;
 
     return (
         <div className="min-h-screen  px-6 py-8">
@@ -73,7 +81,7 @@ export default function PersonalInformation() {
                 {/* Identity card */}
                 <section className="rounded-2xl bg-slate-900 p-6 sm:p-8">
                     <div className="flex items-center gap-4">
-                        { user?.avatar_url ? (
+                        {user?.avatar_url ? (
                             <img
                                 src={user.avatar_url}
                                 alt={`${user.first_name} ${user.last_name}`}
@@ -133,6 +141,45 @@ export default function PersonalInformation() {
                 </section>
 
                 {/* Emergency contact */}
+                <section className="rounded-2xl border border-slate-200 bg-white p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                                <HeartHandshake size={15} className="text-rose-500" />
+                                Emergency contact
+                            </h2>
+                            <p className="mt-0.5 text-xs text-slate-400">
+                                Who to reach in case of an emergency
+                            </p>
+                        </div>
+                        {!hasEmergencyContact && (
+                            <button
+                                onClick={() => navigate("/edit-account")}
+                                className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-slate-900 hover:underline"
+                            >
+                                Add now
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="mt-1 divide-y divide-slate-100">
+                        <InfoRow
+                            icon={User}
+                            label="Contact name"
+                            value={user?.emergency_contact_name}
+                        />
+                        <InfoRow
+                            icon={Phone}
+                            label="Contact number"
+                            value={user?.emergency_contact_number}
+                        />
+                        <InfoRow
+                            icon={Users}
+                            label="Relationship"
+                            value={user?.emergency_contact_relationship}
+                        />
+                    </div>
+                </section>
             </div>
         </div>
     );
