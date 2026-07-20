@@ -39,7 +39,7 @@ export interface BoarderAssignedRoom {
     status: "Active" | "Transferred" | "Checked-Out";
     remarks: string | null;
 
-    
+
     user_id: number;
     user_id_no: string;
     first_name: string;
@@ -143,12 +143,40 @@ export interface OccupancyHistory {
 
 }
 
+export interface BoarderDashboard {
+    room: {
+        roomNumber: string;
+        bedNumber: string;
+        capacity: number;
+    } | null;
+
+    monthlyRate: number;
+
+    stay: {
+        months: number;
+        moveInDate: string;
+    } | null;
+
+    upcomingPayment: {
+        billingNo: string;
+        label: string;
+        billingMonth: string | null;
+        amount: number;
+        balance: number;
+        dueDate: string;
+        daysLeft: number;
+        status: "Pending" | "Partial" | "Paid";
+    } | null;
+}
+
 interface RoomAssignmentStore {
     loading: boolean;
 
     assignedBoarders: AssignedBoarder[];
     occupancyHistory: OccupancyHistory[];
     boarderAssignedRoom: BoarderAssignedRoom | null;
+    dashboard: BoarderDashboard | null;
+
 
     assignRoom: (data: AssignRoomPayload) => Promise<boolean>;
 
@@ -157,6 +185,9 @@ interface RoomAssignmentStore {
     checkoutAssignment: (assignmentId: number) => Promise<boolean>;
     getOccupancyHistory: () => Promise<void>;
     getBoarderAssignedRoom: (userId: number) => Promise<boolean>;
+    getDashboard: () => Promise<boolean>;
+
+
 }
 
 export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
@@ -165,6 +196,59 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
     assignedBoarders: [],
     occupancyHistory: [],
     boarderAssignedRoom: null,
+    dashboard: null,
+
+    getDashboard: async () => {
+
+    const { showError } = useStatusStore.getState();
+
+    try {
+
+        set({
+            loading: true,
+        });
+
+        const res =
+            await axiosInstance.get(
+                "/room-assignment/dashboard-stats"
+            );
+
+        set({
+            dashboard: res.data,
+        });
+
+        return true;
+
+    } catch (error) {
+
+        if (axios.isAxiosError(error)) {
+
+            showError(
+                "Unable to Load Dashboard",
+                error.response?.data?.message ??
+                "Failed to retrieve dashboard."
+            );
+
+        } else {
+
+            showError(
+                "Unable to Load Dashboard",
+                "Failed to retrieve dashboard."
+            );
+
+        }
+
+        return false;
+
+    } finally {
+
+        set({
+            loading: false,
+        });
+
+    }
+
+},
 
     getBoarderAssignedRoom: async (userId) => {
 

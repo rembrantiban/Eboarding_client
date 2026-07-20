@@ -8,24 +8,21 @@ import {
     Clock,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { usePayment } from "@/hooks/usePayment";
-import { useRoom } from "@/hooks/useRoom";
 import PaymentDueDates from "@/components/BoarderDashboard/PaymentDueDates";
 import OutstandingBalance from "@/components/BoarderDashboard/OutstandingBalance"
 import ActivePenalties from "@/components/BoarderDashboard/ActivePenalties"
 import FullCalendar from "@/components/BoarderDashboard/FullCalendar";
+import { useRoomAssignment } from "@/hooks/useRoomAssignment";
 
 
 
 export default function BoarderDashboard() {
     const { user } = useAuth();
-    const { getUpcomingPayment, upcomingPayment, getRecentPayments, } = usePayment();
-    const { getMyDashboard, dashboard } = useRoom();
+    const { getDashboard, dashboard } = useRoomAssignment();
+
     useEffect(() => {
-        getUpcomingPayment();
-        getRecentPayments();
-        getMyDashboard();
-    }, [getUpcomingPayment, getRecentPayments, getMyDashboard]);
+        getDashboard();
+    }, [getDashboard]);
 
     const formatDate = (date: string) => {
         return new Date(date).toLocaleDateString("en-US", {
@@ -35,27 +32,36 @@ export default function BoarderDashboard() {
         });
     };
 
-    const stats = [
-        {
-            label: "Room",
-            value: `Room ${dashboard?.room.roomNumber}`,
-            sub: "Double occupancy",
-            icon: Home,
-        },
-        {
-            label: "Monthly rate",
-            value: `₱${dashboard?.monthlyRate?.toLocaleString()}`,
-            sub: "Billed monthly",
-            icon: Wallet,
-        },
-
-        {
-            label: "Stay duration",
-            value: `${dashboard?.stay.months} months`,
-            sub: `Since ${formatDate(dashboard?.stay.moveInDate ?? "")}`,
-            icon: Clock,
-        },
-    ];
+   const stats = [
+    {
+        label: "Room",
+        value: dashboard?.room
+            ? `Room ${dashboard.room.roomNumber}`
+            : "--",
+        sub: dashboard?.room
+            ? `${dashboard.room.capacity} Occupancy`
+            : "--",
+        icon: Home,
+    },
+    {
+        label: "Monthly rate",
+        value: dashboard
+            ? `₱${dashboard.monthlyRate.toLocaleString()}`
+            : "₱0",
+        sub: "Billed monthly",
+        icon: Wallet,
+    },
+    {
+        label: "Stay duration",
+        value: dashboard?.stay
+            ? `${dashboard.stay.months} months`
+            : "--",
+        sub: dashboard?.stay
+            ? `Since ${formatDate(dashboard.stay.moveInDate)}`
+            : "--",
+        icon: Clock,
+    },
+];
 
 
     return (
@@ -77,22 +83,20 @@ export default function BoarderDashboard() {
                         <div>
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
                                 <Clock size={12} />
-                                Due in {upcomingPayment?.daysLeft} days
+                                Due in {dashboard?.upcomingPayment?.daysLeft ?? 0} days
                             </span>
 
                             <p className="mt-4 text-sm text-white/60">
-                                {upcomingPayment?.label}
+                                {dashboard?.upcomingPayment?.label ?? "No Upcoming Payment"}
                             </p>
                             <p className="mt-1 text-4xl font-semibold tracking-tight text-white">
-                                ₱{upcomingPayment?.amount.toLocaleString()}
+                                ₱{dashboard?.upcomingPayment?.amount.toLocaleString() ?? "0"}
                             </p>
                             <p className="mt-2 flex items-center gap-1.5 text-sm text-white/60">
                                 <Calendar size={14} />
-                                Due {formatDate(upcomingPayment?.dueDate ?? "")}
+                                Due {formatDate(dashboard?.upcomingPayment?.dueDate ?? "")}
                             </p>
                         </div>
-
-
                     </div>
                 </section>
 
@@ -129,7 +133,7 @@ export default function BoarderDashboard() {
                     />
 
                     <ActivePenalties />
-                </section>  
+                </section>
                 <FullCalendar />
             </div>
         </div>
