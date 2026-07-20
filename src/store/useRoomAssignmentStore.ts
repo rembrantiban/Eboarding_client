@@ -530,44 +530,7 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
         }
     },
-    assignRoom: async (data) => {
-        const { showLoading, showError, showSuccess } = useStatusStore.getState();
-        try {
-
-            showLoading("Assigning Room", "Please wait...");
-
-            set({
-                loading: true,
-            });
-
-            const res =
-                await axiosInstance.post(
-                    "/room-assignment/assign",
-                    data
-                );
-
-            showSuccess("Room Assigned", res.data.message);
-
-            set((state) => ({
-                assignedBoarders: [
-                    ...state.assignedBoarders,
-                    res.data.assignment,
-                ],
-            }));
-            return true;
-
-        } catch (error: unknown) {
-
-            if (axios.isAxiosError(error)) {
-                showError("Failed to assign room.", error.response?.data?.message);
-            } else {
-                showError("Failed to assign room.", "An unexpected error occurred.");
-            }
-            return false;
-        }
-
-
-    },
+  
 
     getAssignments: async () => {
 
@@ -597,6 +560,47 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
             });
 
         }
+
+    },
+
+      assignRoom: async (data) => {
+        const { showLoading, showError, showSuccess } = useStatusStore.getState();
+        try {
+
+            showLoading("Assigning Room", "Please wait...");
+
+            set({
+                loading: true,
+            });
+
+            const res =
+                await axiosInstance.post(
+                    "/room-assignment/assign",
+                    data
+                );
+            
+            showSuccess("Room Assigned", res.data.message);
+            
+            set((state) => ({
+                assignedBoarders: [
+                    ...state.assignedBoarders,
+                    res.data.assignment,
+                ],
+            }));
+
+            
+            return true;
+
+        } catch (error: unknown) {
+
+            if (axios.isAxiosError(error)) {
+                showError("Failed to assign room.", error.response?.data?.message);
+            } else {
+                showError("Failed to assign room.", "An unexpected error occurred.");
+            }
+            return false;
+        }
+
 
     },
 

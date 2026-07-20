@@ -1,5 +1,5 @@
 "use client";
-import { Search, SlidersHorizontal, Plus, MoreVertical,
+import { Search, SlidersHorizontal, MoreVertical,
          Download, ChevronLeft, ChevronRight, Printer, Eye,
           Pencil, Tag, BanknoteArrowUp, BanknoteArrowDown 
 } from "lucide-react";
@@ -114,7 +114,6 @@ function getPageNumbers(current: number, total: number): (number | "ellipsis")[]
 export default function BillingTable({
     billings,
     loading,
-    onAddBilling,
     onExport,
     onViewBilling,
     onRecordPayment,
@@ -167,10 +166,7 @@ export default function BillingTable({
     return (
         <div className="overflow-hidden rounded border border-slate-100 bg-white shadow-sm">
             {/* Header row */}
-            <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                <h2 className="text-sm font-semibold text-slate-900">Recent Billings</h2>
-            </div>
-
+         
             {/* Toolbar row */}
             <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-1 items-center gap-2.5">
@@ -203,19 +199,12 @@ export default function BillingTable({
 
                 <div className="flex items-center gap-2.5">
                     <Button
-                        variant="outline"
+                        variant="default"
                         onClick={onExport}
-                        className="h-9 rounded-xl text-sm font-medium text-slate-600"
+                        className="h-9 rounded-xl text-sm font-medium text-slate-100"
                     >
                         <Download className="h-3.5 w-3.5" />
                         Export
-                    </Button>
-                    <Button
-                        onClick={onAddBilling}
-                        className="h-9 rounded-xl bg-slate-900 text-sm font-medium text-white hover:bg-slate-800"
-                    >
-                        <Plus className="h-4 w-4" />
-                        New Billing
                     </Button>
                 </div>
             </div>

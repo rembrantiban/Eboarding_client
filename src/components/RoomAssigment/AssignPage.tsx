@@ -14,9 +14,10 @@ import AssignmentDetailsModal from "./AssignmentDetailsModal";
 import { useRoomAssignment } from "@/hooks/useRoomAssignment";
 import TransferRoomModal from "./TransferoomModal";
 import CheckoutModal from "./CheckoutModal";
+import RoomAssignmentSkeleton from "./RoomAssignmentSkeleton";
 
 export default function RoomAssignmentPage() {
-    const [search, setSearch] = useState("");
+    const [search, setSearch ] = useState("");
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("All");
     const [selected, setSelected] = useState<AssignedBoarder | null>(null);
     const [showAssignModal, setShowAssignModal] = useState(false);
@@ -61,6 +62,10 @@ export default function RoomAssignmentPage() {
     const handleCheckout = (assignment: AssignedBoarder) => {
         setCheckout(assignment);
     };
+
+    if (loading && assignedBoarders.length === 0) {
+    return <RoomAssignmentSkeleton />;
+}
     return (
         <div className="min-h-screen bg-slate-50 px-6 py-8">
             <div className="mx-auto max-w-6xl space-y-2">

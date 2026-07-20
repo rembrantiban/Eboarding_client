@@ -1,6 +1,7 @@
 import axiosInstance from "@/api/api";
 import { create } from "zustand"
 import { useStatusStore } from "./useStatusStore";
+import axios from "axios";
 
 export type UserType = "Admin" | "Staff" | "Boarder";
 export type UpdateUserType = "Staff" | "Boarder";
@@ -891,37 +892,60 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   forgotPassword: async (data) => {
-    try {
-      set({ isLoading: true });
+  try {
+    set({ isLoading: true });
 
-      await axiosInstance.post("/auth/forgot-password", data);
+    const res = await axiosInstance.post(
+      "/auth/forgot-password",
+      data
+    );
 
-      set({ isLoading: false });
+    set({ isLoading: false });
 
-    } catch (error: unknown) {
-      const err = error as ApiError;
+    return res.data;
 
-      set({ isLoading: false });
-      throw err.response?.data?.message || "Failed to send code";
+  } catch (error: unknown) {
+
+    set({ isLoading: false });
+
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ??
+        "Failed to send verification code."
+      );
     }
-  },
 
-  resetPassword: async (data) => {
-    try {
-      set({ isLoading: true });
+    throw new Error("Unexpected server error.");
+  }
+},
 
-      await axiosInstance.post("/auth/reset-password", data);
+ resetPassword: async (data) => {
+  try {
+    set({ isLoading: true });
 
-      set({ isLoading: false });
+    const res = await axiosInstance.post(
+      "/auth/reset-password",
+      data
+    );
 
-    } catch (error: unknown) {
-      const err = error as ApiError;
+    set({ isLoading: false });
 
-      set({ isLoading: false });
-      throw err.response?.data?.message || "Reset failed";
+    return res.data;
+
+  } catch (error: unknown) {
+
+    set({ isLoading: false });
+
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ??
+        "Unable to reset password."
+      );
     }
-  },
 
+    throw new Error("Unexpected server error.");
+  }
+},
   logout: async () => {
     try {
       set({ isLoading: true });

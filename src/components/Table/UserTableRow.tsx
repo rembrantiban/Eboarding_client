@@ -1,4 +1,4 @@
-import { MoreVertical, Mail, Eye, UserRoundPen, Trash2,  UserCheck, Ban, } from "lucide-react"
+import { MoreVertical, Mail, Eye, UserRoundPen, Trash2, UserCheck, Ban, } from "lucide-react"
 import type { User } from "@/store/useAuthStore"
 import {
   DropdownMenu,
@@ -21,7 +21,7 @@ type Props = {
   onUpdateSuccess: (updatedUser: User) => void
 }
 
-const UserTableRow = ({ user,  onUpdateSuccess }: Props) => {
+const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
   const [openDelete, setOpenDelete] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
   const [openActivate, setOpenActivate] = useState(false);
@@ -30,12 +30,12 @@ const UserTableRow = ({ user,  onUpdateSuccess }: Props) => {
   const navigate = useNavigate()
 
   const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString("en-PH", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
+    return new Date(date).toLocaleDateString("en-PH", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   const statusClass =
     user.status === "Approved"
@@ -158,7 +158,7 @@ const UserTableRow = ({ user,  onUpdateSuccess }: Props) => {
               >
                 <Trash2 size={14} /> Delete
               </DropdownMenuItem>
-              {user.status === "Approved" && (
+              {(user.user_type === "Admin" || user.status === "Approved") && (
                 <>
                   {user.account_status === "Active" ? (
                     <DropdownMenuItem
@@ -179,17 +179,17 @@ const UserTableRow = ({ user,  onUpdateSuccess }: Props) => {
                   )}
                 </>
               )}
-              
+
             </DropdownMenuContent>
           </DropdownMenu>
         </td>
       </tr>
 
-        <DeleteUserModal
+      <DeleteUserModal
         open={openDelete}
         onClose={() => setOpenDelete(false)}
         userId={user.id}
-    />
+      />
 
       <UpdateUserModal
         open={openEdit}
@@ -197,7 +197,7 @@ const UserTableRow = ({ user,  onUpdateSuccess }: Props) => {
         user={user}
         onSuccess={(updatedUser: User) => onUpdateSuccess(updatedUser)}
       />
-  
+
       <DeactivateUserModal
         open={openDeactivate}
         onClose={() => setOpenDeactivate(false)}

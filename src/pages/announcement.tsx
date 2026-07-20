@@ -158,16 +158,23 @@ export default function AdminAnnouncementsPage() {
                     {/* Feed */}
                     <section className="space-y-4">
                         {filtered.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center rounded-2xl bg-white py-16 text-center">
+                            <div className="flex flex-col items-center justify-center rounded-2xl bg-slate-50 py-16 text-center">
                                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
                                     <Megaphone size={18} className="text-slate-400" />
                                 </div>
                                 <p className="mt-3 text-sm font-medium text-slate-900">
                                     Nothing here yet
                                 </p>
-                                <p className="mt-0.5 text-xs text-slate-500">
+                                <p className="mt-0.5 text-xs text-slate-500 mb-5">
                                     Create an announcement to get started
                                 </p>
+                                 <button
+                            onClick={openCreate}
+                            className="flex shrink-0 items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                        >
+                            <Plus size={16} />
+                            New
+                        </button>
                             </div>
                         ) : (
                             filtered.map((item) => (

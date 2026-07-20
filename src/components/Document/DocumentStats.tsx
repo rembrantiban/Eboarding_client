@@ -47,7 +47,7 @@ const stats = (props: DocumentStatsProps) => [
 
 const DocumentStats = (props: DocumentStatsProps) => {
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
       {stats(props).map((stat) => (
         <Card key={stat.label} className="rounded-md border-slate-200 shadow-sm">
           <CardContent className="flex items-start gap-3 ">
