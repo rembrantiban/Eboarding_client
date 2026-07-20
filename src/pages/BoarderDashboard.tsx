@@ -79,7 +79,7 @@ export default function BoarderDashboard() {
                 </div>
 
                 {/* Upcoming payment — hero card */}
-                <section className="relative overflow-hidden rounded-2xl bg-slate-900 p-6 sm:p-8">
+                <section className="relative overflow-hidden rounded-2xl  bg-slate-900 p-6 sm:p-8">
                     <div className="relative flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
                         <div>
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">

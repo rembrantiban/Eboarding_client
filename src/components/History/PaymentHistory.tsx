@@ -143,7 +143,7 @@ export default function PaymentHistoryList({
     const grouped = useMemo(() => groupByDate(filtered), [filtered]);
 
     return (
-        <div className="overflow-hidden rounded border border-slate-100 bg-white shadow-sm">
+         <div className="h-full overflow-y-auto space-y-2 border-l-2 border-t-2 rounded-tl-2xl  pb-15  bg-gray-50">
             {/* Header row */}
             <div className="flex flex-col gap-1 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>

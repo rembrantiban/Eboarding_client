@@ -41,9 +41,10 @@ interface UpdateRoomPayload {
   price_per_month?: number;
   description?: string;
   status?:
-    | "Available"
-    | "Occupied"
-    | "Under Maintenance";
+  | "Available"
+  | "Occupied"
+  | "Under Maintenance";
+  existingImages?: string[];
   images?: File[];
 }
 
@@ -116,6 +117,7 @@ interface RoomState {
   getRoomById: (id: number) => Promise<void>;
   getAvailableRooms: () => Promise<void>;
   getOccupancyTrend: () => Promise<void>
+  updateRoomStatus: (id: number, status: "Available" | "Occupied" | "Under Maintenance") => Promise<boolean>;
 }
 
 
@@ -135,17 +137,87 @@ export const useRoomStore = create<RoomState>((set) => ({
     availableBeds: 0,
   },
 
+  updateRoomStatus: async (id, status) => {
+
+    const {
+      showLoading,
+      showSuccess,
+      showError,
+    } = useStatusStore.getState();
+
+    try {
+
+      showLoading(
+        "Updating Room Status",
+        "Please wait..."
+      );
+
+      set({
+        loading: true,
+      });
+
+      const res = await axiosInstance.put(
+        `/rooms/update-room-status/${id}`,
+        {
+          status,
+        }
+      );
+
+      showSuccess(
+        "Status Updated",
+        res.data.message
+      );
+
+      // Update only the changed room
+      set((state) => ({
+        rooms: state.rooms.map((room) =>
+          room.id === id
+            ? res.data.room
+            : room
+        ),
+        loading: false,
+      }));
+
+      return true;
+
+    } catch (error) {
+
+      if (axios.isAxiosError(error)) {
+
+        showError(
+          "Update Failed",
+          error.response?.data?.message ??
+          "Unable to update room status."
+        );
+
+      } else {
+
+        showError(
+          "Update Failed",
+          "Unexpected error."
+        );
+
+      }
+
+      set({
+        loading: false,
+      });
+
+      return false;
+    }
+  },
+
   getMyDashboard: async () => {
     try {
-        const res = await axiosInstance.get("/rooms/my-stats-dashboard");
+      const res = await axiosInstance.get("/rooms/my-stats-dashboard");
 
-        set({
-            dashboard: res.data,
-        });
+      set({
+        dashboard: res.data,
+      });
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-},
+  },
   getOccupancyTrend: async () => {
     try {
 
@@ -312,12 +384,14 @@ export const useRoomStore = create<RoomState>((set) => ({
       if (data.description)
         formData.append("description", data.description);
 
-      if (data.images?.length) {
-        data.images.forEach((file) => {
-          formData.append("images", file);
-        });
-      }
+      formData.append(
+        "existingImages",
+        JSON.stringify(data.existingImages ?? [])
+      );
 
+      data.images?.forEach((file) => {
+        formData.append("images", file);
+      });
       await axiosInstance.put(`/rooms/update-room/${data.id}`, formData);
 
       const res = await axiosInstance.get("/rooms/get-all");

@@ -21,7 +21,7 @@ export interface User {
 
   email: string;
   username: string;
-  
+
   contact_number: string;
   address?: string;
 
@@ -201,7 +201,7 @@ interface AuthState {
   getUsers: (params?: GetUsersParams) => Promise<GetUsersResponse>;
   updateUser: (id: number, data: UpdateUserPayload) => Promise<UpdateUserResponse>;
   checkAuth: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<boolean>;
   updateProfile: (data: FormData) => Promise<UpdateUserResponse>;
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (data: ResetPasswordPayload) => Promise<void>;
@@ -232,9 +232,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw error;
     }
   },
-  
+
   updateUserStatus: async (id, status) => {
-     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
     try {
       showLoading("Updating Status", "Please wait while we update the user's status...")
       const res = await axiosInstance.put(
@@ -252,7 +252,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             : user
         ),
       }));
-      
+
       showSuccess("Status Updated", "The user's status has been updated successfully.");
       return updatedUser;
 
@@ -264,7 +264,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   activateUser: async (id: number) => {
-     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
     try {
 
       showLoading("Activating User", "Please wait while we activate the user...")
@@ -303,9 +303,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   deactivateUser: async (id: number) => {
-     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
     try {
-      
+
       showLoading(
         "Deactivating User",
         "Please wait while we deactivate the user..."
@@ -447,7 +447,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   updateProfileSettings: async (data: UpdateProfileSettingsData) => {
-     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
     try {
       showLoading("Updating Profile", "Please wait while we update your profile...");
       set({ isLoading: true });
@@ -519,17 +519,17 @@ export const useAuthStore = create<AuthState>((set) => ({
         JSON.stringify(updatedUser)
       );
 
-    showSuccess(
-      "Profile Updated",
-      "Your profile has been updated successfully."
-    );
+      showSuccess(
+        "Profile Updated",
+        "Your profile has been updated successfully."
+      );
       return res.data;
 
     } catch (error: unknown) {
       const err = error as ApiError;
 
       set({ isLoading: false });
-    showError(
+      showError(
         "Update Failed",
         err.response?.data?.message || "Failed to update profile"
       );
@@ -625,7 +625,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         );
       }
 
-        await axiosInstance.post(
+      await axiosInstance.post(
         "/auth/register",
         formData
       );
@@ -670,7 +670,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   updateProfile: async (data: FormData) => {
-     const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
     try {
       set({ isLoading: true });
       showLoading("Updating Profile", "Please wait while we update your profile...");
@@ -701,111 +701,111 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
- createUserByAdmin: async (data) => {
-  const {
-    showLoading,
-    showSuccess,
-    showError,
-  } = useStatusStore.getState();
+  createUserByAdmin: async (data) => {
+    const {
+      showLoading,
+      showSuccess,
+      showError,
+    } = useStatusStore.getState();
 
-  try {
-    set({ isLoading: true });
+    try {
+      set({ isLoading: true });
 
-    showLoading(
-      "Creating User",
-      "Please wait while we create the account..."
-    );
-
-    const formData = new FormData();
-
-    formData.append("first_name", data.first_name);
-    formData.append("last_name", data.last_name);
-    formData.append("username", data.username);
-    formData.append("contact_number", data.contact_number);
-    formData.append("email", data.email);
-    formData.append("address", data.address);
-    formData.append("password", data.password);
-    formData.append("user_type", data.user_type);
-
-    if (data.gender) {
-      formData.append("gender", data.gender);
-    }
-
-    if (data.age !== undefined) {
-      formData.append("age", data.age.toString());
-    }
-
-    if (data.emergency_contact_name) {
-      formData.append(
-        "emergency_contact_name",
-        data.emergency_contact_name
+      showLoading(
+        "Creating User",
+        "Please wait while we create the account..."
       );
-    }
 
-    if (data.emergency_contact_number) {
-      formData.append(
-        "emergency_contact_number",
-        data.emergency_contact_number
+      const formData = new FormData();
+
+      formData.append("first_name", data.first_name);
+      formData.append("last_name", data.last_name);
+      formData.append("username", data.username);
+      formData.append("contact_number", data.contact_number);
+      formData.append("email", data.email);
+      formData.append("address", data.address);
+      formData.append("password", data.password);
+      formData.append("user_type", data.user_type);
+
+      if (data.gender) {
+        formData.append("gender", data.gender);
+      }
+
+      if (data.age !== undefined) {
+        formData.append("age", data.age.toString());
+      }
+
+      if (data.emergency_contact_name) {
+        formData.append(
+          "emergency_contact_name",
+          data.emergency_contact_name
+        );
+      }
+
+      if (data.emergency_contact_number) {
+        formData.append(
+          "emergency_contact_number",
+          data.emergency_contact_number
+        );
+      }
+
+      if (data.emergency_contact_relationship) {
+        formData.append(
+          "emergency_contact_relationship",
+          data.emergency_contact_relationship
+        );
+      }
+
+      if (data.avatar) {
+        formData.append("avatar", data.avatar);
+      }
+
+      if (data.valid_id_image) {
+        formData.append(
+          "valid_id_image",
+          data.valid_id_image
+        );
+      }
+
+      if (data.valid_id_type) {
+        formData.append("valid_id_type", data.valid_id_type);
+      }
+
+      const res = await axiosInstance.post(
+        "/auth/admin/users",
+        formData
       );
-    }
 
-    if (data.emergency_contact_relationship) {
-      formData.append(
-        "emergency_contact_relationship",
-        data.emergency_contact_relationship
+      const newUser = res.data.user;
+
+      set((state) => ({
+        isLoading: false,
+        users: [newUser, ...state.users],
+      }));
+
+      showSuccess(
+        "User Created",
+        "The user account has been created successfully."
       );
-    }
 
-    if (data.avatar) {
-      formData.append("avatar", data.avatar);
-    }
+      return res.data;
 
-    if (data.valid_id_image) {
-      formData.append(
-        "valid_id_image",
-        data.valid_id_image
+    } catch (error) {
+      const err = error as ApiError;
+
+      set({
+        isLoading: false,
+      });
+
+      showError(
+        "Creation Failed",
+        err.response?.data?.message ||
+        "Failed to create user."
       );
+
+      throw err.response?.data?.message || "Failed to create user";
     }
-
-    if (data.valid_id_type) {
-      formData.append("valid_id_type", data.valid_id_type);
-    }
-
-    const res = await axiosInstance.post(
-      "/auth/admin/users",
-      formData
-    );
-
-    const newUser = res.data.user;
-
-    set((state) => ({
-      isLoading: false,
-      users: [newUser, ...state.users],
-    }));
-
-    showSuccess(
-      "User Created",
-      "The user account has been created successfully."
-    );
-
-    return res.data;
-
-  } catch (error) {
-    const err = error as ApiError;
-
-    set({
-      isLoading: false,
-    });
-
-    showError(
-      "Creation Failed",
-      err.response?.data?.message ||
-      "Failed to create user."
-    );
-
-    throw err.response?.data?.message || "Failed to create user";
-  }
-},
+  },
   updateUser: async (id: number, data: UpdateUserPayload) => {
     const { showSuccess, showError, showLoading } = useStatusStore.getState();
     try {
@@ -823,7 +823,7 @@ export const useAuthStore = create<AuthState>((set) => ({
             ? { ...u, ...updatedUser }
             : u
         ),
-      }));  
+      }));
 
       showSuccess(
         "User Updated",
@@ -922,9 +922,24 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    set({ user: null, token: null });
+  logout: async () => {
+    try {
+      set({ isLoading: true });
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      set({
+        user: null,
+        token: null,
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Error occurred while logging out:", error);
+      return false;
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));

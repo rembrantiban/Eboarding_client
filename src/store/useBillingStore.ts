@@ -157,7 +157,7 @@ export const useBillingStore = create<BillingStore>((set) => ({
         });
 
         const res = await axiosInstance.get(
-            "/billing/outstanding-balance"
+            "/billings/outstanding-balance"
         );
 
         set({

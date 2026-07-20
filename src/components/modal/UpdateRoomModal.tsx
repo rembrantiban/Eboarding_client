@@ -93,6 +93,8 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
         bed_count: parseInt(form.bed_count),
         price_per_month: parseFloat(form.price_per_month),
         description: form.description,
+
+        existingImages,
         images,
       });
       toast.success("Room updated successfully!");
@@ -131,10 +133,10 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
           <div>
             <p className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3">Room Info</p>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Room Number"    name="room_number"    value={form.room_number}    onChange={handleChange} />
-              <Field label="Capacity"       name="capacity"       value={form.capacity}       onChange={handleChange} type="number" />
-              <Field label="Number of Beds" name="bed_count"      value={form.bed_count}      onChange={handleChange} type="number" />
-              <Field label="Price / Month"  name="price_per_month" value={form.price_per_month} onChange={handleChange} type="number" prefix="₱" />
+              <Field label="Room Number" name="room_number" value={form.room_number} onChange={handleChange} />
+              <Field label="Capacity" name="capacity" value={form.capacity} onChange={handleChange} type="number" />
+              <Field label="Number of Beds" name="bed_count" value={form.bed_count} onChange={handleChange} type="number" />
+              <Field label="Price / Month" name="price_per_month" value={form.price_per_month} onChange={handleChange} type="number" prefix="₱" />
             </div>
           </div>
 
@@ -163,9 +165,8 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
               onDrop={handleDrop}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
-              className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
-                dragOver ? "border-blue-400 bg-blue-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-              }`}
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${dragOver ? "border-blue-400 bg-blue-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                }`}
             >
               <div className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">

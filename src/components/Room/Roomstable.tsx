@@ -76,7 +76,9 @@ const RoomsTable = () => {
             <SelectContent>
               <SelectItem value="All">All</SelectItem>
               <SelectItem value="Available">Available</SelectItem>
-              <SelectItem value="Full">Full</SelectItem>
+              <SelectItem value="Occupied">Occupied</SelectItem>
+              <SelectItem value="Full">Under Maintenance</SelectItem>
+
             </SelectContent>
           </Select>
 

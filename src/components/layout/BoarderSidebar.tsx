@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnnouncement } from "@/hooks/useAnnouncement"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import LogoutModal from "../modal/LogoutModal";
+
 
 const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/boarder-dashboard" },
@@ -26,18 +28,32 @@ const navItems = [
 ];
 
 export default function Sidebar() {
-    const { user } = useAuth();
+    const { user, logout, isLoading } = useAuth();
     const navigate = useNavigate();
     const { markAllAsRead, getUnreadCount, unreadCount } = useAnnouncement();
+    const [showLogout, setShowLogout] = useState(false);
 
     useEffect(() => {
         getUnreadCount()
     }, [getUnreadCount]);
 
     console.log(unreadCount);
+
+
     const currentPath =
         typeof window !== "undefined" ? window.location.pathname : "";
 
+    const handleLogout = async () => {
+        setShowLogout(false);
+
+        const success = await logout();
+
+        if (success) {
+            navigate("/login", { replace: true });
+        }
+    };
+
+    
     return (
         <aside className="sticky top-8 w-64 shrink-0 px-5 py-8">
             {/* User */}
@@ -101,7 +117,7 @@ export default function Sidebar() {
                                 }
                         `}
                         >
-                            
+
                             <Icon size={18} />
                             <span>{label}</span>
                             {label === "Announcements" && unreadCount > 0 && (
@@ -121,14 +137,20 @@ export default function Sidebar() {
             {/* Logout */}
             <button
                 onClick={() => {
-                    // TODO: wire to real signOut handler
-                    navigate("/login");
+                    setShowLogout(true);
                 }}
                 className="mt-6 flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm text-slate-500 transition-colors hover:bg-slate-100 hover:text-red-600"
             >
                 <LogOut size={18} />
                 Sign out
             </button>
+
+            <LogoutModal
+                isOpen={showLogout}
+                isLoading={isLoading}
+                onClose={() => setShowLogout(false)}
+                onConfirm={handleLogout}
+            />
         </aside>
     );
 }

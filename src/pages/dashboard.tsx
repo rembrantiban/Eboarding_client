@@ -1,6 +1,6 @@
 import StatCard from "@/components/Dashboard/StatCard"
 import OccupancyChart from "@/components/Dashboard/OccupancyChart"
-import { Users, Home, BedDouble, CheckCircle, Layers } from "lucide-react"
+import { Users, Home, Layers, Flame } from "lucide-react"
 import PaymentsOverviewChart from "@/components/Dashboard/PaymentsOverviewChart"
 import RoomAvailabilityChart from "@/components/Dashboard/RoomAvailabilityChart"
 import { useAuth } from "@/hooks/useAuth"
@@ -61,12 +61,11 @@ const Dashboard = () => {
                 </div>
 
                 {/* 🔷 STATS */}
-                <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-5">
+                <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
                     <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-slate-600/70" />} />
                     <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-slate-600/70" />} />
                     <StatCard title="Fully Occupied" value={dashboardStats.fullyOccupied.toString()} icon={<Layers size={110} className="text-slate-600/70" />} />
-                    <StatCard title="Occupied Beds" value={dashboardStats.occupiedBeds.toString()} icon={<BedDouble size={110} className="text-slate-600/70" />} />
-                    <StatCard title="Available Beds" value={dashboardStats.availableBeds.toString()} icon={<CheckCircle size={110} className="text-slate-600/70" />} />
+                    <StatCard title="Active Penalties" value={dashboardStats.occupiedBeds.toString()} icon={<Flame size={110} className="text-slate-600/70" />} />
 
                 </div>
 

@@ -26,7 +26,6 @@ import BoardeAnnouncement from './pages/BoarderAnnouncement'
 import MyRoom from "@/pages/MyRoom"
 import ViewOwnAccount from "@/pages/ViewOwnAccount"
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
-import BoarderRoute from './route/BoarderRoute'
 import ViewUserPage from './pages/ViewUserAccount'
 import GlobalStatusModal from './components/StatusModal/GlobalStatusModal'
 import Documents from './pages/Documents'
@@ -65,7 +64,6 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<BoarderRoute />}>
           <Route element={<BoarderLayout />}>
             <Route path="/boarder-dashboard" element={<BoarderDashboard />} />
             <Route path='/edit-account' element={<EditAccountPage />} />
@@ -75,7 +73,6 @@ function App() {
             <Route path="/view-account" element={<ViewOwnAccount />} />
             <Route path="/payment-history" element={<PaymentHistoryPage />} />
           </Route>
-        </Route>
 
       </Routes>
       
