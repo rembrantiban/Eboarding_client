@@ -168,13 +168,13 @@ export default function AdminAnnouncementsPage() {
                                 <p className="mt-0.5 text-xs text-slate-500 mb-5">
                                     Create an announcement to get started
                                 </p>
-                                 <button
-                            onClick={openCreate}
-                            className="flex shrink-0 items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
-                        >
-                            <Plus size={16} />
-                            New
-                        </button>
+                                <button
+                                    onClick={openCreate}
+                                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                                >
+                                    <Plus size={16} />
+                                    New
+                                </button>
                             </div>
                         ) : (
                             filtered.map((item) => (

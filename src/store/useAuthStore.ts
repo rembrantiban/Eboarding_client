@@ -8,7 +8,7 @@ export type UpdateUserType = "Staff" | "Boarder";
 
 export type UserStatus = "Pending" | "Approved" | "Rejected";
 export type AccountStatus = "Active" | "Deactivate";
-type UserApprovalStatus =
+type ValidIdStatus =
   | "Under Review"
   | "Approved"
   | "Rejected";
@@ -40,7 +40,7 @@ export interface User {
   user_type: UserType;
   status: "Pending" | "Approved" | "Rejected";
   account_status: AccountStatus;
-  valid_id_status: "Under Review" | "Approved" | "Rejected";
+  valid_id_status: ValidIdStatus;
   created_at: string;
   updated_at: string;
 
@@ -210,7 +210,7 @@ interface AuthState {
   updateProfileSettings: (data: UpdateProfileSettingsData) => Promise<UpdateProfileSettingsResponse>;
   deactivateUser: (id: number) => Promise<User>;
   activateUser: (id: number) => Promise<User>;
-  updateUserStatus: (id: number, status: UserApprovalStatus) => Promise<User>;
+  updateUserStatus: (id: number, status: UserStatus ) => Promise<User>;
   getAvailableBorders: () => Promise<User[]>;
 }
 
