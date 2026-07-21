@@ -1,7 +1,6 @@
 "use client";
 
-import { ArrowRightLeft, Eye, LogOut, MoreVertical, Trash2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { ArrowRightLeft, LogOut, MoreVertical } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,7 +16,6 @@ interface RowMenuProps {
 }
 
 export default function RowMenu({ assignment, onTransfer, onCheckout }: RowMenuProps) {
-    const { user } = useAuth();
 
     return (
         <div className="flex justify-end">
@@ -33,9 +31,7 @@ export default function RowMenu({ assignment, onTransfer, onCheckout }: RowMenuP
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={() => console.log(assignment)}>
-                        <Eye size={14} className="mr-2" /> View
-                    </DropdownMenuItem>
+
 
                     <DropdownMenuItem onClick={() => onTransfer(assignment)}>
                         <ArrowRightLeft  size={14} className="mr-2" /> Transfer
@@ -47,15 +43,6 @@ export default function RowMenu({ assignment, onTransfer, onCheckout }: RowMenuP
                             className="text-amber-700 focus:bg-amber-50 focus:text-amber-700"
                         >
                             <LogOut size={14} className="mr-2" /> Check out
-                        </DropdownMenuItem>
-                    )}
-
-                    {user?.user_type === "Admin" && (
-                        <DropdownMenuItem
-                            onClick={() => console.log(assignment)}
-                            className="text-red-500 focus:bg-red-50 focus:text-red-500"
-                        >
-                            <Trash2 size={14} className="mr-2" /> Delete
                         </DropdownMenuItem>
                     )}
                 </DropdownMenuContent>

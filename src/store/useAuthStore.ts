@@ -9,7 +9,7 @@ export type UpdateUserType = "Staff" | "Boarder";
 export type UserStatus = "Pending" | "Approved" | "Rejected";
 export type AccountStatus = "Active" | "Deactivate";
 type UserApprovalStatus =
-  | "Pending"
+  | "Under Review"
   | "Approved"
   | "Rejected";
 
@@ -40,7 +40,7 @@ export interface User {
   user_type: UserType;
   status: "Pending" | "Approved" | "Rejected";
   account_status: AccountStatus;
-  valid_id_status: "Pending" | "Approved" | "Rejected";
+  valid_id_status: "Under Review" | "Approved" | "Rejected";
   created_at: string;
   updated_at: string;
 

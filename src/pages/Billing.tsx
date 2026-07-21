@@ -7,7 +7,7 @@ import RecordPaymentModal from "@/components/Billing/RecordPaymentModal";
 import type { Billing as BillingType } from "@/store/useBillingStore";
 import ApplyDiscountModal from "@/components/Billing/ApplyDiscountModal";
 import ApplyLateFeeModal from "@/components/Billing/ApplyLateFeeModal";
-
+import ViewBilling from "@/components/Billing/ViewBillingModal"
 const Billing = () => {
 
     const {
@@ -23,6 +23,9 @@ const Billing = () => {
 
     const [discountOpen, setDiscountOpen] = useState(false);
     const [lateFeeOpen, setLateFeeOpen] = useState(false);
+
+
+    const [viewOpen, setViewOpen] = useState(false);
 
     useEffect(() => {
         getAllBillings();
@@ -105,6 +108,11 @@ const Billing = () => {
                     onApplyLateFee={(billing) => {
                         setSelectedBilling(billing);
                         setLateFeeOpen(true);
+                    }}
+
+                    onViewBilling={(billing) => {
+                        setSelectedBilling(billing);
+                        setViewOpen(true);
                     }}
                 />
                 <RecordPaymentModal
@@ -194,6 +202,36 @@ const Billing = () => {
                     }}
                 />
 
+                <ViewBilling
+                    open={viewOpen}
+                    onOpenChange={(open) => {
+                        setViewOpen(open);
+
+                        if (!open) {
+                            setSelectedBilling(null);
+                        }
+                    }}
+                    billing={selectedBilling}
+                    onRecordPayment={(billing) => {
+                        setViewOpen(false);
+                        setSelectedBilling(billing);
+                        setPaymentOpen(true);
+                    }}
+                    onApplyDiscount={(billing) => {
+                        setViewOpen(false);
+                        setSelectedBilling(billing);
+                        setDiscountOpen(true);
+                    }}
+                    onApplyLateFee={(billing) => {
+                        setViewOpen(false);
+                        setSelectedBilling(billing);
+                        setLateFeeOpen(true);
+                    }}
+                    onPrint={(billing) => {
+                        console.log("Print billing", billing);
+                        // TODO: Generate PDF or window.print()
+                    }}
+                />
             </div>
 
         </div>

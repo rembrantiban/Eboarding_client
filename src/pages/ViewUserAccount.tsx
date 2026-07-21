@@ -27,9 +27,9 @@ import UpdateUserModal from "@/components/modal/UpdateUserModal"
 import AssignBoarderModal from "@/components/modal/AssignBoarderModal"
 import { useAuthStore } from "@/store/useAuthStore"
 
-const STATUS_CONFIG: Record<User["status"], { strip: string; badge: string; label: string }> = {
+const STATUS_CONFIG: Record<User["valid_id_status"], { strip: string; badge: string; label: string }> = {
     Approved: { strip: "bg-emerald-500", badge: "bg-emerald-50 text-emerald-700", label: "Approved" },
-    Pending: { strip: "bg-amber-500", badge: "bg-amber-50 text-amber-700", label: "Pending review" },
+    "Under Review": { strip: "bg-amber-500", badge: "bg-amber-50 text-amber-700", label: "Under Review" },
     Rejected: { strip: "bg-rose-500", badge: "bg-rose-50 text-rose-700", label: "Rejected" },
 }
 
@@ -102,9 +102,11 @@ const ViewUserPage = () => {
         )
     }
 
-    const status = STATUS_CONFIG[user.status]
-    const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
-
+    const status =
+        STATUS_CONFIG[user.valid_id_status] ??
+        STATUS_CONFIG["Under Review"]; const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
+    console.log(user);
+    console.log("valid_id_status:", user.valid_id_status);
     return (
         <div className="h-screen overflow-hidden">
             <div className="h-full overflow-y-auto space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-background">
@@ -119,7 +121,7 @@ const ViewUserPage = () => {
                     </button>
 
                     <div className="flex items-center gap-2">
-                        
+
                         <button
                             onClick={() => setOpenEdit(true)}
                             className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-[13px] font-medium text-slate-600 transition-colors hover:bg-slate-50"
@@ -204,49 +206,55 @@ const ViewUserPage = () => {
                             </div>
                         </SectionCard>
 
-                      { user.user_type === "Boarder" && (
-                          <SectionCard title="Emergency contact" icon={UserPlus}>
-                            {user.emergency_contact_name ? (
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    <Stat icon={UserPlus} label="Name" value={user.emergency_contact_name} />
-                                    <Stat icon={Phone} label="Contact number" value={user.emergency_contact_number || "—"} />
-                                    <Stat icon={HeartHandshake} label="Relationship" value={user.emergency_contact_relationship || "—"} />
-                                </div>
-                            ) : (
-                                <EmptyRow label="No emergency contact on file" />
-                            )}
-                        </SectionCard>
-                      )}
-
-                            {user.user_type === "Boarder" && (
-                                
-                        <SectionCard title="Identity verification" icon={ShieldCheck}>
-                            {user.valid_id_image ? (
-                                <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                                    <img
-                                        src={user.valid_id_image}
-                                        alt="Valid ID"
-                                        className="h-32 w-full rounded-xl border border-slate-200 object-cover sm:w-52"
-                                    />
-                                    <div className="flex flex-1 flex-col gap-2">
-                                        <span className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${status.badge}`}>
-                                            {user.valid_id_status === "Approved" ? "ID verified" : "Unverified"}
-                                        </span>
-                                        <a
-                                            href={user.valid_id_image}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex w-fit items-center gap-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900"
-                                        >
-                                            View full size <ExternalLink size={13} />
-                                        </a>
+                        {user.user_type === "Boarder" && (
+                            <SectionCard title="Emergency contact" icon={UserPlus}>
+                                {user.emergency_contact_name ? (
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                        <Stat icon={UserPlus} label="Name" value={user.emergency_contact_name} />
+                                        <Stat icon={Phone} label="Contact number" value={user.emergency_contact_number || "—"} />
+                                        <Stat icon={HeartHandshake} label="Relationship" value={user.emergency_contact_relationship || "—"} />
                                     </div>
-                                </div>
-                            ) : (
-                                <EmptyRow icon={ImageOff} label="No ID document uploaded" />
-                            )}
-                        </SectionCard>
-                            )}
+                                ) : (
+                                    <EmptyRow label="No emergency contact on file" />
+                                )}
+                            </SectionCard>
+                        )}
+
+                        {user.user_type === "Boarder" && (
+
+                            <SectionCard title="Identity verification" icon={ShieldCheck}>
+                                {user.valid_id_image ? (
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                                        <img
+                                            src={user.valid_id_image}
+                                            alt="Valid ID"
+                                            className="h-32 w-full rounded-xl border border-slate-200 object-cover sm:w-52"
+                                        />
+                                        <div className="flex flex-1 flex-col gap-2">
+                                            <span
+                                                className={`w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold ${status.badge}`}
+                                            >
+                                                {user.valid_id_status === "Approved"
+                                                    ? "ID Verified"
+                                                    : user.valid_id_status === "Under Review"
+                                                        ? "Under Review"
+                                                        : "Rejected"}
+                                            </span>
+                                            <a
+                                                href={user.valid_id_image}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex w-fit items-center gap-1.5 text-[13px] font-medium text-slate-600 hover:text-slate-900"
+                                            >
+                                                View full size <ExternalLink size={13} />
+                                            </a>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <EmptyRow icon={ImageOff} label="No ID document uploaded" />
+                                )}
+                            </SectionCard>
+                        )}
 
                         <SectionCard title="Account activity" icon={Clock}>
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -1,7 +1,7 @@
 "use client";
 import { Search, SlidersHorizontal, MoreVertical,
          Download, ChevronLeft, ChevronRight, Printer, Eye,
-          Pencil, Tag, BanknoteArrowUp, BanknoteArrowDown 
+         Tag, BanknoteArrowUp, BanknoteArrowDown 
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Billing } from "@/store/useBillingStore"
@@ -330,13 +330,6 @@ export default function BillingTable({
                                                 >
                                                     <FaMoneyBill/>
                                                     Record Partial Payment
-                                                </DropdownMenuItem>
-
-                                                <DropdownMenuItem
-                                                    onClick={() => console.log?.(b)}
-                                                >
-                                                    <Pencil/>
-                                                    Update Billing Information
                                                 </DropdownMenuItem>
 
                                                 <DropdownMenuItem

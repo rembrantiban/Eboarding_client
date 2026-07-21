@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import type { Payment } from "@/store/usePaymentStore"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Rocket } from "lucide-react"
 
 type Props = {
   payments: Payment[];
@@ -22,25 +22,25 @@ const ReportTable = ({ payments, search }: Props) => {
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 7
-  
-const filteredPayments = useMemo(() => {
-  const searchLower = search.toLowerCase()
 
-  return payments.filter((p) =>
-    `${p.first_name} ${p.last_name}`.toLowerCase().includes(searchLower) ||
-    p.email.toLowerCase().includes(searchLower) ||
-    `room ${p.room_number}`.toLowerCase().includes(searchLower)
-  )
-}, [payments, search])
+  const filteredPayments = useMemo(() => {
+    const searchLower = search.toLowerCase()
 
-const totalPages = Math.ceil(filteredPayments.length / itemsPerPage)
+    return payments.filter((p) =>
+      `${p.first_name} ${p.last_name}`.toLowerCase().includes(searchLower) ||
+      p.email.toLowerCase().includes(searchLower) ||
+      `room ${p.room_number}`.toLowerCase().includes(searchLower)
+    )
+  }, [payments, search])
 
-const safePage = Math.min(currentPage, totalPages || 1)
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage)
 
-const paginatedPayments = useMemo(() => {
-  const start = (safePage - 1) * itemsPerPage
-  return filteredPayments.slice(start, start + itemsPerPage)
-}, [filteredPayments, safePage])
+  const safePage = Math.min(currentPage, totalPages || 1)
+
+  const paginatedPayments = useMemo(() => {
+    const start = (safePage - 1) * itemsPerPage
+    return filteredPayments.slice(start, start + itemsPerPage)
+  }, [filteredPayments, safePage])
 
 
   const getPageNumbers = () => {
@@ -78,8 +78,20 @@ const paginatedPayments = useMemo(() => {
         <TableBody>
           {paginatedPayments.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                No paid records found
+              <TableCell colSpan={5} className="py-14 text-center">
+                <div className="flex flex-col items-center justify-center gap-2.5">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-500">
+                    <Rocket className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">
+                      Under Development
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Paid records will be available here once this feature is ready.
+                    </p>
+                  </div>
+                </div>
               </TableCell>
             </TableRow>
           ) : (
