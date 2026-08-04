@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-
-    Pencil,
     Trash2,
     Plus,
     X,
@@ -33,7 +31,7 @@ export default function StaffAnnouncementsPage() {
     const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
     const [search, setSearch] = useState("");
     const { user } = useAuth();
-    const { loading, getMyAnnouncements, myAnnouncements, updateAnnouncement, createAnnouncement } = useAnnouncement();
+    const { loading, getAnnouncements, announcements, updateAnnouncement, createAnnouncement } = useAnnouncement();
     const [editing, setEditing] = useState<Announcement | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const audiences = ["Boarders", "Staff", "All"] as const;
@@ -48,14 +46,14 @@ export default function StaffAnnouncementsPage() {
     const [pendingDelete, setPendingDelete] = useState<Announcement | null>(null);
 
     useEffect(() => {
-        getMyAnnouncements();
-    }, [getMyAnnouncements]);
+        getAnnouncements();
+    }, [getAnnouncements]);
 
     const filtered = useMemo(() => {
         const list =
             activeCategory === "All"
-                ? myAnnouncements
-                : myAnnouncements.filter((a) => a.category === activeCategory);
+                ? announcements
+                : announcements.filter((a) => a.category === activeCategory);
 
         const query = search.trim().toLowerCase();
         const searched = query
@@ -68,7 +66,7 @@ export default function StaffAnnouncementsPage() {
             : list;
 
         return [...searched];
-    }, [myAnnouncements, activeCategory, search]);
+    }, [announcements, activeCategory, search]);
 
     const openCreate = () => {
         setDraft({
@@ -81,10 +79,6 @@ export default function StaffAnnouncementsPage() {
         setIsCreating(true);
     };
 
-    const openEdit = (item: Announcement) => {
-        setDraft({ category: item.category, audience: item.audience, title: item.title, description: item.description });
-        setEditing(item);
-    };
 
     const closeForm = () => {
         setIsCreating(false);
@@ -109,7 +103,7 @@ export default function StaffAnnouncementsPage() {
                 });
             }
 
-            await getMyAnnouncements();
+            await getAnnouncements();
 
             closeForm();
 
@@ -125,7 +119,7 @@ export default function StaffAnnouncementsPage() {
     const confirmDelete = () => {
         if (!pendingDelete) return;
         // TODO: call your real delete mutation here
-        getMyAnnouncements();
+        getAnnouncements();
         setPendingDelete(null);
     };
 
@@ -143,7 +137,7 @@ export default function StaffAnnouncementsPage() {
                                 Announcements
                             </h1>
                             <p className="mt-0.5 text-sm text-slate-500">
-                                Manage updates sent to boarders
+                                Manage updates send by Admin
                             </p>
                         </div>
                         {user && user.user_type === "Admin" && (
@@ -208,7 +202,7 @@ export default function StaffAnnouncementsPage() {
                                 <p className="mt-0.5 text-xs text-slate-500 mb-5">
                                     {search
                                         ? "Try a different search term"
-                                        : "Create an announcement to get started"}
+                                        : "No announcements to display"}
                                 </p>
                                 {!search && user && user.user_type === "Admin" && (
                                     <button
@@ -223,7 +217,7 @@ export default function StaffAnnouncementsPage() {
                         ) : (
                             filtered.map((item) => (
                                 <article
-                                    key={item.id}
+                                    key={item.announcement_id}
                                     className="rounded-2xl border border-slate-200 bg-white p-6"
                                 >
                                     <div className="flex items-start justify-between gap-4">
@@ -270,27 +264,6 @@ export default function StaffAnnouncementsPage() {
                                     <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
                                         {item.description}
                                     </p>
-
-                                    <div className="mt-4 flex items-center justify-between">
-
-                                        <div className="flex items-center gap-1">
-
-                                            <button
-                                                onClick={() => openEdit(item)}
-                                                className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-                                                title="Edit"
-                                            >
-                                                <Pencil size={15} />
-                                            </button>
-                                            <button
-                                                onClick={() => setPendingDelete(item)}
-                                                className="flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
-                                                title="Delete"
-                                            >
-                                                <Trash2 size={15} />
-                                            </button>
-                                        </div>
-                                    </div>
                                 </article>
                             ))
                         )}

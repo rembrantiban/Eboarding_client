@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Bell, Megaphone } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Bell, Megaphone, Search, X } from "lucide-react";
 import { useAnnouncementStore } from "@/store/useAnnouncementStore";
 
 type Category = "All" | "Maintenance" | "Billing" | "General";
@@ -21,16 +21,29 @@ const categoryStyles: Record<Category, string> = {
 
 export default function AnnouncementsPage() {
     const [activeCategory, setActiveCategory] = useState<Category>("All");
+    const [search, setSearch] = useState("");
     const { announcements, getAnnouncements } = useAnnouncementStore();
 
     useEffect(() => {
         getAnnouncements();
     }, [getAnnouncements]);
 
-    const filtered =
-        activeCategory === "All"
-            ? announcements
-            : announcements.filter((a) => a.category === activeCategory);
+    const filtered = useMemo(() => {
+        const list =
+            activeCategory === "All"
+                ? announcements
+                : announcements.filter((a) => a.category === activeCategory);
+
+        const query = search.trim().toLowerCase();
+        if (!query) return list;
+
+        return list.filter(
+            (a) =>
+                a.title.toLowerCase().includes(query) ||
+                a.description.toLowerCase().includes(query) ||
+                a.created_by_name.toLowerCase().includes(query)
+        );
+    }, [announcements, activeCategory, search]);
 
     return (
         <div className="min-h-screen bg-slate-50 px-6 py-8">
@@ -48,6 +61,28 @@ export default function AnnouncementsPage() {
                     <button className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-500 hover:text-slate-900">
                         <Bell size={16} />
                     </button>
+                </div>
+
+                {/* Search */}
+                <div className="relative">
+                    <Search
+                        size={15}
+                        className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                    />
+                    <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search announcements..."
+                        className="h-10 w-full rounded-full border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                    />
+                    {search && (
+                        <button
+                            onClick={() => setSearch("")}
+                            className="absolute right-3 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                        >
+                            <X size={12} />
+                        </button>
+                    )}
                 </div>
 
                 {/* Category filter */}
@@ -75,10 +110,12 @@ export default function AnnouncementsPage() {
                                 <Megaphone size={18} className="text-slate-400" />
                             </div>
                             <p className="mt-3 text-sm font-medium text-slate-900">
-                                Nothing here yet
+                                {search ? "No matching announcements" : "Nothing here yet"}
                             </p>
                             <p className="mt-0.5 text-xs text-slate-500">
-                                Announcements in this category will show up here
+                                {search
+                                    ? "Try a different search term"
+                                    : "Announcements in this category will show up here"}
                             </p>
                         </div>
                     ) : (
