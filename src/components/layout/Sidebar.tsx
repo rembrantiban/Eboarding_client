@@ -17,11 +17,12 @@ import {
   NotepadText,
   ArchiveRestore,
 } from "lucide-react"
-import { useState, type ReactNode } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import ProfileModal from "../modal/profileModal"
 import { IoHomeSharp } from "react-icons/io5";
+import { useAnnouncement } from "@/hooks/useAnnouncement";
 
 
 export const MobileHeader = ({ onMenuOpen }: { onMenuOpen: () => void }) => (
@@ -56,6 +57,11 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
   const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [openProfile, setOpenProfile] = useState(false)
+  const { unreadCount, getUnreadCount, markAllAsRead, } = useAnnouncement();
+
+  useEffect(() => {
+    getUnreadCount();
+  }, [getUnreadCount]);
 
   const fullName = user
     ? `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim()
@@ -129,11 +135,21 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
 
           <SectionLabel label="Others" />
           <SidebarItem icon={<Shield size={16} />} label="Rules & Regulations" to="/rules" onNavigate={closeAll} />
-           {user?.user_type === "Admin" && (
-             <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/announcements" onNavigate={closeAll} />
-           )}
+          {user?.user_type === "Admin" && (
+            <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/announcements" onNavigate={closeAll} />
+          )}
           {user?.user_type === "Staff" && (
-            <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/staff-announcements" onNavigate={closeAll} />
+            <SidebarItem
+              icon={<Bell size={16} />}
+              label="Announcements"
+              to="/staff-announcements"
+              unreadCount={unreadCount}
+              onNavigate={async () => {
+                await markAllAsRead();
+                await getUnreadCount();
+                closeAll();
+              }}
+            />
           )}
         </div>
 
@@ -244,32 +260,50 @@ export default Sidebar
 type SidebarItemProps = {
   icon: ReactNode
   label: string
+  unreadCount?: number
   to: string
   onNavigate?: () => void
 }
 
-const SidebarItem = ({ icon, label, to, onNavigate }: SidebarItemProps) => (
+const SidebarItem = ({
+  icon,
+  label,
+  to,
+  unreadCount,
+  onNavigate,
+}: SidebarItemProps) => (
   <NavLink
     to={to}
     onClick={onNavigate}
     className={({ isActive }) =>
-      `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
-        ? "bg-slate-700 text-slate-100"
-        : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+      `flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+        isActive
+          ? "bg-slate-700 text-slate-100"
+          : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
       }`
     }
   >
     {({ isActive }) => (
       <>
-        <span className={isActive ? "text-slate-100" : "text-slate-400"}>{icon}</span>
+        <span className={isActive ? "text-slate-100" : "text-slate-400"}>
+          {icon}
+        </span>
+
         <span>{label}</span>
+
+        {label === "Announcements" && unreadCount! > 0 && (
+          <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-semibold text-white">
+            {unreadCount}
+          </span>
+        )}
+
         {isActive && (
-          <span className="ml-auto w-1.5 h-1.5 rounded-full bg-slate-100" />
+          <span className="ml-2 h-1.5 w-1.5 rounded-full bg-white" />
         )}
       </>
     )}
   </NavLink>
-)
+);
 
 const SectionLabel = ({ label }: { label: string }) => (
   <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase px-3 pt-5 pb-1.5">
