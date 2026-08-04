@@ -25,6 +25,10 @@ export const useAuth = () => {
   const updateUserStatus = useAuthStore((state) => state.updateUserStatus);
   const availableBoarders = useAuthStore((state) => state.availableBoarders);
   const getAvailableBorders = useAuthStore((state) => state.getAvailableBorders);
+  const getAllDeletedUsers = useAuthStore((state) => state.getDeletedUsers);
+  const recoverDeletedUsers = useAuthStore((state) => state.recoverDeletedUser);  
+  const deletedUsers = useAuthStore((state) => state.deletedUsers);
+
 
   return {
     user,
@@ -53,5 +57,8 @@ export const useAuth = () => {
     updateUserStatus,
     availableBoarders,
     getAvailableBorders,
+    getAllDeletedUsers,
+    recoverDeletedUsers,
+    deletedUsers
   };
 };

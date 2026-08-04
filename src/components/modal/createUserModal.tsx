@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import type { UserType } from "@/store/useAuthStore"; // TODO: adjust import path if UserType lives elsewhere
@@ -80,6 +80,7 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const idInputRef = useRef<HTMLInputElement>(null);
+    const [loadingLocation, setLoadingLocation] = useState(false);
 
     const [step, setStep] = useState(1);
 
@@ -103,9 +104,46 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
         valid_id_image: null,
     });
 
+
+
     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
     const [idPreview, setIdPreview] = useState<string | null>(null);
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
+
+
+    useEffect(() => {
+        if (!_open) return;
+
+        setLoadingLocation(true);
+
+        navigator.geolocation.getCurrentPosition(
+            async ({ coords }) => {
+                try {
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.latitude}&lon=${coords.longitude}`
+                    );
+
+                    const data = await res.json();
+
+                    setForm((prev) => ({
+                        ...prev,
+                        address: data.display_name,
+                    }));
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    setLoadingLocation(false);
+                }
+            },
+            () => {
+                setLoadingLocation(false);
+            }
+        );
+    }, [_open]);
+
+
+    // ✅ Return after all hooks
+    if (!_open) return null;
 
     if (!_open) return null;
 
@@ -334,6 +372,8 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
 
     const { title, subtitle } = STEP_INFO[step - 1];
 
+
+
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             <div
@@ -470,8 +510,19 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
 
                                 <Field label="Email address" name="email" placeholder="john@example.com" value={form.email} onChange={handleChange} type="email" error={errors.email} />
 
-                                <Field label="Address" name="address" placeholder="Street, City, Province" value={form.address} onChange={handleChange} error={errors.address} />
-
+                                <Field
+                                    label="Address"
+                                    name="address"
+                                    placeholder={
+                                        loadingLocation
+                                            ? "Getting your current location..."
+                                            : "Street, City, Province"
+                                    }
+                                    value={form.address}
+                                    onChange={handleChange}
+                                    error={errors.address}
+                                    disabled={loadingLocation}
+                                />
                                 <Field label="Password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} type="password" error={errors.password} />
 
                                 {isBoarder && (
@@ -721,7 +772,6 @@ const SectionLabel = ({ label }: { label: string }) => (
         {label}
     </p>
 );
-
 type FieldProps = {
     label: string;
     name: string;
@@ -730,6 +780,7 @@ type FieldProps = {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     type?: string;
     error?: string;
+    disabled?: boolean;
 };
 
 const Field = ({ label, name, placeholder, value, onChange, type = "text", error }: FieldProps) => (

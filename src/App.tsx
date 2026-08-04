@@ -32,6 +32,7 @@ import Documents from './pages/Documents'
 import BoarderDocumentPage from './pages/BoarderDocumentPage'
 import History from './pages/History'
 import BoarderBilling from './pages/BoarderBilling'
+import DeletedAccountsPage from './pages/DeletedAccounts'
 
 function App() {
  
@@ -62,6 +63,7 @@ function App() {
             <Route path="/view-user/:id" element={<ViewUserPage />} />
             <Route path='documents' element={<Documents />} />
             <Route path="/history" element={<History />} />
+            <Route path="/deleted-accounts" element={<DeletedAccountsPage />} />
           </Route>
         </Route>
 

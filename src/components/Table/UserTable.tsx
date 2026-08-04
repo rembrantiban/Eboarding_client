@@ -84,7 +84,7 @@ const handleUpdateSuccess = (updatedUser: User) => {
               <th className="text-left px-4 py-3">Role</th>
               <th className="text-left px-4 py-3">Account Approval</th>
               <th className="text-left px-4 py-3">Status</th>
-              <th className="text-left px-4 py-3">Room</th>
+              <th className="text-left px-4 py-3">Created At</th>
               <th className="text-right px-4 py-3">Actions</th>
             </tr>
           </thead>

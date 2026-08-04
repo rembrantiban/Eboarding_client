@@ -218,6 +218,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       console.error(error);
     }
   },
+
   getOccupancyTrend: async () => {
     try {
 
@@ -364,7 +365,10 @@ export const useRoomStore = create<RoomState>((set) => ({
 
 
   updateRoom: async (data) => {
+      const { showLoading, showError, showSuccess } = useStatusStore.getState();
+
     try {
+      showLoading("Updating Room", "Please wait...");
       set({ loading: true, error: null });
 
       const formData = new FormData();
@@ -401,6 +405,8 @@ export const useRoomStore = create<RoomState>((set) => ({
         loading: false,
       });
 
+      showSuccess("Room Updated", "Room updated successfully");
+
     } catch (error: unknown) {
       let message = "Failed to update room";
 
@@ -410,14 +416,17 @@ export const useRoomStore = create<RoomState>((set) => ({
         message = error.message;
       }
 
+      showError("Failed to update room", message);
       set({ loading: false, error: message });
       throw new Error(message); // 🔥 THIS FIXES YOUR TOAST ISSUE
     }
   },
 
   deleteRoom: async (id: number) => {
+      const { showLoading, showError, showSuccess } = useStatusStore.getState();
     try {
       set({ loading: true, error: null });
+      showLoading("Deleting Room", "Please wait...");
 
       await axiosInstance.delete(`/rooms/delete/${id}`);
 
@@ -425,6 +434,7 @@ export const useRoomStore = create<RoomState>((set) => ({
         rooms: state.rooms.filter((room) => room.id !== id),
         loading: false,
       }));
+      showSuccess("Room Deleted", "Room deleted successfully");
 
     } catch (error: unknown) {
       let message = "Failed to delete room";
@@ -434,7 +444,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       } else if (error instanceof Error) {
         message = error.message;
       }
-
+      showError("Failed to delete room", message);
       set({ loading: false, error: message });
       throw new Error(message); // 🔥 IMPORTANT for toast
     }

@@ -5,7 +5,6 @@ import {
   Users,
   UserCheck,
   User,
-  Settings,
   LogOut,
   Shield,
   Bell,
@@ -15,7 +14,8 @@ import {
   Wallet,
   ScrollText,
   FolderOpen,
-  NotepadText, 
+  NotepadText,
+  ArchiveRestore,
 } from "lucide-react"
 import { useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
@@ -71,9 +71,8 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
   return (
     <>
       <div
-        className={`lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] transition-opacity duration-300 ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
         onClick={onMobileClose}
         aria-hidden="true"
       />
@@ -92,12 +91,12 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
             <div className="w-10 h-10 rounded-md  bg-linear-to-r from-slate-600 to-slate-700 flex items-center justify-center shrink-0">
               <span className="text-white font-black text-sm leading-none"><IoHomeSharp size={20} className="text-white" /></span>
             </div>
-           <div className="flex flex-col">
-             <span className="text-[15px] font-bold tracking-tight text-slate-900">
-              E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">BOARDING</span>
-            </span>
-            <p className="text-xs text-slate-500">Erming House</p>
-           </div>
+            <div className="flex flex-col">
+              <span className="text-[15px] font-bold tracking-tight text-slate-900">
+                E-<span className="bg-linear-to-r from-slate-600 to-slate-700 bg-clip-text text-transparent select-none">BOARDING</span>
+              </span>
+              <p className="text-xs text-slate-500">Erming House</p>
+            </div>
           </div>
 
           {/* Close button — mobile only */}
@@ -139,7 +138,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
             onClick={() => setDropdownOpen((v) => !v)}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-colors group"
           >
-            { user?.avatar_url ? (
+            {user?.avatar_url ? (
               <img
                 src={user.avatar_url}
                 alt="Profile"
@@ -150,42 +149,79 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
                 {initial}
               </div>
             )}
+
             <div className="flex-1 text-left min-w-0">
-              <p className="text-sm font-semibold text-slate-800 truncate leading-tight">{fullName}</p>
-              <p className="text-[11px] text-slate-400 truncate leading-tight">{email}</p>
+              <p className="text-sm font-semibold text-slate-800 truncate leading-tight">
+                {fullName}
+              </p>
+              <p className="text-[11px] text-slate-400 truncate leading-tight">
+                {email}
+              </p>
             </div>
-            <MoreHorizontal size={16} className="text-slate-400 shrink-0" />
+
+            <MoreHorizontal
+              size={16}
+              className="text-slate-400 shrink-0"
+            />
           </button>
 
           {/* DROPDOWN */}
           {dropdownOpen && (
             <div className="absolute bottom-full mb-2 left-3 right-3 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden z-50">
+
+              {/* User Info */}
               <div className="px-4 py-3 border-b border-slate-100">
-                <p className="text-xs font-semibold text-slate-800 truncate">{fullName}</p>
-                <p className="text-[11px] text-slate-400 truncate">{email}</p>
+                <p className="text-xs font-semibold text-slate-800 truncate">
+                  {fullName}
+                </p>
+                <p className="text-[11px] text-slate-400 truncate">
+                  {email}
+                </p>
               </div>
 
+              {/* Profile */}
               <div className="py-1">
                 <DropdownButton
                   icon={<User size={14} />}
                   label="Profile"
-                  onClick={() => { navigate("/profile"); setDropdownOpen(false) }}
-                />
-                <DropdownButton
-                  icon={<Settings size={14} />}
-                  label="Settings"
-                  onClick={() => { navigate("/settings"); setDropdownOpen(false) }}
+                  onClick={() => {
+                    navigate("/profile");
+                    setDropdownOpen(false);
+                  }}
                 />
               </div>
 
+              {/* Admin Tools */}
+              {user?.user_type === "Admin" && (
+                <>
+                  <div className="border-t border-slate-100" />
+
+                  <div className="py-1">
+                    <DropdownButton
+                      icon={<ArchiveRestore size={14} />}
+                      label="Deleted Accounts"
+                      onClick={() => {
+                        navigate("/deleted-accounts");
+                        setDropdownOpen(false);
+                      }}
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Logout */}
               <div className="border-t border-slate-100 py-1">
                 <DropdownButton
                   icon={<LogOut size={14} />}
                   label="Logout"
                   danger
-                  onClick={() => { logout(); navigate("/login") }}
+                  onClick={() => {
+                    logout();
+                    navigate("/login");
+                  }}
                 />
               </div>
+
             </div>
           )}
         </div>
@@ -212,10 +248,9 @@ const SidebarItem = ({ icon, label, to, onNavigate }: SidebarItemProps) => (
     to={to}
     onClick={onNavigate}
     className={({ isActive }) =>
-      `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        isActive
-          ? "bg-slate-700 text-slate-100"
-          : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+      `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+        ? "bg-slate-700 text-slate-100"
+        : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
       }`
     }
   >
@@ -247,11 +282,10 @@ type DropdownButtonProps = {
 const DropdownButton = ({ icon, label, onClick, danger }: DropdownButtonProps) => (
   <button
     onClick={onClick}
-    className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
-      danger
-        ? "text-red-500 hover:bg-red-50"
-        : "text-slate-600 hover:bg-slate-50"
-    }`}
+    className={`w-full flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${danger
+      ? "text-red-500 hover:bg-red-50"
+      : "text-slate-600 hover:bg-slate-50"
+      }`}
   >
     {icon}
     {label}

@@ -74,7 +74,7 @@ const handleDelete = async () => {
         if (!val) onClose();
       }}
     >
-      <DialogContent className="sm:max-w-md text-center space-y-4">
+      <DialogContent className="sm:max-w-sm text-center">
 
         {/* 🔷 LOADING */}
         {status === "loading" && (

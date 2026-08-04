@@ -30,6 +30,7 @@ export interface User {
 
   gender?: string;
   age?: number;
+
   valid_id_type?: string;
   valid_id_image?: string;
 
@@ -38,9 +39,17 @@ export interface User {
   emergency_contact_relationship?: string;
 
   user_type: UserType;
-  status: "Pending" | "Approved" | "Rejected";
+  status: UserStatus;
   account_status: AccountStatus;
   valid_id_status: ValidIdStatus;
+
+  // NEW
+  is_deleted: boolean;
+  deleted_at?: string | null;
+  deleted_by?: number | null;
+  deleted_by_name?: string;
+  deleted_by_avatar: string;
+
   created_at: string;
   updated_at: string;
 
@@ -193,6 +202,7 @@ interface AuthState {
   users: User[];
   totalBoarders: number;
   availableBoarders: User[];
+  deletedUsers: User[];
 
   register: (data: RegisterPayload) => Promise<void>;
   login: (data: LoginPayload) => Promise<void>;
@@ -210,8 +220,12 @@ interface AuthState {
   updateProfileSettings: (data: UpdateProfileSettingsData) => Promise<UpdateProfileSettingsResponse>;
   deactivateUser: (id: number) => Promise<User>;
   activateUser: (id: number) => Promise<User>;
-  updateUserStatus: (id: number, status: UserStatus ) => Promise<User>;
+  updateUserStatus: (id: number, status: UserStatus) => Promise<User>;
   getAvailableBorders: () => Promise<User[]>;
+
+  getDeletedUsers: () => Promise<GetUsersResponse>;
+
+  recoverDeletedUser: (id: number) => Promise<User>;
 }
 
 
@@ -222,6 +236,81 @@ export const useAuthStore = create<AuthState>((set) => ({
   users: [],
   totalBoarders: 0,
   availableBoarders: [],
+
+  deletedUsers: [],
+
+
+  getDeletedUsers: async () => {
+  try {
+    const res = await axiosInstance.get<GetUsersResponse>(
+      "/auth/deleted-users"
+    );
+
+    set({
+      deletedUsers: res.data.users,
+    });
+
+    return res.data;
+
+  } catch (error) {
+    const err = error as ApiError;
+    throw (
+      err.response?.data?.message ||
+      "Failed to fetch deleted users"
+    );
+  }
+},
+
+recoverDeletedUser: async (id: number) => {
+  const {
+    showLoading,
+    showSuccess,
+    showError,
+  } = useStatusStore.getState();
+
+  try {
+
+    showLoading(
+      "Recovering User",
+      "Please wait while we recover the user account..."
+    );
+
+    const res = await axiosInstance.put(
+      `/auth/recover-deleted-user/${id}`
+    );
+
+    const recoveredUser = res.data.user;
+
+    set((state) => ({
+      deletedUsers: state.deletedUsers.filter(
+        (u) => u.id !== id
+      ),
+
+      users: [recoveredUser, ...state.users],
+    }));
+
+    showSuccess(
+      "User Recovered",
+      "The user account has been recovered successfully."
+    );
+
+    return recoveredUser;
+
+  } catch (error) {
+    const err = error as ApiError;
+
+    showError(
+      "Recovery Failed",
+      err.response?.data?.message ||
+      "Failed to recover user."
+    );
+
+    throw (
+      err.response?.data?.message ||
+      "Failed to recover user."
+    );
+  }
+},
 
   getAvailableBorders: async () => {
     try {
@@ -892,60 +981,60 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   forgotPassword: async (data) => {
-  try {
-    set({ isLoading: true });
+    try {
+      set({ isLoading: true });
 
-    const res = await axiosInstance.post(
-      "/auth/forgot-password",
-      data
-    );
-
-    set({ isLoading: false });
-
-    return res.data;
-
-  } catch (error: unknown) {
-
-    set({ isLoading: false });
-
-    if (axios.isAxiosError(error)) {
-      throw new Error(
-        error.response?.data?.message ??
-        "Failed to send verification code."
+      const res = await axiosInstance.post(
+        "/auth/forgot-password",
+        data
       );
+
+      set({ isLoading: false });
+
+      return res.data;
+
+    } catch (error: unknown) {
+
+      set({ isLoading: false });
+
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          error.response?.data?.message ??
+          "Failed to send verification code."
+        );
+      }
+
+      throw new Error("Unexpected server error.");
     }
+  },
 
-    throw new Error("Unexpected server error.");
-  }
-},
+  resetPassword: async (data) => {
+    try {
+      set({ isLoading: true });
 
- resetPassword: async (data) => {
-  try {
-    set({ isLoading: true });
-
-    const res = await axiosInstance.post(
-      "/auth/reset-password",
-      data
-    );
-
-    set({ isLoading: false });
-
-    return res.data;
-
-  } catch (error: unknown) {
-
-    set({ isLoading: false });
-
-    if (axios.isAxiosError(error)) {
-      throw new Error(
-        error.response?.data?.message ??
-        "Unable to reset password."
+      const res = await axiosInstance.post(
+        "/auth/reset-password",
+        data
       );
-    }
 
-    throw new Error("Unexpected server error.");
-  }
-},
+      set({ isLoading: false });
+
+      return res.data;
+
+    } catch (error: unknown) {
+
+      set({ isLoading: false });
+
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          error.response?.data?.message ??
+          "Unable to reset password."
+        );
+      }
+
+      throw new Error("Unexpected server error.");
+    }
+  },
   logout: async () => {
     try {
       set({ isLoading: true });
