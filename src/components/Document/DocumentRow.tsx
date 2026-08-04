@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, MoreVertical, CircleCheck, FileText, User, CircleXIcon } from "lucide-react";
+import {
+  Eye,
+  MoreVertical,
+  CircleCheck,
+  FileText,
+  User,
+  CircleXIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +27,8 @@ interface DocumentRowProps {
   document: Document;
 }
 
+const CELL = "px-3 py-2 align-middle";
+
 const DocumentRow = ({ document }: DocumentRowProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
@@ -33,110 +42,106 @@ const DocumentRow = ({ document }: DocumentRowProps) => {
       year: "numeric",
     });
 
+  const isUnderReview = document.valid_id_status === "Under Review";
+  const isApproved = document.valid_id_status === "Approved";
 
-
-
+  const timeline = isUnderReview
+    ? `Submitted ${formatDate(document.created_at)}`
+    : `${isApproved ? "Approved" : "Rejected"} ${formatDate(document.updated_at)}`;
 
   return (
     <>
-      <tr className="border-t border-slate-100 transition hover:bg-slate-50">
-        <td className="px-4 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
-              <FileText size={18} className="text-slate-600" />
+      <tr className="border-b border-slate-100 transition-colors hover:bg-slate-50/70">
+        <td className={CELL}>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-100">
+              <FileText size={14} className="text-slate-500" />
             </div>
-            <p className="text-sm font-medium text-slate-700">
+            <p className="text-[13px] font-medium text-slate-900">
               {document.valid_id_type}
             </p>
           </div>
         </td>
 
-        <td className="px-4 py-4">
-          <div className="flex items-center gap-3">
+        <td className={CELL}>
+          <div className="flex items-center gap-2.5">
             {document.avatar_url ? (
               <img
                 src={document.avatar_url}
                 alt={`${document.first_name} ${document.last_name}`}
-                className="h-9 w-9 rounded-full border border-slate-200 object-cover"
+                className="h-7 w-7 rounded-full border border-slate-200 object-cover"
               />
             ) : (
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100">
-                <User size={16} className="text-slate-500" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100">
+                <User size={13} className="text-slate-400" />
               </div>
             )}
-            <p className="text-sm text-slate-700">
+            <p className="text-[13px] text-slate-700">
               {document.first_name} {document.last_name}
             </p>
           </div>
         </td>
 
-        <td className="px-4 py-4">
+        <td className={CELL}>
           <DocumentStatusBadge status={document.valid_id_status} />
-          <p className="mt-1 text-xs text-slate-500">
-            {document.valid_id_status === "Under Review" && (
-              <>Submitted on {formatDate(document.created_at)}</>
-            )}
-            {document.valid_id_status === "Approved" && (
-              <>Approved on {formatDate(document.updated_at)}</>
-            )}
-            {document.valid_id_status === "Rejected" && (
-              <>Rejected on {formatDate(document.updated_at)}</>
-            )}
-          </p>
+          <p className="mt-1 text-[11px] text-slate-400">{timeline}</p>
         </td>
 
-        <td className="px-4 py-4">
-          <div className="flex items-center justify-end gap-2">
-            {document.valid_id_status === "Under Review" ? (
+        <td className={CELL}>
+          <div className="flex items-center justify-end gap-1">
+            {isUnderReview ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
                     aria-label="Open document actions"
-                    className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                    className="flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
                   >
-                    <MoreVertical size={16} />
+                    <MoreVertical size={14} />
                   </button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" className="w-44">
-                  <DropdownMenuItem onClick={() => setApproveOpen(true)}>
-                    <CircleCheck size={14} className="mr-2 text-green-600" />
+                <DropdownMenuContent
+                  align="end"
+                  className="w-40 rounded-lg p-1 text-[13px]"
+                >
+                  <DropdownMenuItem
+                    onClick={() => setApproveOpen(true)}
+                    className="gap-2 rounded-md py-1.5 text-[13px]"
+                  >
+                    <CircleCheck size={14} className="text-emerald-600" />
                     Approve
                   </DropdownMenuItem>
 
                   <DropdownMenuItem
                     onClick={() => setRejectOpen(true)}
-                    className="text-red-500 focus:bg-red-50 focus:text-red-500"
+                    className="gap-2 rounded-md py-1.5 text-[13px] text-rose-600 focus:bg-rose-50 focus:text-rose-600"
                   >
-                    <CircleXIcon size={14} className="mr-2" />
+                    <CircleXIcon size={14} />
                     Reject
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <div className="flex justify-center">
-                {document.valid_id_status === "Approved" ? (
-                  <CircleCheck
-                    size={15}
-                    className="text-green-600"
-                  />
+              <span
+                title={timeline}
+                className="flex h-7 w-7 items-center justify-center"
+              >
+                {isApproved ? (
+                  <CircleCheck size={14} className="text-emerald-500" />
                 ) : (
-                  <CircleXIcon
-                    size={15}
-                    className="text-red-600"
-                  />
+                  <CircleXIcon size={14} className="text-rose-500" />
                 )}
-              </div>
+              </span>
             )}
 
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsModalOpen(true)}
-              className="gap-1.5 rounded-lg border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
+              className="h-7 gap-1.5 rounded-md border-slate-200 px-2.5 text-[12px] font-medium text-slate-600 shadow-none hover:bg-slate-50 hover:text-slate-900"
             >
-              <Eye size={14} />
+              <Eye size={13} />
               View
             </Button>
           </div>

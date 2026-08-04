@@ -1,13 +1,13 @@
 "use client";
-import { Search, SlidersHorizontal, MoreVertical,
-         Download, ChevronLeft, ChevronRight, Printer, Eye,
-         Tag, BanknoteArrowUp, BanknoteArrowDown 
+import {
+    Search, SlidersHorizontal, MoreVertical,
+     ChevronLeft, ChevronRight,  Eye,
+    Tag, BanknoteArrowUp, BanknoteArrowDown
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Billing } from "@/store/useBillingStore"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
     Select,
     SelectContent,
@@ -27,14 +27,15 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FaMoneyBill } from "react-icons/fa6";
+import PrintBillingButton from "./PrintBillingButton"
+import PrintPaymentsReportButton from "./Printpaymentsreportbutton";
 
-export type BillingStatus = "Pending" | "Paid" | "Partial" | "Overdue" | "Cancelled";
-
-
+export type BillingStatus = "Upcoming" | "Pending" | "Paid" | "Partial" | "Overdue" | "Cancelled";
 
 interface BillingTableProps {
     billings: Billing[];
@@ -49,35 +50,32 @@ interface BillingTableProps {
 }
 
 function formatCurrency(value: number) {
-    return `₱${value.toLocaleString("en-PH", {
+    return `₱${Number(value).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })}`;
 }
 
-const STATUS_STYLES: Record<BillingStatus, string> = {
-    Pending: "bg-slate-900 text-slate-100 hover:bg-slate-50",
-    Paid: "bg-emerald-50 text-emerald-600 hover:bg-emerald-50",
-    Partial: "bg-amber-50 text-amber-600 hover:bg-amber-50",
-    Overdue: "bg-rose-50 text-rose-600 hover:bg-rose-50",
-    Cancelled: "bg-slate-50 text-slate-600 hover:bg-slate-50",
-};
-
-const STATUS_LABELS: Record<BillingStatus, string> = {
-    Pending: "Pending",
-    Paid: "Paid",
-    Partial: "Partial",
-    Overdue: "Overdue",
-    Cancelled: "Cancelled",
+const STATUS_STYLES: Record<BillingStatus, { chip: string; dot: string }> = {
+    Upcoming: { chip: "bg-blue-50 text-blue-700 ring-blue-100", dot: "bg-blue-500" },
+    Pending: { chip: "bg-slate-100 text-slate-700 ring-slate-200", dot: "bg-slate-400" },
+    Paid: { chip: "bg-emerald-50 text-emerald-700 ring-emerald-100", dot: "bg-emerald-500" },
+    Partial: { chip: "bg-amber-50 text-amber-700 ring-amber-100", dot: "bg-amber-500" },
+    Overdue: { chip: "bg-rose-50 text-rose-700 ring-rose-100", dot: "bg-rose-500" },
+    Cancelled: { chip: "bg-slate-50 text-slate-500 ring-slate-200", dot: "bg-slate-300" },
 };
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50];
 
 function StatusBadge({ status }: { status: BillingStatus }) {
+    const style = STATUS_STYLES[status] ?? STATUS_STYLES.Pending;
     return (
-        <Badge className={`rounded-full font-medium ${STATUS_STYLES[status]}`}>
-            {STATUS_LABELS[status]}
-        </Badge>
+        <span
+            className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${style.chip}`}
+        >
+            <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
+            {status}
+        </span>
     );
 }
 
@@ -98,23 +96,22 @@ function getPageNumbers(current: number, total: number): (number | "ellipsis")[]
     return pages;
 }
 
-
- const formatDate = (date: string | null) => {
-    if (!date) return "-";
+const formatDate = (date: string | null) => {
+    if (!date) return "—";
 
     return new Date(date).toLocaleDateString("en-PH", {
-        month: "long",
+        month: "short",
         day: "2-digit",
         year: "numeric",
     });
 };
 
-
+const HEAD = "h-9 px-3 text-[11px] font-semibold uppercase tracking-wide text-slate-500";
+const CELL = "px-3 py-2 text-[13px] whitespace-nowrap";
 
 export default function BillingTable({
     billings,
     loading,
-    onExport,
     onViewBilling,
     onRecordPayment,
     onApplyDiscount,
@@ -164,19 +161,17 @@ export default function BillingTable({
     }
 
     return (
-        <div className="overflow-hidden rounded border border-slate-100 bg-white shadow-sm">
-            {/* Header row */}
-         
-            {/* Toolbar row */}
-            <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-1 items-center gap-2.5">
-                    <div className="relative w-full max-w-xs">
-                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <div className="overflow-hidden rounded-xl border border-slate-200/70 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            {/* Toolbar */}
+            <div className="flex flex-col gap-2 border-b border-slate-100 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-1 items-center gap-2">
+                    <div className="relative w-full max-w-65">
+                        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                         <Input
                             value={search}
                             onChange={(e) => updateSearch(e.target.value)}
                             placeholder="Search billing no. or boarder"
-                            className="h-9 rounded-xl pl-9 text-sm"
+                            className="h-8 rounded-lg border-slate-200 pl-8 text-[13px] shadow-none placeholder:text-slate-400"
                         />
                     </div>
 
@@ -184,169 +179,188 @@ export default function BillingTable({
                         value={statusFilter}
                         onValueChange={(v) => updateStatusFilter(v as BillingStatus | "all")}
                     >
-                        <SelectTrigger className="h-9 w-40 rounded-xl text-sm">
-                            <SlidersHorizontal className="mr-1.5 h-3.5 w-3.5 text-slate-400" />
+                        <SelectTrigger className="h-8 w-37 rounded-lg border-slate-200 text-[13px] shadow-none">
+                            <SlidersHorizontal className="mr-1 h-3.5 w-3.5 text-slate-400" />
                             <SelectValue placeholder="All statuses" />
                         </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
+                        <SelectContent className="text-[13px]">
+                            <SelectItem value="all">All statuses</SelectItem>
+                            <SelectItem value="Upcoming">Upcoming</SelectItem>
                             <SelectItem value="Pending">Pending</SelectItem>
                             <SelectItem value="Partial">Partial</SelectItem>
                             <SelectItem value="Overdue">Overdue</SelectItem>
                         </SelectContent>
                     </Select>
+
+                    {!loading && (
+                        <span className="hidden text-[12px] text-slate-400 md:inline">
+                            {filtered.length} record{filtered.length === 1 ? "" : "s"}
+                        </span>
+                    )}
                 </div>
 
-                <div className="flex items-center gap-2.5">
-                    <Button
-                        variant="default"
-                        onClick={onExport}
-                        className="h-9 rounded-xl text-sm font-medium text-slate-100"
-                    >
-                        <Download className="h-3.5 w-3.5" />
-                        Export
-                    </Button>
-                </div>
+                <PrintPaymentsReportButton billings={filtered} />
             </div>
 
             {/* Table */}
             <div className="overflow-x-auto">
                 <Table>
                     <TableHeader>
-                        <TableRow className="hover:bg-transparent">
-                            <TableHead className="whitespace-nowrap">Billing No.</TableHead>
-                            <TableHead className="whitespace-nowrap">Boarder</TableHead>
-                            <TableHead className="whitespace-nowrap">Room</TableHead>
-                            <TableHead className="whitespace-nowrap">Billing Month</TableHead>
-                            <TableHead className="whitespace-nowrap">Due Date</TableHead>
-                            <TableHead className="whitespace-nowrap">Total Amount</TableHead>
-                            <TableHead className="whitespace-nowrap">Paid</TableHead>
-                            <TableHead className="whitespace-nowrap">Balance</TableHead>
-                            <TableHead className="whitespace-nowrap">Discount</TableHead>
-                            <TableHead className="whitespace-nowrap">Status</TableHead>
-                            <TableHead className="whitespace-nowrap text-right">
-                                Actions
-                            </TableHead>
+                        <TableRow className="border-slate-100 bg-slate-50/60 hover:bg-slate-50/60">
+                            <TableHead className={HEAD}>Billing No.</TableHead>
+                            <TableHead className={HEAD}>Boarder</TableHead>
+                            <TableHead className={HEAD}>Room</TableHead>
+                            <TableHead className={HEAD}>Billing Month</TableHead>
+                            <TableHead className={HEAD}>Due Date</TableHead>
+                            <TableHead className={`${HEAD} text-right`}>Total</TableHead>
+                            <TableHead className={`${HEAD} text-right`}>Paid</TableHead>
+                            <TableHead className={`${HEAD} text-right`}>Balance</TableHead>
+                            <TableHead className={`${HEAD} text-right`}>Discount</TableHead>
+                            <TableHead className={HEAD}>Status</TableHead>
+                            <TableHead className={`${HEAD} text-right`}>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {loading &&
-                            Array.from({ length: 5 }).map((_, i) => (
-                                <TableRow key={i}>
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <TableRow key={i} className="border-slate-100">
                                     {Array.from({ length: 11 }).map((__, j) => (
-                                        <TableCell key={j}>
-                                            <Skeleton className="h-3.5 w-full max-w-20" />
+                                        <TableCell key={j} className={CELL}>
+                                            <Skeleton className="h-3 w-full max-w-72 rounded" />
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))}
 
                         {!loading && filtered.length === 0 && (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={11}
-                                    className="py-10 text-center text-sm text-slate-400"
-                                >
-                                    No billings match your search.
+                            <TableRow className="border-slate-100 hover:bg-transparent">
+                                <TableCell colSpan={11} className="px-3 py-12 text-center">
+                                    <p className="text-[13px] font-medium text-slate-600">
+                                        No billings found
+                                    </p>
+                                    <p className="mt-1 text-[12px] text-slate-400">
+                                        Adjust your search or status filter to see results.
+                                    </p>
                                 </TableCell>
                             </TableRow>
                         )}
 
                         {!loading &&
                             paginated.map((b) => (
-                                <TableRow key={b.id} className="hover:bg-slate-50/60">
-                                    <TableCell className="whitespace-nowrap">
+                                <TableRow
+                                    key={b.id}
+                                    className="border-slate-100 transition-colors hover:bg-slate-50/70"
+                                >
+                                    <TableCell className={CELL}>
                                         <button
                                             onClick={() => onViewBilling?.(b)}
-                                            className="font-medium text-blue-600 hover:underline"
+                                            className="font-medium text-slate-900 underline-offset-2 hover:text-emerald-700 hover:underline"
                                         >
                                             {b.billing_no}
                                         </button>
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-slate-700">
+                                    <TableCell className={`${CELL} text-slate-700`}>
                                         {b.first_name} {b.last_name}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-slate-700">
-                                        {b.room_number} - {b.bed_number}
+                                    <TableCell className={`${CELL} text-slate-500`}>
+                                        <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600">
+                                            {b.room_number} · {b.bed_number}
+                                        </span>
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-slate-500">
+                                    <TableCell className={`${CELL} text-slate-500`}>
                                         {formatDate(b.billing_month)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-slate-500">
-                                        {new Date(b.due_date).toLocaleDateString("en-PH", {
-                                            month: "long",
-                                            day: "2-digit",
-                                            year: "numeric",
-                                        })}
+                                    <TableCell className={`${CELL} text-slate-500`}>
+                                        {formatDate(b.due_date)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap font-medium text-slate-900">
+                                    <TableCell
+                                        className={`${CELL} text-right font-medium tabular-nums text-slate-900`}
+                                    >
                                         {formatCurrency(b.total_amount)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-slate-700">
+                                    <TableCell
+                                        className={`${CELL} text-right tabular-nums text-slate-600`}
+                                    >
                                         {formatCurrency(b.paid_amount)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-slate-700">
+                                    <TableCell
+                                        className={`${CELL} text-right font-medium tabular-nums ${Number(b.balance) > 0 ? "text-rose-600" : "text-slate-400"
+                                            }`}
+                                    >
                                         {formatCurrency(b.balance)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-green-700">
+                                    <TableCell
+                                        className={`${CELL} text-right tabular-nums ${Number(b.discount) > 0 ? "text-emerald-600" : "text-slate-300"
+                                            }`}
+                                    >
                                         {formatCurrency(b.discount)}
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap">
+                                    <TableCell className={CELL}>
                                         <StatusBadge status={b.status} />
                                     </TableCell>
-                                    <TableCell className="whitespace-nowrap text-right">
-                                        <Button>
-                                            <Printer/>
-                                        </Button>
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700"
-                                                >
-                                                    <MoreVertical size={16} />
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                                    <TableCell className={`${CELL} text-right`}>
+                                        <div className="flex items-center justify-end gap-0.5">
+                                            <PrintBillingButton billing={b} />
 
-                                            <DropdownMenuContent align="end" className="w-56">
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-7 w-7 rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                                                    >
+                                                        <MoreVertical className="h-3.5 w-3.5" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
 
-                                                <DropdownMenuItem
-                                                    onClick={() => onViewBilling?.(b)}
+                                                <DropdownMenuContent
+                                                    align="end"
+                                                    className="w-52 rounded-lg p-1 text-[13px]"
                                                 >
-                                                    <Eye/>
-                                                    View Billing Details
-                                                </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onViewBilling?.(b)}
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <Eye className="h-3.5 w-3.5 text-slate-500" />
+                                                        View details
+                                                    </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    onClick={() => onRecordPayment?.(b)}
-                                                >
-                                                    <BanknoteArrowDown className="text-green-600"/>
-                                                    Record Payment
-                                                </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onRecordPayment?.(b)}
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <BanknoteArrowDown className="h-3.5 w-3.5 text-emerald-600" />
+                                                        Record payment
+                                                    </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    onClick={() => console.log?.(b)}
-                                                >
-                                                    <FaMoneyBill/>
-                                                    Record Partial Payment
-                                                </DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => console.log?.(b)}
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <FaMoneyBill className="h-3.5 w-3.5 text-emerald-600" />
+                                                        Record partial payment
+                                                    </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    onClick={() => onApplyDiscount?.(b)}
-                                                >
-                                                    <Tag className="text-blue-600"/>
-                                                    Apply Discount
-                                                </DropdownMenuItem>
+                                                    <DropdownMenuSeparator className="my-1 bg-slate-100" />
 
-                                                <DropdownMenuItem
-                                                    onClick={() => onApplyLateFee?.(b)}
-                                                >
-                                                    <BanknoteArrowUp className="text-red-700" />
-                                                    Apply Late Payment Fee
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                                    <DropdownMenuItem
+                                                        onClick={() => onApplyDiscount?.(b)}
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <Tag className="h-3.5 w-3.5 text-blue-600" />
+                                                        Apply discount
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem
+                                                        onClick={() => onApplyLateFee?.(b)}
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <BanknoteArrowUp className="h-3.5 w-3.5 text-rose-600" />
+                                                        Apply late payment fee
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -356,10 +370,9 @@ export default function BillingTable({
 
             {/* Pagination footer */}
             {!loading && filtered.length > 0 && (
-                <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3 text-sm text-slate-500">
+                <div className="flex flex-col gap-2 border-t border-slate-100 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-500">
                         <span>
-                            Showing{" "}
                             <span className="font-medium text-slate-700">{rangeStart}</span>
                             {"–"}
                             <span className="font-medium text-slate-700">{rangeEnd}</span> of{" "}
@@ -370,12 +383,16 @@ export default function BillingTable({
                             value={String(pageSize)}
                             onValueChange={(v) => updatePageSize(Number(v))}
                         >
-                            <SelectTrigger className="h-8 w-26 rounded-lg text-xs">
+                            <SelectTrigger className="h-7 w-23 rounded-md border-slate-200 text-[12px] shadow-none">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                                 {PAGE_SIZE_OPTIONS.map((size) => (
-                                    <SelectItem key={size} value={String(size)}>
+                                    <SelectItem
+                                        key={size}
+                                        value={String(size)}
+                                        className="text-[12px]"
+                                    >
                                         {size} / page
                                     </SelectItem>
                                 ))}
@@ -383,22 +400,22 @@ export default function BillingTable({
                         </Select>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-0.5">
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
                             disabled={currentPage === 1}
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
-                            className="h-8 w-8 rounded-lg text-slate-500 disabled:opacity-40"
+                            className="h-7 w-7 rounded-md text-slate-500 hover:bg-slate-100 disabled:opacity-30"
                         >
-                            <ChevronLeft className="h-4 w-4" />
+                            <ChevronLeft className="h-3.5 w-3.5" />
                         </Button>
 
                         {getPageNumbers(currentPage, totalPages).map((p, i) =>
                             p === "ellipsis" ? (
                                 <span
                                     key={`ellipsis-${i}`}
-                                    className="px-1.5 text-sm text-slate-400"
+                                    className="px-1 text-[12px] text-slate-300"
                                 >
                                     …
                                 </span>
@@ -406,7 +423,7 @@ export default function BillingTable({
                                 <button
                                     key={p}
                                     onClick={() => setPage(p)}
-                                    className={`h-8 min-w-8 rounded-lg px-2.5 text-sm font-medium transition-colors ${p === currentPage
+                                    className={`h-7 min-w-7 rounded-md px-2 text-[12px] font-medium transition-colors ${p === currentPage
                                         ? "bg-slate-900 text-white"
                                         : "text-slate-600 hover:bg-slate-100"
                                         }`}
@@ -417,13 +434,13 @@ export default function BillingTable({
                         )}
 
                         <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
                             disabled={currentPage === totalPages}
                             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                            className="h-8 w-8 rounded-lg text-slate-500 disabled:opacity-40"
+                            className="h-7 w-7 rounded-md text-slate-500 hover:bg-slate-100 disabled:opacity-30"
                         >
-                            <ChevronRight className="h-4 w-4" />
+                            <ChevronRight className="h-3.5 w-3.5" />
                         </Button>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Receipt } from "lucide-react";
 
 import BillingStats from "@/components/Billing/BillingStats";
 import BillingTable from "@/components/Billing/BillingTable";
@@ -8,6 +9,7 @@ import type { Billing as BillingType } from "@/store/useBillingStore";
 import ApplyDiscountModal from "@/components/Billing/ApplyDiscountModal";
 import ApplyLateFeeModal from "@/components/Billing/ApplyLateFeeModal";
 import ViewBilling from "@/components/Billing/ViewBillingModal"
+
 const Billing = () => {
 
     const {
@@ -71,21 +73,22 @@ const Billing = () => {
     return (
         <div className="h-full overflow-hidden">
 
-            <div className="space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-4 pt-2 pb-15 h-screen overflow-auto">
+            <div className="h-screen space-y-4 overflow-auto rounded-tl-2xl border-l-2 border-t-2 px-4 pb-16 pt-3">
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-
-                    <h1 className="text-2xl font-bold text-slate-900">
-                        Billing & Payment Management
-                    </h1>
-
-                    <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-500">
-                        Track boarder billings, monitor payment progress,
-                        record payments, manage discounts and penalties,
-                        generate billing statements, and issue official
-                        receipts from a centralized billing dashboard.
-                    </p>
-
+                {/* Page header */}
+                <div className="flex items-start gap-3 border-b border-slate-100 pb-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white">
+                        <Receipt className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                        <h1 className="text-base font-semibold tracking-tight text-slate-900">
+                            Billing &amp; Payments
+                        </h1>
+                        <p className="mt-0.5 max-w-2xl text-[12px] leading-5 text-slate-500">
+                            Track boarder billings, record payments, manage discounts and
+                            penalties, and issue receipts from one place.
+                        </p>
+                    </div>
                 </div>
 
                 <BillingStats

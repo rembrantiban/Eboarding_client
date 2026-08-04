@@ -1,10 +1,9 @@
 import { useRoomAssignmentStore } from "@/store/useRoomAssignmentStore";
-import { useRoomStore } from "@/store/useRoomStore";
 
 export const useRoomAssignment = () => {
     const assignRoom = useRoomAssignmentStore((state) => state.assignRoom);
     const getAssignments = useRoomAssignmentStore((state) => state.getAssignments);
-    const loading = useRoomStore((state) => state.loading);
+    const loading = useRoomAssignmentStore((state) => state.loading);
     const assignedBoarders = useRoomAssignmentStore((state) => state.assignedBoarders);
     const transferAssignment = useRoomAssignmentStore((state) => state.transferAssignment);
     const checkoutAssignment = useRoomAssignmentStore((state) => state.checkoutAssignment);

@@ -28,43 +28,53 @@ interface StatCardProps {
     icon: React.ReactNode;
     iconBg: string;
     iconColor: string;
+    accent: string;
     label: string;
     value: string;
     caption: string;
 }
 
-function StatCard({ icon, iconBg, iconColor, label, value, caption }: StatCardProps) {
+function StatCard({
+    icon,
+    iconBg,
+    iconColor,
+    accent,
+    label,
+    value,
+    caption,
+}: StatCardProps) {
     return (
-        <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm transition hover:shadow-md">
-            <div className="flex items-center gap-3">
+        <div className="group relative flex-1 overflow-hidden rounded-xl border border-slate-200/70 bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300">
+            <span
+                className={`absolute inset-y-0 left-0 w-0.5 ${accent} opacity-0 transition-opacity group-hover:opacity-100`}
+            />
+            <div className="flex items-start justify-between gap-2">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                    {label}
+                </p>
                 <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBg} ${iconColor}`}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${iconBg} ${iconColor}`}
                 >
                     {icon}
                 </div>
-                <div className="min-w-0">
-                    <p className="text-xs font-medium text-slate-400">{label}</p>
-                    <p className="mt-0.5 truncate text-lg font-semibold text-slate-900">
-                        {value}
-                    </p>
-                </div>
             </div>
-            <p className="mt-2 text-xs text-slate-400">{caption}</p>
+            <p className="mt-1.5 truncate text-[17px] font-semibold leading-tight tracking-tight text-slate-900">
+                {value}
+            </p>
+            <p className="mt-1 text-[11px] text-slate-400">{caption}</p>
         </div>
     );
 }
 
 function StatCardSkeleton() {
     return (
-        <div className="flex-1 animate-pulse rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-            <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-slate-100" />
-                <div className="min-w-0 flex-1 space-y-2">
-                    <div className="h-3 w-16 rounded bg-slate-100" />
-                    <div className="h-5 w-24 rounded bg-slate-100" />
-                </div>
+        <div className="flex-1 animate-pulse rounded-xl border border-slate-200/70 bg-white px-3.5 py-3">
+            <div className="flex items-start justify-between">
+                <div className="h-2.5 w-20 rounded bg-slate-100" />
+                <div className="h-7 w-7 rounded-lg bg-slate-100" />
             </div>
-            <div className="mt-3 h-3 w-14 rounded bg-slate-100" />
+            <div className="mt-2.5 h-4 w-28 rounded bg-slate-100" />
+            <div className="mt-2 h-2.5 w-12 rounded bg-slate-100" />
         </div>
     );
 }
@@ -72,7 +82,7 @@ function StatCardSkeleton() {
 export default function BillingStats({ data, loading }: BillingStatsProps) {
     if (loading) {
         return (
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                     <StatCardSkeleton key={i} />
                 ))}
@@ -81,38 +91,42 @@ export default function BillingStats({ data, loading }: BillingStatsProps) {
     }
 
     return (
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
-                icon={<Wallet size={18} />}
-                iconBg="bg-blue-50"
-                iconColor="text-blue-500"
+                icon={<Wallet size={14} />}
+                iconBg="bg-slate-100"
+                iconColor="text-slate-600"
+                accent="bg-slate-400"
                 label="Total Billings"
                 value={formatCurrency(data.total_billings)}
                 caption={data.total_billings_period_label ?? "This Month"}
             />
             <StatCard
-                icon={<CheckCircle2 size={18} />}
+                icon={<CheckCircle2 size={14} />}
                 iconBg="bg-emerald-50"
-                iconColor="text-emerald-500"
+                iconColor="text-emerald-600"
+                accent="bg-emerald-500"
                 label="Paid"
                 value={formatCurrency(data.paid_amount)}
-                caption={`${data.paid_percentage.toFixed(2)}%`}
+                caption={`${data.paid_percentage.toFixed(2)}% of total`}
             />
             <StatCard
-                icon={<Clock size={18} />}
+                icon={<Clock size={14} />}
                 iconBg="bg-amber-50"
-                iconColor="text-amber-500"
+                iconColor="text-amber-600"
+                accent="bg-amber-500"
                 label="Partial Payments"
                 value={formatCurrency(data.partial_amount)}
-                caption={`${data.partial_percentage.toFixed(2)}%`}
+                caption={`${data.partial_percentage.toFixed(2)}% of total`}
             />
             <StatCard
-                icon={<AlertTriangle size={18} />}
+                icon={<AlertTriangle size={14} />}
                 iconBg="bg-rose-50"
-                iconColor="text-rose-500"
+                iconColor="text-rose-600"
+                accent="bg-rose-500"
                 label="Overdue"
                 value={formatCurrency(data.overdue_amount)}
-                caption={`${data.overdue_percentage.toFixed(2)}%`}
+                caption={`${data.overdue_percentage.toFixed(2)}% of total`}
             />
         </div>
     );

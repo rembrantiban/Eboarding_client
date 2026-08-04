@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
-export type BillingStatus = "Pending" | "Paid" | "Partial" | "Overdue" | "Cancelled";
+export type BillingStatus = "Upcoming" | "Pending" | "Paid" | "Partial" | "Overdue" | "Cancelled";
 
 interface ApplyDiscountModalProps {
     open: boolean;
@@ -41,6 +41,7 @@ function formatCurrency(value: number) {
 }
 
 const STATUS_STYLES: Record<BillingStatus, string> = {
+    Upcoming: "bg-blue-50 text-blue-600 hover:bg-blue-50",
     Pending: "bg-slate-900 text-slate-100 hover:bg-slate-900",
     Paid: "bg-emerald-50 text-emerald-600 hover:bg-emerald-50",
     Partial: "bg-amber-50 text-amber-600 hover:bg-amber-50",

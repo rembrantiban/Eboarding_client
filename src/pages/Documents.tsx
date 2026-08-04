@@ -1,6 +1,5 @@
-
-
 import DocumentsModule from "@/components/Document/DocumentsModule"
+
 const Documents = () => {
     return (
         <div className="h-screen overflow-hidden">

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import DocumentStats from "./DocumentStats";
 import DocumentsTable from "./DocumentsTable";
@@ -11,13 +10,6 @@ import type { Document } from "@/store/useDocumentStore";
 
 const statusFilters = ["All", "Under Review", "Approved", "Rejected"] as const;
 type StatusFilter = (typeof statusFilters)[number];
-
-const StatCardSkeleton = () => (
-  <Card className="rounded-2xl border-slate-200/70 p-4 shadow-sm">
-    <div className="h-3 w-20 animate-pulse rounded-full bg-slate-200/80" />
-    <div className="mt-3 h-6 w-12 animate-pulse rounded-full bg-slate-200/80" />
-  </Card>
-);
 
 const DocumentsModule = () => {
   const { documents, getAllDocuments, loading } = useDocument();
@@ -50,51 +42,57 @@ const DocumentsModule = () => {
     });
   }, [documents, search, statusFilter]);
 
-  return (
-    <div className="space-y-2">
-      {loading ? (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <StatCardSkeleton key={i} />
-          ))}
-        </div>
-      ) : (
-        <DocumentStats {...stats} />
-      )}
-
-      {/* Toolbar: search + status filter */}
-      <Card className="flex flex-col gap-3 rounded border-slate-200/70 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+  const toolbar = (
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-1 items-center gap-2">
+        <div className="relative w-full max-w-[260px]">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search boarder or document type"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="rounded-xl border-slate-200 bg-slate-50/50 pl-9 focus-visible:bg-white"
+            className="h-8 rounded-lg border-slate-200 pl-8 text-[13px] shadow-none placeholder:text-slate-400"
           />
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <SlidersHorizontal className="mr-1 hidden h-3.5 w-3.5 text-slate-400 sm:block" />
-          <div className="flex flex-wrap gap-1.5">
-            {statusFilters.map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                  statusFilter === s
-                    ? "border-slate-900 bg-slate-900 text-white shadow-sm"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-      </Card>
+        {!loading && (
+          <span className="hidden text-[12px] text-slate-400 md:inline">
+            {filteredDocuments.length} record
+            {filteredDocuments.length === 1 ? "" : "s"}
+          </span>
+        )}
+      </div>
 
-      <DocumentsTable documents={filteredDocuments} loading={loading} />
+      <div className="flex items-center gap-1.5">
+        <SlidersHorizontal className="hidden h-3.5 w-3.5 text-slate-400 sm:block" />
+        <div className="flex flex-wrap gap-1">
+          {statusFilters.map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`h-7 rounded-full border px-2.5 text-[12px] font-medium transition-colors ${
+                statusFilter === s
+                  ? "border-slate-900 bg-slate-900 text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-3">
+      <DocumentStats {...stats} loading={loading} />
+
+      <DocumentsTable
+        documents={filteredDocuments}
+        loading={loading}
+        toolbar={toolbar}
+      />
     </div>
   );
 };

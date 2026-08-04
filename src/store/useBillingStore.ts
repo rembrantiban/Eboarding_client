@@ -25,6 +25,7 @@ export interface Billing {
     balance: number;
 
     status:
+      "Upcoming"
     | "Pending"
     | "Partial"
     | "Paid"
