@@ -15,8 +15,10 @@ import type { Rule } from "@/store/useRulesStore";
 import DeleteRuleModal from "@/components/modal/deleteRulesModal";
 import PublishRuleModal from "@/components/modal/PublishRuleModal";
 import UnpublishRuleModal from "@/components/modal/UnpublishRuleModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const Rules = () => {
+  const { user } = useAuth();
   const { rules, loading, getRules, publishRule, unpublishRule } = useRules();
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -42,13 +44,15 @@ const Rules = () => {
             for everyone.
           </p>
         </div>
-        <button
-          onClick={() => setOpenCreate(true)}
-          className="flex shrink-0 items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
-        >
-          <Plus size={16} />
-          Create rule
-        </button>
+        {user?.user_type === "Admin" && (
+          <button
+            onClick={() => setOpenCreate(true)}
+            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+          >
+            <Plus size={16} />
+            Create rule
+          </button>
+        )}
       </div>
 
       {/* LOADING */}
@@ -132,26 +136,29 @@ const Rules = () => {
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end" className="w-40">
-                          {rule.status === "Published" ? (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedRule(rule);
-                                setOpenUnpublish(true);
-                              }}
-                            >
-                              <EyeOff size={14} />
-                              Unpublish
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem
-                              onClick={() => {
-                                setSelectedRule(rule);
-                                setOpenPublish(true);
-                              }}
-                            >
-                              <Globe size={14} />
-                              Publish
-                            </DropdownMenuItem>
+                          {user?.user_type === "Admin" && (
+                            <>
+                              {rule.status === "Published" ? (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedRule(rule);
+                                    setOpenUnpublish(true);
+                                  }}
+                                >
+                                  <EyeOff size={14} />
+                                  Unpublish
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    setSelectedRule(rule);
+                                    setOpenPublish(true);
+                                  }}
+                                >
+                                  <Globe size={14} />
+                                  Publish
+                                </DropdownMenuItem>
+                              )}</>
                           )}
                           <DropdownMenuItem
                             onClick={() => {
@@ -163,16 +170,18 @@ const Rules = () => {
                             Update rule
                           </DropdownMenuItem>
 
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedRule(rule);
-                              setOpenDelete(true);
-                            }}
-                            className="text-red-500 focus:text-red-500"
-                          >
-                            <Trash2 size={14} />
-                            Delete rule
-                          </DropdownMenuItem>
+                          {user?.user_type === "Admin" && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedRule(rule);
+                                setOpenDelete(true);
+                              }}
+                              className="text-red-500 focus:text-red-500"
+                            >
+                              <Trash2 size={14} />
+                              Delete rule
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>

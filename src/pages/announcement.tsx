@@ -8,9 +8,11 @@ import {
     Plus,
     X,
     Megaphone,
+    Search,
 } from "lucide-react";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 import type { Announcement } from "@/store/useAnnouncementStore";
+import { useAuth } from "@/hooks/useAuth";
 
 type Category = "Maintenance" | "Billing" | "General";
 type CategoryFilter = "All" | Category;
@@ -26,22 +28,23 @@ const categoryStyles: Record<Category, string> = {
     General: "bg-slate-100 text-slate-600",
 };
 
-// TODO: replace with real data from useAnnouncements hook
-
-
-
 
 export default function AdminAnnouncementsPage() {
     const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
+    const [search, setSearch] = useState("");
+    const { user } = useAuth();
     const { loading, getMyAnnouncements, myAnnouncements, updateAnnouncement, createAnnouncement } = useAnnouncement();
     const [editing, setEditing] = useState<Announcement | null>(null);
     const [isCreating, setIsCreating] = useState(false);
-    const [draft, setDraft] = useState(() => ({
-        category: "General" as Category,
-        title: "",
-        description: ""
+    const audiences = ["Boarders", "Staff", "All"] as const;
 
-    }));
+    const [draft, setDraft] = useState({
+        category: "General" as Category,
+        audience: "Boarders" as "Boarders" | "Staff" | "All",
+        title: "",
+        description: "",
+    });
+
     const [pendingDelete, setPendingDelete] = useState<Announcement | null>(null);
 
     useEffect(() => {
@@ -53,20 +56,33 @@ export default function AdminAnnouncementsPage() {
             activeCategory === "All"
                 ? myAnnouncements
                 : myAnnouncements.filter((a) => a.category === activeCategory);
-        return [...list];
-    }, [myAnnouncements, activeCategory]);
+
+        const query = search.trim().toLowerCase();
+        const searched = query
+            ? list.filter(
+                (a) =>
+                    a.title.toLowerCase().includes(query) ||
+                    a.description.toLowerCase().includes(query) ||
+                    a.created_by_name.toLowerCase().includes(query)
+            )
+            : list;
+
+        return [...searched];
+    }, [myAnnouncements, activeCategory, search]);
 
     const openCreate = () => {
-        setDraft(() => ({
-            category: "General" as Category,
+        setDraft({
+            category: "General",
+            audience: "Boarders",
             title: "",
-            description: ""
-        }));
+            description: "",
+        });
+
         setIsCreating(true);
     };
 
     const openEdit = (item: Announcement) => {
-        setDraft({ category: item.category, title: item.title, description: item.description });
+        setDraft({ category: item.category, audience: item.audience, title: item.title, description: item.description });
         setEditing(item);
     };
 
@@ -84,12 +100,14 @@ export default function AdminAnnouncementsPage() {
                     title: draft.title,
                     description: draft.description,
                     category: draft.category,
+                    audience: draft.audience,
                 });
             } else {
                 await createAnnouncement({
                     title: draft.title,
                     description: draft.description,
                     category: draft.category,
+                    audience: draft.audience,
                 });
             }
 
@@ -130,13 +148,37 @@ export default function AdminAnnouncementsPage() {
                                 Manage updates sent to boarders
                             </p>
                         </div>
-                        <button
-                            onClick={openCreate}
-                            className="flex shrink-0 items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
-                        >
-                            <Plus size={16} />
-                            New
-                        </button>
+                        {user && user.user_type === "Admin" && (
+                            <button
+                                onClick={openCreate}
+                                className="flex shrink-0 items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                            >
+                                <Plus size={16} />
+                                New
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative">
+                        <Search
+                            size={15}
+                            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
+                        <input
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Search announcements..."
+                            className="h-10 w-full rounded-full border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                        />
+                        {search && (
+                            <button
+                                onClick={() => setSearch("")}
+                                className="absolute right-3 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                            >
+                                <X size={12} />
+                            </button>
+                        )}
                     </div>
 
                     {/* Category filter */}
@@ -152,7 +194,10 @@ export default function AdminAnnouncementsPage() {
                             >
                                 {category}
                             </button>
+
                         ))}
+
+
                     </div>
 
                     {/* Feed */}
@@ -163,18 +208,22 @@ export default function AdminAnnouncementsPage() {
                                     <Megaphone size={18} className="text-slate-400" />
                                 </div>
                                 <p className="mt-3 text-sm font-medium text-slate-900">
-                                    Nothing here yet
+                                    {search ? "No matching announcements" : "Nothing here yet"}
                                 </p>
                                 <p className="mt-0.5 text-xs text-slate-500 mb-5">
-                                    Create an announcement to get started
+                                    {search
+                                        ? "Try a different search term"
+                                        : "Create an announcement to get started"}
                                 </p>
-                                <button
-                                    onClick={openCreate}
-                                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
-                                >
-                                    <Plus size={16} />
-                                    New
-                                </button>
+                                {!search && user && user.user_type === "Admin" && (
+                                    <button
+                                        onClick={openCreate}
+                                        className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                                    >
+                                        <Plus size={16} />
+                                        Create Announcement
+                                    </button>
+                                )}
                             </div>
                         ) : (
                             filtered.map((item) => (
@@ -215,9 +264,15 @@ export default function AdminAnnouncementsPage() {
                                             </div>
                                         </div>
 
-                                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${categoryStyles[item.category]}`}>
-                                            {item.category}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${categoryStyles[item.category]}`}>
+                                                {item.category}
+                                            </span>
+
+                                            <span className="rounded-full bg-blue-50 text-blue-700 px-2.5 py-1 text-xs font-medium">
+                                                {item.audience}
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <h3 className="mt-4 text-sm font-semibold text-slate-900">
@@ -307,6 +362,33 @@ export default function AdminAnnouncementsPage() {
                                         placeholder="Announcement title"
                                         className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                                     />
+                                </div>
+
+                                <div>
+                                    <label className="mb-1.5 block text-xs font-medium text-slate-600">
+                                        Target Audience
+                                    </label>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {audiences.map((audience) => (
+                                            <button
+                                                key={audience}
+                                                type="button"
+                                                onClick={() =>
+                                                    setDraft((d) => ({
+                                                        ...d,
+                                                        audience,
+                                                    }))
+                                                }
+                                                className={`rounded-full px-3 py-1 text-xs font-medium transition ${draft.audience === audience
+                                                    ? "bg-slate-900 text-white"
+                                                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                                    }`}
+                                            >
+                                                {audience}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div>

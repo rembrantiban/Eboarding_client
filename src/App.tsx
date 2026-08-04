@@ -33,6 +33,7 @@ import BoarderDocumentPage from './pages/BoarderDocumentPage'
 import History from './pages/History'
 import BoarderBilling from './pages/BoarderBilling'
 import DeletedAccountsPage from './pages/DeletedAccounts'
+import StaffAnnouncementsPage from "@/pages/StaffAnnouncement"
 
 function App() {
  
@@ -59,6 +60,7 @@ function App() {
             <Route path='/billing' element={<Billing />} />
             <Route path='/reports' element={<Report />} />
             <Route path='/announcements' element={<Announcement />} />
+            <Route path='/staff-announcements' element={<StaffAnnouncementsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/view-user/:id" element={<ViewUserPage />} />
             <Route path='documents' element={<Documents />} />

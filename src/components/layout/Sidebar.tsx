@@ -129,7 +129,12 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
 
           <SectionLabel label="Others" />
           <SidebarItem icon={<Shield size={16} />} label="Rules & Regulations" to="/rules" onNavigate={closeAll} />
-          <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/announcements" onNavigate={closeAll} />
+           {user?.user_type === "Admin" && (
+             <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/announcements" onNavigate={closeAll} />
+           )}
+          {user?.user_type === "Staff" && (
+            <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/staff-announcements" onNavigate={closeAll} />
+          )}
         </div>
 
         {/* ── PROFILE FOOTER ── */}
