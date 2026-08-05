@@ -11,6 +11,11 @@ export const useBilling = ( ) => {
             getPaymentHistory,
             outstandingBalance,
             getOutstandingBalance,
+            getMyPendingBilling,
+            myPendingBilling,
+            myPaymentHistory,
+            myPaymentSummary,
+            getMyPaymentHistory,
         } = useBillingStore();
 
     
@@ -24,6 +29,11 @@ export const useBilling = ( ) => {
             paymentHistory,
             getPaymentHistory,
             outstandingBalance,
-            getOutstandingBalance
+            getOutstandingBalance,
+            getMyPendingBilling,
+            myPendingBilling,
+            myPaymentHistory,
+            myPaymentSummary,
+            getMyPaymentHistory,
         };
 };

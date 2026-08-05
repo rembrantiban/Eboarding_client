@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Printer,
   Mail,
@@ -8,43 +8,12 @@ import {
   CalendarClock,
   CalendarCheck,
   ChevronRight,
+  ReceiptText,
+  PhilippinePeso,
 } from "lucide-react";
-import type { Billing } from "@/store/useBillingStore";
+import { useBilling } from "@/hooks/useBilling";
 
-const billings : Billing[] = [
-  {
-    id: 417,
-    billing_no: "BILL-2026-0417",
-    billing_type: "Monthly rent",
-    billing_month: "July 2026",
-    due_date: "2026-07-25",
-    room_fee: 6500,
-    utilities_fee: 850,
-    other_charges: 300,
-    discount: 0,
-    late_fee: 150,
-    total_amount: 7800,
-    paid_amount: 4000,
-    balance: 3800,
-    status: "Partial",
-    created_at: "2026-07-01",
-    updated_at: "2026-07-18",
-    user_id: 2024182,
-    user_id_no: "BR-2024-0182",
-    first_name: "Jomar",
-    last_name: "Dela Cruz",
-    email: "jomar.delacruz@email.com",
-    contact_number: "+63 917 123 4567",
-    avatar_url: null,
-    assignment_id: 88,
-    assigned_date: "2026-01-12",
-    expected_checkout: "2026-12-12",
-    room_id: 4,
-    room_number: "R-204",
-    bed_id: 2,
-    bed_number: "Bed B",
-  },
-];
+
 
 
 
@@ -53,22 +22,53 @@ const peso = (n: number) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
+  
+const formatDate = (iso: string | null) => {
+  if (!iso) return "—";
 
-const formatDate = (iso: string | null) =>
-  iso
-    ? new Date(iso + "T00:00:00").toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "—";
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
-const STATUS_STYLE = {
-  Pending: { text: "text-amber-700", bg: "bg-amber-100", dot: "bg-amber-500" },
-  Partial: { text: "text-sky-700", bg: "bg-sky-100", dot: "bg-sky-500" },
-  Paid: { text: "text-green-700", bg: "bg-green-100", dot: "bg-green-500" },
-  Overdue: { text: "text-red-700", bg: "bg-red-100", dot: "bg-red-500" },
-  Cancelled: { text: "text-gray-700", bg: "bg-gray-200", dot: "bg-gray-500" },
+const STATUS_STYLE: Record<string, { text: string; bg: string; dot: string }> = {
+  Upcoming: {
+    text: "text-indigo-700",
+    bg: "bg-indigo-100",
+    dot: "bg-indigo-500",
+  },
+
+  Pending: {
+    text: "text-amber-700",
+    bg: "bg-amber-100",
+    dot: "bg-amber-500",
+  },
+
+  Partial: {
+    text: "text-sky-700",
+    bg: "bg-sky-100",
+    dot: "bg-sky-500",
+  },
+
+  Paid: {
+    text: "text-green-700",
+    bg: "bg-green-100",
+    dot: "bg-green-500",
+  },
+
+  Overdue: {
+    text: "text-red-700",
+    bg: "bg-red-100",
+    dot: "bg-red-500",
+  },
+
+  Cancelled: {
+    text: "text-gray-700",
+    bg: "bg-gray-200",
+    dot: "bg-gray-500",
+  },
 };
 
 function initials(first: string, last: string) {
@@ -77,17 +77,112 @@ function initials(first: string, last: string) {
 
 
 export default function BillingStatement() {
-  const [activeId, setActiveId] = useState(billings[0].id);
-  const bill = billings.find((b) => b.id === activeId) ?? billings[0];
+
+  const { myPendingBilling, getMyPendingBilling } = useBilling();
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  useEffect(() => {
+    getMyPendingBilling();
+  }, [getMyPendingBilling]);
+
+
+  useEffect(() => {
+    if (
+      myPendingBilling.length > 0 &&
+      activeId === null
+    ) {
+      //eslint-disable-next-line
+      setActiveId(myPendingBilling[0].id);
+    }
+  }, [myPendingBilling, activeId]);
+
+
+  const bill =
+    myPendingBilling.find(
+      (b) => b.id === activeId
+    ) ?? myPendingBilling[0];
+
+
+  if (!bill) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+        <div className="relative overflow-hidden w-full max-w-lg rounded-lg border border-slate-300 bg-white">
+
+          <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-indigo-100 blur-3xl opacity-60" />
+          <div className="absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-sky-100 blur-3xl opacity-60" />
+
+          <div className="relative flex flex-col items-center px-10 py-14 text-center">
+
+            {/* Icon */}
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-indigo-50">
+              <ReceiptText
+                size={30}
+                className="text-slate-600"
+              />
+            </div>
+
+            {/* Title */}
+            <h2 className="text-xl font-bold text-slate-900">
+              No Active Billing
+            </h2>
+
+            {/* Description */}
+            <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">
+              Great news! You don't have any pending, upcoming,
+              overdue, or partial billing statements at the moment.
+            </p>
+
+            {/* Status Card */}
+            <div className="mt-8 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+              <PhilippinePeso
+                size={26}
+                className="text-slate-600"
+              />
+
+              <div className="text-left">
+                <p className="text-sm font-semibold text-emerald-700">
+                  Account Status
+                </p>
+                <p className="text-xs text-emerald-600">
+                  Your account currently has no outstanding balance.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const st = STATUS_STYLE[bill.status];
 
   const lineItems = [
-    { label: "Room fee", value: bill.room_fee },
-    { label: "Utilities fee", value: bill.utilities_fee },
-    { label: "Other charges", value: bill.other_charges },
-    ...(bill.discount ? [{ label: "Discount", value: -bill.discount, tone: "good" }] : []),
-    ...(bill.late_fee ? [{ label: "Late fee", value: bill.late_fee, tone: "bad" }] : []),
+    {
+      label: "Room fee",
+      value: bill.room_fee,
+    },  
+    ...(bill.discount > 0
+      ? [
+        {
+          label: "Discount",
+          value: -bill.discount,
+          tone: "good",
+        },
+      ]
+      : []),
+    ...(bill.late_fee > 0
+      ? [
+        {
+          label: "Late fee",
+          value: bill.late_fee,
+          tone: "bad",
+        },
+      ]
+      : []),
   ];
+
+
 
   return (
     <div className="min-h-screen w-full flex justify-center bg-slate-50 p-4 md:p-8 font-sans">
@@ -101,44 +196,42 @@ export default function BillingStatement() {
               Statements
             </p>
             <p className="text-sm mt-0.5 text-slate-500">
-              {billings.length} records
+              {myPendingBilling ? 1 : 0} records
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
-            {billings.map((b) => {
+            {myPendingBilling?.map((b) => {
               const s = STATUS_STYLE[b.status];
-              const active = b.id === activeId;
               return (
                 <button
                   key={b.id}
                   onClick={() => setActiveId(b.id)}
-                  className={`text-left rounded-xl p-3 flex items-center gap-3 border transition-colors ${
-                    active
-                      ? "bg-slate-900 border-slate-900"
-                      : "bg-white border-slate-200 hover:bg-slate-50"
-                  }`}
+                  className={`text-left rounded-xl p-3 flex items-center gap-3 border transition-colors ${activeId === b.id
+                    ? "bg-slate-900 border-slate-900"
+                    : "bg-white border-slate-200 hover:bg-slate-50"
+                    }`}
                 >
                   <span className={`h-2 w-2 rounded-full shrink-0 ${s.dot}`} />
                   <span className="flex-1 min-w-0">
                     <span
-                      className={`text-xs block truncate tabular-nums ${
-                        active ? "text-slate-400" : "text-slate-500"
-                      }`}
+                      className={`text-xs block truncate tabular-nums ${activeId === b.id
+                          ? "text-slate-400"
+                          : "text-slate-500"
+                        }`}
                     >
                       {b.billing_no}
                     </span>
                     <span
-                      className={`text-sm font-medium block truncate ${
-                        active ? "text-white" : "text-slate-900"
-                      }`}
+                      className={`text-sm font-medium block truncate ${activeId === b.id ? "text-white" : "text-slate-900"
+                        }`}
                     >
                       {b.first_name} {b.last_name}
                     </span>
                   </span>
                   <ChevronRight
                     size={15}
-                    className={active ? "text-slate-600" : "text-slate-300"}
+                    className={activeId === b.id ? "text-slate-600" : "text-slate-300"}
                   />
                 </button>
               );
@@ -211,7 +304,7 @@ export default function BillingStatement() {
                 <div className="flex sm:justify-end gap-2">
                   <dt className="text-slate-500">Billing month</dt>
                   <dd className="font-medium text-slate-900">
-                    {bill.billing_month ?? "—"}
+                    {formatDate(bill.billing_month) ?? "—"}
                   </dd>
                 </div>
                 <div className="flex sm:justify-end gap-2">
@@ -273,13 +366,12 @@ export default function BillingStatement() {
                 >
                   <span className="text-sm text-slate-700">{item.label}</span>
                   <span
-                    className={`text-sm font-medium tabular-nums ${
-                      item.tone === "bad"
-                        ? "text-red-600"
-                        : item.tone === "good"
+                    className={`text-sm font-medium tabular-nums ${item.tone === "bad"
+                      ? "text-red-600"
+                      : item.tone === "good"
                         ? "text-green-600"
                         : "text-slate-900"
-                    }`}
+                      }`}
                   >
                     {item.value < 0 ? "−" : item.tone === "bad" ? "+" : ""}
                     {peso(item.value)}

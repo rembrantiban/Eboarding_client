@@ -25,7 +25,7 @@ export interface Billing {
     balance: number;
 
     status:
-      "Upcoming"
+    "Upcoming"
     | "Pending"
     | "Partial"
     | "Paid"
@@ -82,11 +82,11 @@ export interface PaymentHistory {
     updated_at: string;
 
     status:
-        | "Pending"
-        | "Partial"
-        | "Paid"
-        | "Overdue"
-        | "Cancelled";
+    | "Pending"
+    | "Partial"
+    | "Paid"
+    | "Overdue"
+    | "Cancelled";
 
     amount: number;
     received_at: string;
@@ -125,12 +125,23 @@ export interface OutstandingBalance {
     pending_count: number;
 }
 
+
+export interface MyPaymentSummary {
+    totalPaid: number;
+    outstanding: number;
+    count: number;
+}
+
 interface BillingStore {
 
     loading: boolean;
     billings: Billing[];
     paymentHistory: PaymentHistory[];
     outstandingBalance: OutstandingBalance | null;
+    myPendingBilling: Billing[];
+
+    myPaymentSummary: MyPaymentSummary | null;
+    myPaymentHistory: PaymentHistory[];
 
     getAllBillings: () => Promise<void>;
     recordPayment: (data: RecordPaymentData) => Promise<boolean>;
@@ -139,6 +150,8 @@ interface BillingStore {
     getPaymentHistory: () => Promise<boolean>;
     getOutstandingBalance: () => Promise<boolean>;
 
+    getMyPendingBilling: () => Promise<boolean>;
+    getMyPaymentHistory: () => Promise<boolean>;
 
 }
 
@@ -149,48 +162,135 @@ export const useBillingStore = create<BillingStore>((set) => ({
     paymentHistory: [],
 
     outstandingBalance: null,
+    myPendingBilling: [],
+    myPaymentSummary: null,
+    myPaymentHistory: [],
+
+
+    getMyPaymentHistory: async () => {
+        try {
+            set({ loading: true });
+
+            const res = await axiosInstance.get(
+                "/billings/my-payment-history"
+            );
+
+            console.log(res.data);
+
+            set({
+                myPaymentHistory: res.data.payments,
+                myPaymentSummary: {
+                    totalPaid: res.data.payments.reduce(
+                        (sum: number, payment: PaymentHistory) =>
+                            sum + Number(payment.amount),
+                        0
+                    ),
+                    outstanding: res.data.payments.reduce(
+                        (sum: number, payment: PaymentHistory) =>
+                            sum + Number(payment.balance),
+                        0
+                    ),
+                    count: res.data.total,
+                },
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get My Payment History:",
+                error
+            );
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
+
+        }
+    },
+    getMyPendingBilling: async () => {
+        try {
+
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/my-billing"
+            );
+
+            set({
+                myPendingBilling: Array.isArray(res.data.billing)
+                    ? res.data.billing
+                    : [],
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get My Pending Billing:",
+                error
+            );
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
+
+        }
+    },
 
     getOutstandingBalance: async () => {
-    try {
+        try {
 
-        set({
-            loading: true,
-        });
+            set({
+                loading: true,
+            });
 
-        const res = await axiosInstance.get(
-            "/billings/outstanding-balance"
-        );
+            const res = await axiosInstance.get(
+                "/billings/outstanding-balance"
+            );
 
-        set({
-            outstandingBalance: {
-                outstanding_balance: Number(
-                    res.data.outstanding_balance
-                ),
-                pending_count: Number(
-                    res.data.pending_count
-                ),
-            },
-        });
+            set({
+                outstandingBalance: {
+                    outstanding_balance: Number(
+                        res.data.outstanding_balance
+                    ),
+                    pending_count: Number(
+                        res.data.pending_count
+                    ),
+                },
+            });
 
-        return true;
+            return true;
 
-    } catch (error) {
+        } catch (error) {
 
-        console.error(
-            "Get Outstanding Balance Error:",
-            error
-        );
+            console.error(
+                "Get Outstanding Balance Error:",
+                error
+            );
 
-        return false;
+            return false;
 
-    } finally {
+        } finally {
 
-        set({
-            loading: false,
-        });
+            set({
+                loading: false,
+            });
 
-    }
-},
+        }
+    },
     getPaymentHistory: async () => {
 
         const {
@@ -203,7 +303,8 @@ export const useBillingStore = create<BillingStore>((set) => ({
                 "/billings/payment-history"
             );
 
-            set({ loading: false,
+            set({
+                loading: false,
                 paymentHistory: res.data,
             });
 

@@ -341,6 +341,7 @@ const Register = () => {
         emergency_contact_number: form.emergency_contact_number,
         emergency_contact_relationship: form.emergency_contact_relationship,
         avatar,
+        valid_id_type: form.valid_id_type,
         valid_id_image: validId,
       });
 
