@@ -125,11 +125,42 @@ export interface OutstandingBalance {
     pending_count: number;
 }
 
+export interface PaymentsOverview {
+    date: string;
+    value: number;
+}
 
 export interface MyPaymentSummary {
     totalPaid: number;
     outstanding: number;
     count: number;
+}
+
+export interface CalendarEvent {
+    id: number;
+    date: string;
+    label: string;
+    type: "payment";
+    amount: number;
+    boarder: string;
+    room: string;
+    status:
+    | "Pending"
+    | "Upcoming"
+    | "Overdue"
+    | "Paid";
+    color: string;
+}
+
+export interface ActivePenalty {
+    id: number;
+    boarder: string;
+    initials: string;
+    reason: string;
+    amount: number;
+    date: string;
+    room_number: string;
+    bed_number: string;
 }
 
 interface BillingStore {
@@ -143,6 +174,12 @@ interface BillingStore {
     myPaymentSummary: MyPaymentSummary | null;
     myPaymentHistory: PaymentHistory[];
 
+    paymentsOverview: PaymentsOverview[];
+    calendarEvents: CalendarEvent[];
+
+    activePenalties: ActivePenalty[];
+
+
     getAllBillings: () => Promise<void>;
     recordPayment: (data: RecordPaymentData) => Promise<boolean>;
     applyDiscount: (data: ApplyDiscountData) => Promise<boolean>;
@@ -152,6 +189,12 @@ interface BillingStore {
 
     getMyPendingBilling: () => Promise<boolean>;
     getMyPaymentHistory: () => Promise<boolean>;
+
+    getPaymentsOverview: () => Promise<boolean>;
+    getCalendarEvents: () => Promise<boolean>;
+    getActivePenalties: () => Promise<void>;
+
+
 
 }
 
@@ -165,7 +208,65 @@ export const useBillingStore = create<BillingStore>((set) => ({
     myPendingBilling: [],
     myPaymentSummary: null,
     myPaymentHistory: [],
+    paymentsOverview: [],
+    calendarEvents: [],
 
+
+    activePenalties: [],
+
+
+    getActivePenalties: async () => {
+        try {
+            const res = await axiosInstance.get(
+                "/billing/all-active-penalties"
+            );
+
+            set({
+                activePenalties: res.data,
+            });
+
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    getCalendarEvents: async (): Promise<boolean> => {
+        try {
+            const res = await axiosInstance.get("/billings/calendar-events");
+
+            set({
+                calendarEvents: res.data,
+            });
+            return true;
+
+        } catch (error) {
+            console.error(error);
+
+            return false;
+        }
+    },
+
+    getPaymentsOverview: async () => {
+        try {
+
+            const res = await axiosInstance.get(
+                "/billings/payments-overview"
+            );
+
+            set({
+                paymentsOverview: res.data,
+            });
+
+            console.log(res.data);
+
+            return true;
+
+        } catch (error) {
+
+            console.error(error);
+            return false;
+
+        }
+    },
 
     getMyPaymentHistory: async () => {
         try {

@@ -39,114 +39,118 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
 
   const statusClass =
     user.status === "Approved"
-      ? "bg-emerald-50 text-emerald-700"
+      ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
       : user.status === "Pending"
-        ? "bg-amber-50 text-amber-700"
-        : "bg-rose-50 text-rose-700"
+        ? "bg-amber-50 text-amber-700 ring-1 ring-amber-100"
+        : "bg-rose-50 text-rose-700 ring-1 ring-rose-100"
+
+  const roleClass =
+    user.user_type === "Admin"
+      ? "bg-slate-900 text-white"
+      : user.user_type === "Staff"
+        ? "bg-slate-100 text-slate-700 ring-1 ring-slate-200"
+        : "bg-white text-slate-600 ring-1 ring-slate-200"
 
   return (
     <>
-      <tr className="transition hover:bg-slate-50/80">
-        <td className="whitespace-nowrap px-4 py-3 text-xs text-slate-500">#{user.user_id_no}</td>
+      <tr className="transition-colors hover:bg-slate-50/70">
+        <td className="whitespace-nowrap px-4 py-2.5 text-[11.5px] tabular-nums text-slate-400">
+          #{user.user_id_no}
+        </td>
 
-        <td className="px-4 py-3">
-          <div className="flex items-center gap-3 min-w-0">
+        <td className="px-4 py-2.5">
+          <div className="flex min-w-0 items-center gap-2.5">
             {user.avatar_url ? (
               <img
                 onClick={() => navigate(`/view-user/${user.id}`)}
                 src={user.avatar_url}
                 alt={user.username}
-                className="h-10 w-10 rounded-2xl object-cover ring-1 ring-slate-200 cursor-pointer hover:ring-slate-400 transition"
+                className="h-9 w-9 cursor-pointer rounded-lg object-cover ring-1 ring-slate-200 transition hover:ring-slate-400"
               />
             ) : (
               <div
                 onClick={() => navigate(`/view-user/${user.id}`)}
-                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl bg-slate-800 text-sm font-semibold text-blue-100 hover:bg-slate-700 transition"
+                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-[12px] font-semibold text-white transition hover:bg-slate-800"
               >
                 {user.first_name?.charAt(0)}
               </div>
             )}
 
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-800">
+              <p className="truncate text-[12.5px] font-medium text-slate-900">
                 {user.first_name} {user.last_name}
               </p>
-              <p className="truncate text-xs text-slate-500">@{user.username}</p>
+              <p className="truncate text-[11px] text-slate-400">@{user.username}</p>
             </div>
           </div>
         </td>
 
-        <td className="px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            <Mail size={14} className="text-slate-400" />
+        <td className="px-4 py-2.5">
+          <div className="flex items-center gap-1.5 text-[12px] text-slate-600">
+            <Mail size={13} className="shrink-0 text-slate-400" />
             <span className="truncate">{user.email}</span>
           </div>
         </td>
 
-        <td className="px-4 py-3">
+        <td className="px-4 py-2.5">
           <span
-            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${user.user_type === "Admin"
-              ? "bg-purple-100 text-purple-700"
-              : user.user_type === "Staff"
-                ? "bg-blue-100 text-blue-700"
-                : "bg-emerald-100 text-emerald-700"
-              }`}
+            className={`inline-flex rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${roleClass}`}
           >
             {user.user_type}
           </span>
         </td>
 
-        <td className="px-4 py-3">
-          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}>
+        <td className="px-4 py-2.5">
+          <span
+            className={`inline-flex rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${statusClass}`}
+          >
             {user.status}
           </span>
         </td>
 
-        <td className="px-4 py-3">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
-            {user.account_status === "Active" ? (
-              <>
-                <UserCheck size={14} className="text-emerald-500" />
-                <span className="text-emerald-500">Active</span>
-              </>
-            ) : (
-              <>
-                <Ban size={14} className="text-rose-500" />
-                <span className="text-rose-500">Deactivated</span>
-              </>
-            )}
-          </div>
+        <td className="px-4 py-2.5">
+          {user.account_status === "Active" ? (
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-emerald-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Active
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-rose-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
+              Deactivated
+            </span>
+          )}
         </td>
 
-        <td className="px-4 py-3">
+        <td className="whitespace-nowrap px-4 py-2.5 text-[11.5px] tabular-nums text-slate-500">
           {formatDate(user.created_at)}
         </td>
 
-        <td className="px-4 py-3 text-right">
+        <td className="px-4 py-2.5 text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700">
-                <MoreVertical size={16} />
+              <button className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900">
+                <MoreVertical size={15} />
               </button>
             </DropdownMenuTrigger>
 
 
-            <DropdownMenuContent align="end" className="w-44 rounded-xl border-slate-200 p-1">
+            <DropdownMenuContent align="end" className="w-44 rounded-xl border-slate-200 p-1 text-[12.5px]">
               {user.user_type === "Boarder" &&
                 user.status === "Pending" && (
                   <DropdownMenuItem
                     onClick={() => setOpenStatusReview(true)}
-                    className="gap-2 text-blue-600"
+                    className="gap-2 rounded-lg text-blue-600"
                   >
                     <UserCheck size={14} />
                     Review Application
                   </DropdownMenuItem>
                 )}
-              <DropdownMenuItem onClick={() => navigate(`/view-user/${user.id}`)} className="gap-2">
+              <DropdownMenuItem onClick={() => navigate(`/view-user/${user.id}`)} className="gap-2 rounded-lg">
                 <Eye size={14} /> View
               </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => setOpenEdit(true)} className="gap-2">
+              <DropdownMenuItem onClick={() => setOpenEdit(true)} className="gap-2 rounded-lg">
                 <UserRoundPen size={14} /> Update
               </DropdownMenuItem>
 
@@ -154,7 +158,7 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
 
               <DropdownMenuItem
                 onClick={() => setOpenDelete(true)}
-                className="gap-2 text-red-500 focus:text-red-500"
+                className="gap-2 rounded-lg text-red-500 focus:text-red-500"
               >
                 <Trash2 size={14} /> Delete
               </DropdownMenuItem>
@@ -163,7 +167,7 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
                   {user.account_status === "Active" ? (
                     <DropdownMenuItem
                       onClick={() => setOpenDeactivate(true)}
-                      className="gap-2 text-orange-600 focus:text-orange-600"
+                      className="gap-2 rounded-lg text-orange-600 focus:text-orange-600"
                     >
                       <Ban size={14} />
                       Deactivate
@@ -171,7 +175,7 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
                   ) : (
                     <DropdownMenuItem
                       onClick={() => setOpenActivate(true)}
-                      className="gap-2 text-emerald-600 focus:text-emerald-600"
+                      className="gap-2 rounded-lg text-emerald-600 focus:text-emerald-600"
                     >
                       <UserCheck size={14} />
                       Activate

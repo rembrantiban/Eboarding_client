@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Printer,
+  Download,
   Mail,
   Phone,
   BedDouble,
@@ -12,9 +12,8 @@ import {
   PhilippinePeso,
 } from "lucide-react";
 import { useBilling } from "@/hooks/useBilling";
-
-
-
+import PrintModal from "@/components/BillingStatement/PrintModal";
+import StatementReceipt from "@/components/BillingStatement/StatementReceipt";
 
 
 const peso = (n: number) =>
@@ -22,7 +21,7 @@ const peso = (n: number) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
-  
+
 const formatDate = (iso: string | null) => {
   if (!iso) return "—";
 
@@ -80,6 +79,7 @@ export default function BillingStatement() {
 
   const { myPendingBilling, getMyPendingBilling } = useBilling();
   const [activeId, setActiveId] = useState<number | null>(null);
+  const [printOpen, setPrintOpen] = useState(false);
 
   useEffect(() => {
     getMyPendingBilling();
@@ -408,14 +408,25 @@ export default function BillingStatement() {
           {/* Actions */}
           <div className="px-6 py-4 md:px-8 flex justify-end gap-2 bg-slate-50 border-t border-slate-200">
             <button
-              onClick={() => window.print()}
+              onClick={() => setPrintOpen(true)}
               className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800"
             >
-              <Printer size={15} /> Print
+              <Download size={15} /> Download
             </button>
           </div>
         </div>
       </div>
+
+      {/* Print view lives in its own modal — this is the only thing that ever prints */}
+      <PrintModal
+        open={printOpen}
+        onClose={() => setPrintOpen(false)}
+        rootId="statement-print-root"
+        printLabel="Print Statement"
+        maxWidthClassName="max-w-xl"
+      >
+        <StatementReceipt bill={bill} />
+      </PrintModal>
     </div>
   );
 }

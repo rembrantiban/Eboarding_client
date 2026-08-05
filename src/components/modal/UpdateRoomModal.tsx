@@ -110,7 +110,7 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-2xl bg-white rounded shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-2xl bg-white  shadow-2xl border rounded-lg border-slate-100 flex flex-col max-h-[90vh]">
 
         {/* ── HEADER ── */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
@@ -149,7 +149,7 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
               onChange={handleChange}
               placeholder="Describe the room (amenities, rules, etc.)"
               rows={3}
-              className="w-full border border-slate-200 rounded-xl p-3 text-sm text-slate-700 placeholder:text-slate-300 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition"
+              className="w-full border border-slate-200 rounded-xl p-3 text-sm text-slate-700 placeholder:text-slate-300 resize-none focus:outline-none focus:ring-2 focus:ring-slate-500/30 focus:border-slate-400 transition"
             />
           </div>
 
@@ -165,12 +165,12 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
               onDrop={handleDrop}
               onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
               onDragLeave={() => setDragOver(false)}
-              className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${dragOver ? "border-blue-400 bg-blue-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${dragOver ? "border-slate-400 bg-slate-50" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                 }`}
             >
               <div className="flex flex-col items-center gap-2">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                  <ImagePlus size={18} className="text-blue-500" />
+                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center">
+                  <ImagePlus size={18} className="text-slate-500" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-700">Drop images here</p>
@@ -220,7 +220,7 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
                 <p className="text-xs font-semibold text-slate-500 mb-2">New Photos</p>
                 <div className="grid grid-cols-4 gap-2">
                   {images.map((file, i) => (
-                    <div key={i} className="relative group rounded-lg overflow-hidden border border-blue-200 aspect-square ring-1 ring-blue-300">
+                    <div key={i} className="relative group rounded-lg overflow-hidden border border-slate-200 aspect-square ring-1 ring-slate-300">
                       <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt={`new-${i}`} />
                       <button
                         type="button"
@@ -246,7 +246,7 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
             type="submit"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm px-6"
+            className="bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm px-6"
           >
             {isSubmitting ? "Updating..." : "Save Changes"}
           </Button>
@@ -282,7 +282,7 @@ const Field = ({ label, name, value, onChange, type = "text", prefix }: FieldPro
         value={value}
         onChange={onChange}
         type={type}
-        className={`rounded-xl border-slate-200 text-sm h-9 focus-visible:ring-blue-500/30 focus-visible:border-blue-400 ${prefix ? "pl-7" : ""}`}
+        className={`rounded-xl border-slate-200 text-sm h-9 focus-visible:ring-slate-500/30 focus-visible:border-slate-400 ${prefix ? "pl-7" : ""}`}
       />
     </div>
   </div>

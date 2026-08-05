@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import type { UserType } from "@/store/useAuthStore"; // TODO: adjust import path if UserType lives elsewhere
+import {
+    X,
+    UserPlus,
+    MapPin,
+    LoaderCircle,
+    Camera,
+    ImagePlus,
+    AlertCircle,
+    ChevronDown,
+} from "lucide-react";
 
 type Props = {
     open: boolean;
@@ -33,11 +43,29 @@ const MAX_AVATAR_MB = 5;
 const MAX_ID_MB = 5;
 const GENDER_OPTIONS = ["Male", "Female"];
 
+const ID_TYPES = [
+    "National ID",
+    "Passport",
+    "Driver's License",
+    "PhilHealth ID",
+    "SSS ID",
+    "UMID",
+    "Postal ID",
+    "Voter's ID",
+    "PRC ID",
+    "TIN ID",
+    "PWD ID",
+    "Senior Citizen ID",
+    "Student ID",
+    "Barangay ID",
+];
+
 const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
     const { createUserByStaff } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const idInputRef = useRef<HTMLInputElement>(null);
+    const [loadingLocation, setLoadingLocation] = useState(false);
 
     const [form, setForm] = useState<FormState>({
         first_name: "",
@@ -63,16 +91,78 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
     const [idPreview, setIdPreview] = useState<string | null>(null);
     const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
 
+
+    const fetchLocation = useCallback((silent = false) => {
+        if (!navigator.geolocation) {
+            if (!silent) toast.error("Geolocation is not supported on this device");
+            return;
+        }
+
+        setLoadingLocation(true);
+
+        navigator.geolocation.getCurrentPosition(
+            async ({ coords }) => {
+                try {
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${coords.latitude}&lon=${coords.longitude}`
+                    );
+
+                    const data = await res.json();
+
+                    if (data?.display_name) {
+                        setForm((prev) => ({ ...prev, address: data.display_name }));
+                        setErrors((prev) => ({ ...prev, address: "" }));
+                        if (!silent) toast.success("Address filled from your location");
+                    } else if (!silent) {
+                        toast.error("Could not resolve your address");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    if (!silent) toast.error("Could not resolve your address");
+                } finally {
+                    setLoadingLocation(false);
+                }
+            },
+            () => {
+                setLoadingLocation(false);
+                if (!silent) toast.error("Location permission denied");
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }, []);
+
+    // Auto-fill address once when the modal opens
+    useEffect(() => {
+        if (!_open) return;
+        fetchLocation(true);
+    }, [_open, fetchLocation]);
+
+    // Close on Escape
+    useEffect(() => {
+        if (!_open) return;
+        const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [_open, onClose]);
+
     if (!_open) return null;
 
     const sanitize = (value: string) => value.trim().replace(/\s+/g, " ");
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+        setErrors((prev) => ({ ...prev, [name]: "" }));
+    };
+
+    // Trim / collapse spaces only on blur, so spaces can still be typed
+    const handleBlur = (
+        e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: sanitize(value) }));
-        setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,6 +263,7 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
             const firstErrorKey = Object.keys(validationErrors)[0];
             const el = document.querySelector(`[name="${firstErrorKey}"]`);
             el?.scrollIntoView({ behavior: "smooth", block: "center" });
+            toast.error("Please complete the highlighted fields");
             return;
         }
 
@@ -191,112 +282,66 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
     };
 
     const initials =
-        (form.first_name?.[0] ?? "") + (form.last_name?.[0] ?? "");
+        ((form.first_name?.[0] ?? "") + (form.last_name?.[0] ?? "")).toUpperCase();
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]"
                 onClick={onClose}
             />
 
-            <div className="relative w-full sm:max-w-140 bg-white rounded-t-2xl sm:rounded-md shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300 border border-slate-100 max-h-[92vh] flex flex-col">
+            <div className="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200/80 bg-white shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-300 sm:max-w-xl sm:rounded-2xl">
 
                 {/* Header */}
-                <div className="px-6 pt-5 pb-4 border-b border-slate-100 shrink-0">
-                    <div className="flex items-start justify-between">
+                <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-100 px-5 py-4">
+                    <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900">
+                            <UserPlus className="h-4 w-4 text-white" />
+                        </div>
                         <div>
-                            <h2 className="text-[15px] font-semibold text-slate-900 leading-tight">
+                            <h2 className="text-[14px] font-semibold leading-tight text-slate-900">
                                 Add New Boarder
                             </h2>
-                            <p className="text-[13px] text-slate-400 mt-0.5">
-                                Fill in all the details below to create a boarder account
+                            <p className="text-[11.5px] leading-tight text-slate-400">
+                                Fill in the details to create a boarder account
                             </p>
                         </div>
-                        <button
-                            onClick={onClose}
-                            className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all"
-                        >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                            </svg>
-                        </button>
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                    >
+                        <X className="h-4 w-4" />
+                    </button>
                 </div>
 
-                {/* Scrollable form body */}
-                <form onSubmit={handleSubmit} className="overflow-y-auto px-6 py-5 space-y-5">
+                <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+                    <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5">
 
-                    {/* Personal information */}
-                    <section className="space-y-3">
-                        <SectionLabel label="Personal information" />
-                        <div className="grid grid-cols-2 gap-3">
-                            <Field label="First name" name="first_name" placeholder="John" value={form.first_name} onChange={handleChange} error={errors.first_name} />
-                            <Field label="Last name" name="last_name" placeholder="Doe" value={form.last_name} onChange={handleChange} error={errors.last_name} />
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <Select
-                                label="Gender"
-                                name="gender"
-                                value={form.gender}
-                                onChange={handleChange}
-                                options={GENDER_OPTIONS}
-                                error={errors.gender}
-                            />
-                            <Field label="Age" name="age" placeholder="18" value={form.age} onChange={handleChange} type="number" error={errors.age} />
-                        </div>
-                    </section>
-
-                    {/* Account details */}
-                    <section className="space-y-3">
-                        <SectionLabel label="Account details" />
-                        <div className="grid grid-cols-2 gap-3">
-                            <Field label="Username" name="username" placeholder="john_doe" value={form.username} onChange={handleChange} error={errors.username} />
-                            <Field label="Contact number" name="contact_number" placeholder="09XXXXXXXXX" value={form.contact_number} onChange={handleChange} error={errors.contact_number} />
-                        </div>
-                        <Field label="Email address" name="email" placeholder="john@example.com" value={form.email} onChange={handleChange} type="email" error={errors.email} />
-                        <Field label="Address" name="address" placeholder="Street, City, Province" value={form.address} onChange={handleChange} error={errors.address} />
-                        <Field label="Password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} type="password" error={errors.password} />
-                    </section>
-
-                    {/* Emergency contact */}
-                    <section className="space-y-3">
-                        <SectionLabel label="Emergency contact" />
-                        <div className="grid grid-cols-2 gap-3">
-                            <Field label="Contact name" name="emergency_contact_name" placeholder="Jane Doe" value={form.emergency_contact_name} onChange={handleChange} error={errors.emergency_contact_name} />
-                            <Field label="Contact number" name="emergency_contact_number" placeholder="09XXXXXXXXX" value={form.emergency_contact_number} onChange={handleChange} error={errors.emergency_contact_number} />
-                        </div>
-                        <Field label="Relationship" name="emergency_contact_relationship" placeholder="Mother, Father, Guardian..." value={form.emergency_contact_relationship} onChange={handleChange} error={errors.emergency_contact_relationship} />
-                    </section>
-
-                    {/* Photo & documents */}
-                    <section className="space-y-3">
-                        <SectionLabel label="Profile photo" />
-
-                        <div className="flex items-center gap-4">
+                        {/* Profile photo */}
+                        <div className="flex items-center gap-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 p-3">
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="group relative w-14 h-14 shrink-0 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-sm font-semibold text-slate-500 overflow-hidden transition-all duration-200 hover:border-slate-300"
+                                className="group relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white text-[13px] font-semibold text-slate-400 transition-all hover:border-slate-300"
                             >
                                 {avatarPreview ? (
-                                    <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
-                                ) : initials.toUpperCase() || (
-                                    <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                    </svg>
+                                    <img
+                                        src={avatarPreview}
+                                        alt="Avatar preview"
+                                        className="h-full w-full object-cover"
+                                    />
+                                ) : initials ? (
+                                    initials
+                                ) : (
+                                    <Camera className="h-4 w-4 text-slate-400" />
                                 )}
 
-                                <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-150">
-                                    <svg className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 8.586 5.5h6.828c.685 0 1.34.276 1.759.675M6.827 6.175 5.907 8.25a2.25 2.25 0 0 0-2.157 2.243v7.007c0 1.243 1.007 2.25 2.25 2.25h12a2.25 2.25 0 0 0 2.25-2.25v-7.007a2.25 2.25 0 0 0-2.157-2.243l-.92-2.075m-9.146 0a2.31 2.31 0 0 0-1.759.675M12 17.25a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" />
-                                    </svg>
-                                </span>
-
-                                <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-slate-900 border-2 border-white flex items-center justify-center">
-                                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 8.586 5.5h6.828c.685 0 1.34.276 1.759.675M6.827 6.175 5.907 8.25a2.25 2.25 0 0 0-2.157 2.243v7.007c0 1.243 1.007 2.25 2.25 2.25h12a2.25 2.25 0 0 0 2.25-2.25v-7.007a2.25 2.25 0 0 0-2.157-2.243l-.92-2.075m-9.146 0a2.31 2.31 0 0 0-1.759.675M12 17.25a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Z" />
-                                    </svg>
+                                <span className="absolute inset-0 flex items-center justify-center bg-slate-900/0 transition-all group-hover:bg-slate-900/40">
+                                    <Camera className="h-4 w-4 text-white opacity-0 transition-opacity group-hover:opacity-100" />
                                 </span>
                             </button>
 
@@ -308,169 +353,249 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
                                 className="hidden"
                             />
 
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-3">
+                            <div className="min-w-0">
+                                <p className="text-[12.5px] font-medium text-slate-800">
+                                    Profile photo{" "}
+                                    <span className="font-normal text-slate-400">(optional)</span>
+                                </p>
+                                <p className="mt-0.5 text-[11px] text-slate-400">
+                                    JPG, PNG, or WEBP — up to {MAX_AVATAR_MB}MB
+                                </p>
+
+                                <div className="mt-1.5 flex items-center gap-2">
                                     <button
                                         type="button"
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="text-[13px] font-medium text-slate-700 hover:text-slate-900 underline underline-offset-2 decoration-slate-300 hover:decoration-slate-500 transition-colors"
+                                        className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[11.5px] font-medium text-slate-700 transition-colors hover:bg-slate-50"
                                     >
-                                        Upload photo
+                                        Upload
                                     </button>
                                     {avatarPreview && (
                                         <button
                                             type="button"
                                             onClick={removeAvatar}
-                                            className="text-[13px] font-medium text-slate-400 hover:text-red-500 transition-colors"
+                                            className="text-[11.5px] font-medium text-slate-400 transition-colors hover:text-red-500"
                                         >
                                             Remove
                                         </button>
                                     )}
                                 </div>
-                                <p className="text-[11px] text-slate-400">
-                                    JPG, PNG, or WEBP — up to {MAX_AVATAR_MB}MB
-                                </p>
-                                {errors.avatar && (
-                                    <p className="flex items-center gap-1 text-[11px] text-red-500">
-                                        {errors.avatar}
-                                    </p>
-                                )}
+
+                                {errors.avatar && <ErrorText text={errors.avatar} />}
                             </div>
                         </div>
 
-                        {/* Valid ID Type */}
-                        <SectionLabel label="Valid ID Information" />
+                        {/* Personal information */}
+                        <section className="space-y-3">
+                            <SectionLabel label="Personal information" />
 
-                        <div className="space-y-1">
-                            <label className="text-xs text-slate-500">ID Type</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field label="First name" name="first_name" placeholder="John" value={form.first_name} onChange={handleChange} onBlur={handleBlur} error={errors.first_name} />
+                                <Field label="Last name" name="last_name" placeholder="Doe" value={form.last_name} onChange={handleChange} onBlur={handleBlur} error={errors.last_name} />
+                            </div>
 
-                            <select
+                            <div className="grid grid-cols-2 gap-3">
+                                <Select
+                                    label="Gender"
+                                    name="gender"
+                                    value={form.gender}
+                                    onChange={handleChange}
+                                    options={GENDER_OPTIONS}
+                                    error={errors.gender}
+                                />
+                                <Field label="Age" name="age" placeholder="18" value={form.age} onChange={handleChange} type="number" error={errors.age} />
+                            </div>
+                        </section>
+
+                        {/* Account details */}
+                        <section className="space-y-3">
+                            <SectionLabel label="Account details" />
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field label="Username" name="username" placeholder="john_doe" value={form.username} onChange={handleChange} onBlur={handleBlur} error={errors.username} />
+                                <Field label="Contact number" name="contact_number" placeholder="09XXXXXXXXX" value={form.contact_number} onChange={handleChange} onBlur={handleBlur} error={errors.contact_number} />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field label="Email address" name="email" placeholder="john@example.com" value={form.email} onChange={handleChange} onBlur={handleBlur} type="email" error={errors.email} />
+                                <Field label="Password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} type="password" error={errors.password} />
+                            </div>
+
+                            {/* Address with location */}
+                            <div className="space-y-1.5">
+                                <div className="flex items-center justify-between gap-2">
+                                    <label className="block text-[12px] font-medium text-slate-600">
+                                        Address
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => fetchLocation(false)}
+                                        disabled={loadingLocation}
+                                        className="flex items-center gap-1 text-[11.5px] font-medium text-slate-600 transition-colors hover:text-slate-900 disabled:opacity-60"
+                                    >
+                                        {loadingLocation ? (
+                                            <LoaderCircle className="h-3 w-3 animate-spin" />
+                                        ) : (
+                                            <MapPin className="h-3 w-3" />
+                                        )}
+                                        {loadingLocation ? "Locating..." : "Use my location"}
+                                    </button>
+                                </div>
+
+                                <div className="relative">
+                                    <MapPin className="pointer-events-none absolute left-3 top-3 h-3.5 w-3.5 text-slate-400" />
+                                    <textarea
+                                        name="address"
+                                        rows={2}
+                                        placeholder={
+                                            loadingLocation
+                                                ? "Getting your current location..."
+                                                : "Street, Barangay, City, Province"
+                                        }
+                                        value={form.address}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        className={`w-full resize-none rounded-lg border bg-white py-2 pl-8 pr-3 text-[13px] leading-relaxed text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20 ${errors.address
+                                            ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
+                                            : "border-slate-200 hover:border-slate-300"
+                                            }`}
+                                    />
+                                </div>
+
+                                {errors.address ? (
+                                    <ErrorText text={errors.address} />
+                                ) : (
+                                    <p className="text-[11px] text-slate-400">
+                                        Detected automatically — you can edit it if it's not exact.
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+
+                        {/* Emergency contact */}
+                        <section className="space-y-3">
+                            <SectionLabel label="Emergency contact" />
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field label="Contact name" name="emergency_contact_name" placeholder="Jane Doe" value={form.emergency_contact_name} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_name} />
+                                <Field label="Contact number" name="emergency_contact_number" placeholder="09XXXXXXXXX" value={form.emergency_contact_number} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_number} />
+                            </div>
+
+                            <Field label="Relationship" name="emergency_contact_relationship" placeholder="Mother, Father, Guardian..." value={form.emergency_contact_relationship} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_relationship} />
+                        </section>
+
+                        {/* Valid ID */}
+                        <section className="space-y-3">
+                            <SectionLabel label="Valid ID" />
+
+                            <Select
+                                label="ID type"
                                 name="valid_id_type"
                                 value={form.valid_id_type}
                                 onChange={handleChange}
-                                className="w-full rounded-lg border border-slate-300 placeholder:text-xs bg-white px-3 py-2 text-sm focus:ring-2 focus:ring-slate-500"
-                            >
-                                <option value="" disabled>
-                                    Select ID Type
-                                </option>
-                                <option value="National ID">National ID</option>
-                                <option value="Passport">Passport</option>
-                                <option value="Driver's License">Driver's License</option>
-                                <option value="PhilHealth ID">PhilHealth ID</option>
-                                <option value="SSS ID">SSS ID</option>
-                                <option value="UMID">UMID</option>
-                                <option value="Postal ID">Postal ID</option>
-                                <option value="Voter's ID">Voter's ID</option>
-                                <option value="PRC ID">PRC ID</option>
-                                <option value="TIN ID">TIN ID</option>
-                                <option value="PWD ID">PWD ID</option>
-                                <option value="Senior Citizen ID">Senior Citizen ID</option>
-                                <option value="Student ID">Student ID</option>
-                                <option value="Barangay ID">Barangay ID</option>
-                            </select>
+                                options={ID_TYPES}
+                                error={errors.valid_id_type}
+                            />
 
-                            {errors.valid_id_type && (
-                                <p className="text-xs text-red-500">
-                                    {errors.valid_id_type}
-                                </p>
-                            )}
-                        </div>
-                        <SectionLabel label="Valid ID" />
+                            <div className="space-y-1.5">
+                                <label className="block text-[12px] font-medium text-slate-600">
+                                    ID photo
+                                </label>
 
+                                <button
+                                    type="button"
+                                    onClick={() => idInputRef.current?.click()}
+                                    className={`group relative flex h-28 w-full flex-col items-center justify-center gap-1.5 overflow-hidden rounded-xl border-2 border-dashed transition-all ${errors.valid_id_image
+                                        ? "border-red-300 bg-red-50/30"
+                                        : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
+                                        }`}
+                                >
+                                    {idPreview ? (
+                                        <>
+                                            <img
+                                                src={idPreview}
+                                                alt="Valid ID preview"
+                                                className="absolute inset-0 h-full w-full object-cover"
+                                            />
+                                            <span className="absolute inset-0 flex items-center justify-center bg-slate-900/0 transition-all group-hover:bg-slate-900/50">
+                                                <span className="text-[12px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                                    Replace image
+                                                </span>
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white ring-1 ring-slate-200">
+                                                <ImagePlus className="h-4 w-4 text-slate-400" />
+                                            </div>
+                                            <span className="text-[12px] font-medium text-slate-600">
+                                                Upload valid ID
+                                            </span>
+                                            <span className="text-[10.5px] text-slate-400">
+                                                JPG, PNG, or WEBP — up to {MAX_ID_MB}MB
+                                            </span>
+                                        </>
+                                    )}
+                                </button>
+
+                                <input
+                                    ref={idInputRef}
+                                    type="file"
+                                    accept="image/png, image/jpeg, image/webp"
+                                    onChange={handleIdChange}
+                                    className="hidden"
+                                />
+
+                                <div className="flex items-center justify-between gap-2">
+                                    {errors.valid_id_image ? (
+                                        <ErrorText text={errors.valid_id_image} />
+                                    ) : (
+                                        <span />
+                                    )}
+                                    {idPreview && (
+                                        <button
+                                            type="button"
+                                            onClick={removeId}
+                                            className="text-[11px] font-medium text-slate-400 transition-colors hover:text-red-500"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex shrink-0 items-center justify-end gap-2 border-t border-slate-100 bg-white px-5 py-3.5">
                         <button
                             type="button"
-                            onClick={() => idInputRef.current?.click()}
-                            className={`group relative w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 overflow-hidden transition-all duration-200 ${errors.valid_id_image
-                                ? "border-red-300 bg-red-50/30"
-                                : "border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100"
-                                }`}
+                            onClick={onClose}
+                            disabled={isSubmitting}
+                            className="rounded-lg border border-slate-200 px-4 py-2 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:opacity-50"
                         >
-                            {idPreview ? (
+                            Cancel
+                        </button>
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2 text-[12.5px] font-medium text-white transition-all hover:bg-slate-800 active:scale-[0.98] disabled:opacity-60"
+                        >
+                            {isSubmitting ? (
                                 <>
-                                    <img src={idPreview} alt="Valid ID preview" className="absolute inset-0 w-full h-full object-cover" />
-                                    <span className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-all duration-150">
-                                        <span className="text-[12px] font-medium text-white opacity-0 group-hover:opacity-100 transition-opacity">
-                                            Replace image
-                                        </span>
-                                    </span>
+                                    <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                                    Creating...
                                 </>
                             ) : (
                                 <>
-                                    <svg className="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                                    </svg>
-                                    <span className="text-[12px] font-medium text-slate-600">
-                                        Upload valid ID
-                                    </span>
+                                    <UserPlus className="h-3.5 w-3.5" />
+                                    Create boarder
                                 </>
                             )}
                         </button>
-
-                        <input
-                            ref={idInputRef}
-                            type="file"
-                            accept="image/png, image/jpeg, image/webp"
-                            onChange={handleIdChange}
-                            className="hidden"
-                        />
-
-                        <div className="flex items-center justify-between">
-                            <p className="text-[11px] text-slate-400">
-                                JPG, PNG, or WEBP — up to {MAX_ID_MB}MB
-                            </p>
-                            {idPreview && (
-                                <button
-                                    type="button"
-                                    onClick={removeId}
-                                    className="text-[11px] font-medium text-slate-400 hover:text-red-500 transition-colors"
-                                >
-                                    Remove
-                                </button>
-                            )}
-                        </div>
-                        {errors.valid_id_image && (
-                            <p className="flex items-center gap-1 text-[11px] text-red-500">
-                                {errors.valid_id_image}
-                            </p>
-                        )}
-                    </section>
+                    </div>
                 </form>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between gap-2 px-6 py-4 border-t border-slate-100 shrink-0">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={isSubmitting}
-                        className="px-4 py-2 text-[13px] font-medium text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="px-5 py-2 text-[13px] font-medium text-white bg-slate-900 hover:bg-slate-800 active:scale-[0.98] rounded-lg transition-all disabled:opacity-60 flex items-center gap-2 shadow-sm shadow-slate-300"
-                    >
-                        {isSubmitting ? (
-                            <>
-                                <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                                </svg>
-                                Creating...
-                            </>
-                        ) : (
-                            <>
-                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                                Create boarder
-                            </>
-                        )}
-                    </button>
-                </div>
             </div>
         </div>
     );
@@ -478,10 +603,21 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
 
 export default BoarderCreateUser;
 
+/* ---------------- Small building blocks ---------------- */
 
 const SectionLabel = ({ label }: { label: string }) => (
-    <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
-        {label}
+    <div className="flex items-center gap-2.5">
+        <p className="whitespace-nowrap text-[10.5px] font-semibold uppercase tracking-wider text-slate-400">
+            {label}
+        </p>
+        <div className="h-px flex-1 bg-slate-100" />
+    </div>
+);
+
+const ErrorText = ({ text }: { text: string }) => (
+    <p className="flex items-center gap-1 text-[11px] text-red-500">
+        <AlertCircle className="h-3 w-3 shrink-0" />
+        {text}
     </p>
 );
 
@@ -491,11 +627,23 @@ type FieldProps = {
     placeholder: string;
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
     type?: string;
     error?: string;
+    disabled?: boolean;
 };
 
-const Field = ({ label, name, placeholder, value, onChange, type = "text", error }: FieldProps) => (
+const Field = ({
+    label,
+    name,
+    placeholder,
+    value,
+    onChange,
+    onBlur,
+    type = "text",
+    error,
+    disabled,
+}: FieldProps) => (
     <div className="space-y-1.5">
         <label className="block text-[12px] font-medium text-slate-600">
             {label}
@@ -506,21 +654,15 @@ const Field = ({ label, name, placeholder, value, onChange, type = "text", error
             value={value}
             type={type}
             onChange={onChange}
-            className={`w-full h-9 px-3 text-[13px] rounded-lg border bg-white placeholder:text-slate-300 text-slate-800 outline-none transition-all duration-150
-                focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400
+            onBlur={onBlur}
+            disabled={disabled}
+            className={`h-9 w-full rounded-lg border bg-white px-3 text-[13px] text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20 disabled:bg-slate-50 disabled:text-slate-400
                 ${error
-                    ? "border-red-300 bg-red-50/30 focus:ring-red-500/20 focus:border-red-400"
+                    ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
                     : "border-slate-200 hover:border-slate-300"
                 }`}
         />
-        {error && (
-            <p className="flex items-center gap-1 text-[11px] text-red-500">
-                <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c.31-.31.73-.483 1.169-.483h.187a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V11.81a.75.75 0 0 1 .394-.675ZM12 15a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" clipRule="evenodd" />
-                </svg>
-                {error}
-            </p>
-        )}
+        {error && <ErrorText text={error} />}
     </div>
 );
 
@@ -538,33 +680,28 @@ const Select = ({ label, name, value, onChange, options, error }: SelectProps) =
         <label className="block text-[12px] font-medium text-slate-600">
             {label}
         </label>
-        <select
-            name={name}
-            value={value}
-            onChange={onChange}
-            className={`w-full h-9 px-3 text-[13px] rounded-lg border bg-white text-slate-800 outline-none transition-all duration-150 appearance-none
-                focus:ring-2 focus:ring-slate-500/20 focus:border-slate-400
+        <div className="relative">
+            <select
+                name={name}
+                value={value}
+                onChange={onChange}
+                className={`h-9 w-full appearance-none rounded-lg border bg-white pl-3 pr-8 text-[13px] text-slate-800 outline-none transition-all focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20
                 ${error
-                    ? "border-red-300 bg-red-50/30 focus:ring-red-500/20 focus:border-red-400"
-                    : "border-slate-200 hover:border-slate-300"
-                }`}
-        >
-            <option value="" disabled>
-                Select...
-            </option>
-            {options.map((opt) => (
-                <option key={opt} value={opt}>
-                    {opt}
+                        ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+            >
+                <option value="" disabled>
+                    Select...
                 </option>
-            ))}
-        </select>
-        {error && (
-            <p className="flex items-center gap-1 text-[11px] text-red-500">
-                <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c.31-.31.73-.483 1.169-.483h.187a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V11.81a.75.75 0 0 1 .394-.675ZM12 15a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z" clipRule="evenodd" />
-                </svg>
-                {error}
-            </p>
-        )}
+                {options.map((opt) => (
+                    <option key={opt} value={opt}>
+                        {opt}
+                    </option>
+                ))}
+            </select>
+            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+        </div>
+        {error && <ErrorText text={error} />}
     </div>
 );

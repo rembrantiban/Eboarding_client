@@ -4,152 +4,170 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useEffect, useMemo } from "react";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useBilling } from "@/hooks/useBilling";
 
+type ChartPoint = {
+  date: string;
+  value: number;
+};
 
-const data = [
-  { date: "May 1", value: 18000 },
-  { date: "May 3", value: 42000 },
-  { date: "May 5", value: 58000 },
-  { date: "May 6", value: 68000 },
-  { date: "May 7", value: 64000 },
-  { date: "May 8", value: 78000 },
-  { date: "May 9", value: 86000 },
-  { date: "May 10", value: 92000 },
-  { date: "May 11", value: 98000 },
-  { date: "May 12", value: 100000 },
-  { date: "May 13", value: 104000 },
-  { date: "May 14", value: 108000 },
-  { date: "May 15", value: 116000 },
-  { date: "May 16", value: 128450 },
-];
+const LINE_COLOR = "#121111"; // indigo-700
 
-const lastValue = data[data.length - 1];
-
-function formatCurrency(v: number) {
+function formatAxisCurrency(v: number) {
   return `₱${(v / 1000).toFixed(0)}K`;
 }
 
-export default function PaymentsOverviewChart() {
+function formatCurrency(v: number) {
+  return `₱${v.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`;
+}
+
+type CustomTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+  }>;
+  label?: string;
+};
+
+function CustomTooltip({
+  active,
+  payload,
+  label,
+}: CustomTooltipProps) {
+  if (!active || !payload?.length) return null;
+
   return (
-    <div className="w-full max-w-md rounded border border-slate-200 bg-white p-6 ">
-      <h3 className="mb-4 text-[15px] font-semibold text-slate-900">
-        Payments overview{" "}
-        <span className="font-normal text-slate-400">(This month)</span>
-      </h3>
+    <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-lg shadow-slate-900/10">
+      <p className="text-[10px] uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
 
-      <div style={{ width: "100%", height: 220 }}>
-        <ResponsiveContainer>
-          <AreaChart data={data} margin={{ top: 24, right: 16, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="paymentsFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#64748b" stopOpacity={0.25} />
-                <stop offset="100%" stopColor="#64748b" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+      <p className="mt-1 text-sm font-semibold">
+        {formatCurrency(Number(payload[0].value))}
+      </p>
+    </div>
+  );
+}
 
-            <CartesianGrid vertical={false} stroke="#f1f5f9" />
+export default function PaymentsOverviewChart() {
+  const { paymentsOverview, getPaymentsOverview } = useBilling();
 
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
-              ticks={["May 1", "May 6", "May 11", "May 16"]}
-            />
+  useEffect(() => {
+    getPaymentsOverview();
+    // eslint-disable-next-line
+  }, []);
 
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={formatCurrency}
-              tick={{ fill: "#94a3b8", fontSize: 11 }}
-              width={48}
-              domain={[0, 160000]}
-              ticks={[0, 20000, 40000, 60000, 80000, 100000, 120000, 140000, 160000]}
-            />
+  const chartData: ChartPoint[] = useMemo(
+    () =>
+      paymentsOverview.map((item) => ({
+        ...item,
+        value: Number(item.value),
+      })),
+    [paymentsOverview]
+  );
 
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#475569"
-              strokeWidth={2.5}
-              fill="url(#paymentsFill)"
-              dot={(props) => {
-                const { cx, cy, payload } = props as {
-                  cx?: number;
-                  cy?: number;
-                  payload?: {
-                    date: string;
-                    value: number;
-                  };
-                };
+  const totalPayments = useMemo(
+    () =>
+      chartData.reduce((sum, item) => sum + item.value, 0),
+    [chartData]
+  );
+  const prevValue = chartData.length > 1 ? chartData[chartData.length - 2] : null;
 
-                if (cx == null || cy == null || !payload) {
-                  return null;
-                }
+  const change =
+    totalPayments && prevValue && prevValue.value !== 0
+      ? ((totalPayments - prevValue.value) / prevValue.value) * 100
+      : null;
 
-                const isLast = payload.date === lastValue.date;
+  const Trend = change === null || change === 0 ? Minus : change > 0 ? TrendingUp : TrendingDown;
+  const trendColor =
+    change === null || change === 0
+      ? "text-slate-400 bg-slate-50"
+      : change > 0
+        ? "text-emerald-600 bg-emerald-50"
+        : "text-red-600 bg-red-50";
 
-                if (!isLast) {
-                  return (
-                    <circle
-                      cx={cx}
-                      cy={cy}
-                      r={3.5}
-                      fill="#475569"
-                      stroke="#fff"
-                      strokeWidth={1.5}
-                    />
-                  );
-                }
+  return (
+    <div className="w-full  rounded border border-slate-300 bg-white p-6 ">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            Payments overview (This Month)
+          </p>
+          <p className="mt-1.5 text-2xl font-bold tabular-nums text-slate-900">
+            {formatCurrency(totalPayments)}
+          </p>
+          <p className="mt-0.5 text-xs text-slate-400">This month</p>
+        </div>
 
-                const label = `₱${lastValue.value.toLocaleString()}`;
-                const labelWidth = label.length * 7 + 20;
-
-                return (
-                  <g>
-                    <circle
-                      cx={cx}
-                      cy={cy}
-                      r={5}
-                      fill="#475569"
-                      stroke="#fff"
-                      strokeWidth={2}
-                    />
-
-                    <g transform={`translate(${cx - labelWidth / 2}, ${cy - 38})`}>
-                      <rect
-                        width={labelWidth}
-                        height={24}
-                        rx={12}
-                        fill="#475569"
-                      />
-
-                      <polygon
-                        points={`${labelWidth / 2 - 5},24 ${labelWidth / 2 + 5},24 ${labelWidth / 2},31`}
-                        fill="#475569"
-                      />
-
-                      <text
-                        x={labelWidth / 2}
-                        y={16}
-                        textAnchor="middle"
-                        fill="#fff"
-                        fontSize={12}
-                        fontWeight={600}
-                      >
-                        {label}
-                      </text>
-                    </g>
-                  </g>
-                );
-              }}
-              activeDot={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {change !== null && (
+          <span
+            className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold tabular-nums ${trendColor}`}
+          >
+            <Trend size={12} strokeWidth={2.5} />
+            {Math.abs(change).toFixed(1)}%
+          </span>
+        )}
       </div>
+
+      {/* Chart */}
+      {!chartData.length ? (
+        <div className="mt-6 flex h-55 items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-400">
+          No payment data available.
+        </div>
+      ) : (
+        <div className="mt-4" style={{ width: "100%", height: 220 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="paymentsFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={LINE_COLOR} stopOpacity={0.18} />
+                  <stop offset="100%" stopColor={LINE_COLOR} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              <CartesianGrid vertical={false} stroke="#f1f5f9" />
+
+              <XAxis
+                dataKey="date"
+                interval={0}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#94a3b8", fontSize: 11 }}
+              />
+
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                width={44}
+                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                tickFormatter={formatAxisCurrency}
+                domain={[0, "dataMax + 5000"]}
+              />
+
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ stroke: "#cbd5e1", strokeWidth: 1, strokeDasharray: "4 4" }}
+              />
+
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke={LINE_COLOR}
+                strokeWidth={2.5}
+                fill="url(#paymentsFill)"
+                dot={{ r: 3, fill: LINE_COLOR, stroke: "#fff", strokeWidth: 1.5 }}
+                activeDot={{ r: 5, fill: LINE_COLOR, stroke: "#fff", strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </div>
   );
 }

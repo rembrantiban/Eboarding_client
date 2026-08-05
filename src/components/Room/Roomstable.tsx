@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import RoomRow from "./RoomRow";
-import { Button } from "../ui/button";
-import { ArrowUpDown, Plus, RotateCcw } from "lucide-react";
+import { Search, Plus, RotateCcw, DoorOpen, PackageOpen } from "lucide-react";
 import AddRoomModal from "../modal/AddRoomModal";
 import { useRoom } from "@/hooks/useRoom";
 import ViewRoomModal from "../modal/ViewRoomModal";
@@ -55,137 +54,166 @@ const RoomsTable = () => {
     setFilter("All");
   };
 
+  const isFiltered = search !== "" || filter !== "All";
+
   return (
-    <div className="rounded border bg-background p-5 shadow-sm space-y-4">
+    <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
 
       {/* 🔷 Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900">
+            <DoorOpen className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <h2 className="text-[14px] font-semibold leading-tight text-slate-900">
+              Rooms
+            </h2>
+            <p className="text-[11px] leading-tight text-slate-400">
+              {filteredRooms.length} of {rooms.length} rooms
+            </p>
+          </div>
+        </div>
 
-        <div className="flex gap-2">
-          <Input
-            placeholder="Search room..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-52"
-          />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <Input
+              placeholder="Search room..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 w-full rounded-lg border-slate-200 pl-8 text-[12.5px] shadow-none placeholder:text-slate-400 focus-visible:ring-1 focus-visible:ring-slate-900 sm:w-52"
+            />
+          </div>
 
           <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="h-9 w-full rounded-lg border-slate-200 text-[12.5px] font-medium text-slate-700 shadow-none focus:ring-1 focus:ring-slate-900 sm:w-40">
               <SelectValue placeholder="Filter status" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All</SelectItem>
-              <SelectItem value="Available">Available</SelectItem>
-              <SelectItem value="Occupied">Occupied</SelectItem>
-              <SelectItem value="Full">Under Maintenance</SelectItem>
-
+            <SelectContent className="rounded-xl">
+              <SelectItem value="All" className="text-[12.5px]">All status</SelectItem>
+              <SelectItem value="Available" className="text-[12.5px]">Available</SelectItem>
+              <SelectItem value="Occupied" className="text-[12.5px]">Occupied</SelectItem>
+              <SelectItem value="Under Maintenance" className="text-[12.5px]">Under Maintenance</SelectItem>
             </SelectContent>
           </Select>
 
-          {/* ✅ FIXED RESET BUTTON */}
-          <Button onClick={handleReset}>
-            <RotateCcw />
-            Reset
-          </Button>
-        </div>
+          <div className="flex items-center gap-2">
+            {/* ✅ FIXED RESET BUTTON */}
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={!isFiltered}
+              title="Reset filters"
+              className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-transparent"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Reset
+            </button>
 
-        <div>
-          <Button onClick={() => setAddRoomOpen(true)}>
-            <Plus />
-            Add New
-          </Button>
+            <button
+              type="button"
+              onClick={() => setAddRoomOpen(true)}
+              className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-[12.5px] font-medium text-white transition-colors hover:bg-slate-800 sm:flex-none"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Add Room
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 🔷 Table */}
-      <div className="rounded border">
-        <table className="w-full text-sm">
+      <div className="overflow-hidden rounded-xl border border-slate-200/80">
+        <div className="overflow-x-auto">
+          <table className="w-full">
 
-          <thead className="  text-slate-700">
-            <tr>
-              <th className="text-left px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown size={16} />
-                  Room
-                </div>
-              </th>
-
-              <th className="text-left px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown size={16} />
-                  Capacity
-                </div>
-              </th>
-
-              <th className="text-left px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown size={16} />
-                  Beds
-                </div>
-              </th>
-
-              <th className="text-left px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown size={16} />
-                  Price Per Month
-                </div>
-              </th>
-
-              <th className="text-left px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <ArrowUpDown size={16} />
-                  Status
-                </div>
-              </th>
-
-              <th className="text-right px-4 py-3">
-                <div className="flex items-center justify-end gap-2">
-                  <ArrowUpDown size={16} />
-                  Actions
-                </div>
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={5} className="text-center py-4">
-                  Loading...
-                </td>
+            <thead className="border-b border-slate-200/80 bg-slate-50/70">
+              <tr className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500">
+                <th className="whitespace-nowrap px-4 py-2.5 text-left">Room</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left">Capacity</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left">Beds</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left">Price / Month</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left">Status</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-right">Actions</th>
               </tr>
-            ) : filteredRooms.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="text-center py-4">
-                  No rooms found
-                </td>
-              </tr>
-            ) : (
-              filteredRooms.map((room) => (
-                <RoomRow
-                  key={room.id}
-                  room={{
-                    ...room,
-                    status: room.status as "Available" | "Occupied" | "Under Maintenance",
-                  }}
-                  onView={(r) => {
-                    setSelectedRoom(r);
-                    setViewOpen(true);
-                  }}
-                  onEdit={(r) => {
-                    setSelectedRoom(r);
-                    setEditOpen(true);
-                  }}
-                  onDelete={(room) => {
-                    setRoomToDelete(room);
-                    setDeleteOpen(true);
-                  }}
-                />
-              ))
-            )}
-          </tbody>
+            </thead>
 
-        </table>
+            <tbody className="divide-y divide-slate-100">
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-9 w-9 animate-pulse rounded-lg bg-slate-100" />
+                        <div className="space-y-1.5">
+                          <div className="h-3 w-16 animate-pulse rounded bg-slate-100" />
+                          <div className="h-2.5 w-12 animate-pulse rounded bg-slate-100" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-10 animate-pulse rounded bg-slate-100" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-5 w-12 animate-pulse rounded-full bg-slate-100" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-16 animate-pulse rounded bg-slate-100" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-5 w-20 animate-pulse rounded-full bg-slate-100" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="ml-auto h-7 w-7 animate-pulse rounded-lg bg-slate-100" />
+                    </td>
+                  </tr>
+                ))
+              ) : filteredRooms.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-14">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
+                        <PackageOpen className="h-5 w-5 text-slate-400" />
+                      </div>
+                      <p className="mt-3 text-[13px] font-semibold text-slate-900">
+                        No rooms found
+                      </p>
+                      <p className="mt-1 text-[11.5px] text-slate-400">
+                        {isFiltered
+                          ? "Try adjusting your search or filter."
+                          : "Add your first room to get started."}
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredRooms.map((room) => (
+                  <RoomRow
+                    key={room.id}
+                    room={{
+                      ...room,
+                      status: room.status as "Available" | "Occupied" | "Under Maintenance",
+                    }}
+                    onView={(r) => {
+                      setSelectedRoom(r);
+                      setViewOpen(true);
+                    }}
+                    onEdit={(r) => {
+                      setSelectedRoom(r);
+                      setEditOpen(true);
+                    }}
+                    onDelete={(room) => {
+                      setRoomToDelete(room);
+                      setDeleteOpen(true);
+                    }}
+                  />
+                ))
+              )}
+            </tbody>
+
+          </table>
+        </div>
       </div>
 
       {/* ✅ MODAL */}

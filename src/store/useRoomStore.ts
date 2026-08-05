@@ -92,6 +92,13 @@ export interface DashboardData {
 }
 
 
+export interface RoomAvailabilityChart {
+  room: string;
+  total: number;
+  available: number;
+  occupied: number;
+}
+
 interface RoomState {
   rooms: Room[];
   availableRooms: AvailableRoom[];
@@ -102,6 +109,10 @@ interface RoomState {
     occupiedBeds: number,
     availableBeds: number,
   };
+
+
+  roomAvailabilityChart: RoomAvailabilityChart[];
+
 
   dashboard: DashboardData | null;
   getMyDashboard: () => Promise<void>;
@@ -118,6 +129,9 @@ interface RoomState {
   getAvailableRooms: () => Promise<void>;
   getOccupancyTrend: () => Promise<void>
   updateRoomStatus: (id: number, status: "Available" | "Occupied" | "Under Maintenance") => Promise<boolean>;
+
+  getRoomAvailabilityChart: () => Promise<void>;
+
 }
 
 
@@ -137,6 +151,30 @@ export const useRoomStore = create<RoomState>((set) => ({
     availableBeds: 0,
   },
 
+  roomAvailabilityChart: [],
+
+
+
+
+  getRoomAvailabilityChart: async () => {
+    try {
+      const res = await axiosInstance.get(
+        "/rooms/availability-chart"
+      );
+
+      set({
+        roomAvailabilityChart: res.data,
+      });
+
+      console.log(res.data)
+
+    } catch (error) {
+      console.error(
+        "Room availability chart error:",
+        error
+      );
+    }
+  },
   updateRoomStatus: async (id, status) => {
 
     const {
@@ -365,7 +403,7 @@ export const useRoomStore = create<RoomState>((set) => ({
 
 
   updateRoom: async (data) => {
-      const { showLoading, showError, showSuccess } = useStatusStore.getState();
+    const { showLoading, showError, showSuccess } = useStatusStore.getState();
 
     try {
       showLoading("Updating Room", "Please wait...");
@@ -423,7 +461,7 @@ export const useRoomStore = create<RoomState>((set) => ({
   },
 
   deleteRoom: async (id: number) => {
-      const { showLoading, showError, showSuccess } = useStatusStore.getState();
+    const { showLoading, showError, showSuccess } = useStatusStore.getState();
     try {
       set({ loading: true, error: null });
       showLoading("Deleting Room", "Please wait...");

@@ -1,6 +1,6 @@
 import StatCard from "@/components/Dashboard/StatCard"
 import OccupancyChart from "@/components/Dashboard/OccupancyChart"
-import { Users, Home, Layers, Flame } from "lucide-react"
+import { Users, Home, AlertTriangle, Wallet } from "lucide-react"
 import PaymentsOverviewChart from "@/components/Dashboard/PaymentsOverviewChart"
 import RoomAvailabilityChart from "@/components/Dashboard/RoomAvailabilityChart"
 import { useAuth } from "@/hooks/useAuth"
@@ -13,7 +13,6 @@ import DashboardPrint from "@/components/Dashboard/DashboardPrints"
 import { useReactToPrint } from "react-to-print"
 import ActivePenaltiesCard from "@/components/Dashboard/ActivePenaltiesCard"
 import CalendarCard from "@/components/Dashboard/CalendarCard"
-import RecentPaymentsCard from "@/components/Dashboard/RecentPaymentsCard"
 
 
 const Dashboard = () => {
@@ -53,8 +52,8 @@ const Dashboard = () => {
                                 totalBoarders={totalBoarders}
                                 dashboardStats={dashboardStats}
                                 analytics={analytics}
-                                 occupancyTrend={occupancyTrend}
-                                  recentPaidUsers={revenueAnalytics?.recentPaidUsers || [] }
+                                occupancyTrend={occupancyTrend}
+                                recentPaidUsers={revenueAnalytics?.recentPaidUsers || []}
                             />
                         </div>
                     </div>
@@ -62,35 +61,31 @@ const Dashboard = () => {
 
                 {/* 🔷 STATS */}
                 <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
-                    <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-slate-600/70" />} />
-                    <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-slate-600/70" />} />
-                    <StatCard title="Fully Occupied" value={dashboardStats.fullyOccupied.toString()} icon={<Layers size={110} className="text-slate-600/70" />} />
-                    <StatCard title="Active Penalties" value={dashboardStats.occupiedBeds.toString()} icon={<Flame size={110} className="text-slate-600/70" />} />
+                    <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-blue-600/70" />} />
+                    <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-green-400/70" />} />
+                    <StatCard title="Active Penalties" value={dashboardStats.occupiedBeds.toString()} icon={<AlertTriangle size={110} className="text-red-600/70" />} />
+                    <StatCard title="Monthly Revenue" value="₱84,500" icon={<Wallet className="text-amber-500" />} trend="+12%" />
 
                 </div>
 
                 {/* 🔷 CHARTS + STATUS */}
-                <div className="grid gap-2 lg:grid-cols-3">
-                        <RoomAvailabilityChart />
-                        <OccupancyChart />
-                        <PaymentsOverviewChart/>
+                <div className="grid gap-2 lg:grid-cols-2">
+                    <RoomAvailabilityChart />
+                    <PaymentsOverviewChart />
                 </div>
 
-                <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
-                   <div className=" grid gap-2">
-                     <ActivePenaltiesCard />
-                     <RecentPaymentsCard/>
-                   </div>
-                  <div className="md:col-span-2 lg:col-span-2 grid gap-2">
-                      <div >
-                         <CalendarCard />
-                      </div>
-                      <div className="bg-white flex justify-center items-center border p-8 rounded">
-                        <h2 className="text-lg font-bold text-slate-900">
-                          E-BOARDING: A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS
-                        </h2>
-                      </div>
-                  </div>
+                <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-1">
+
+                    <div >
+                        <CalendarCard />
+                    </div>
+
+
+                    <div className=" grid grid-cols-2 gap-2">
+                        <ActivePenaltiesCard />
+                        <OccupancyChart />
+                    </div>
+
                 </div>
             </div>
 
