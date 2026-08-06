@@ -6,13 +6,21 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useState } from "react"
 import RulesModal from "@/components/modal/RulesModal"
-import { Mail, Lock, Loader2, Check, X as XIcon } from "lucide-react"
+import {
+  Mail,
+  Lock,
+  Loader2,
+  Check,
+  X as XIcon,
+  Eye,
+  EyeOff,
+} from "lucide-react"
 
 const Login = () => {
   const navigate = useNavigate()
   const { login, isLoading, user } = useAuth()
   const [openRules, setOpenRules] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     identifier: "",
     password: "",
@@ -173,11 +181,23 @@ const Login = () => {
                   <Lock size={16} className="absolute left-3 text-slate-400" />
                   <Input
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     onChange={handleChange}
-                    className="border-0 bg-transparent pl-9 pr-3 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
+                    className="border-0 bg-transparent pl-9 pr-10 py-2.5 text-slate-900 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-sm"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 text-slate-400 transition hover:text-slate-700"
+                  >
+                    {showPassword ? (
+                      <EyeOff size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="text-xs text-red-500 flex items-center gap-1 pl-0.5">

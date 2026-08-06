@@ -99,6 +99,13 @@ export interface RoomAvailabilityChart {
   occupied: number;
 }
 
+
+export interface BedOccupancyChart {
+  name: string;
+  value: number;
+  color: string;
+}
+
 interface RoomState {
   rooms: Room[];
   availableRooms: AvailableRoom[];
@@ -110,11 +117,14 @@ interface RoomState {
     availableBeds: number,
   };
 
+  
 
   roomAvailabilityChart: RoomAvailabilityChart[];
 
-
   dashboard: DashboardData | null;
+
+   bedOccupancyChart: BedOccupancyChart[],
+
   getMyDashboard: () => Promise<void>;
   occupancyTrend: OccupancyTrend[],
 
@@ -131,6 +141,7 @@ interface RoomState {
   updateRoomStatus: (id: number, status: "Available" | "Occupied" | "Under Maintenance") => Promise<boolean>;
 
   getRoomAvailabilityChart: () => Promise<void>;
+  getBedOccupancyChart: () => Promise<boolean>;
 
 }
 
@@ -152,9 +163,27 @@ export const useRoomStore = create<RoomState>((set) => ({
   },
 
   roomAvailabilityChart: [],
+  bedOccupancyChart: [],
 
 
 
+
+  getBedOccupancyChart: async () => {
+  try {
+    const response = await axiosInstance.get(
+      "/rooms/bed-occupancy-chart"
+    );
+
+    set({
+      bedOccupancyChart: response.data,
+    });
+
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+},
 
   getRoomAvailabilityChart: async () => {
     try {

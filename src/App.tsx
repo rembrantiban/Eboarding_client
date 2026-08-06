@@ -34,6 +34,7 @@ import History from './pages/History'
 import BoarderBilling from './pages/BoarderBilling'
 import DeletedAccountsPage from './pages/DeletedAccounts'
 import StaffAnnouncementsPage from "@/pages/StaffAnnouncement"
+import MaintenanceRequestPage from './pages/MaintenanceRequestPage'
 
 function App() {
  
@@ -66,6 +67,7 @@ function App() {
             <Route path='documents' element={<Documents />} />
             <Route path="/history" element={<History />} />
             <Route path="/deleted-accounts" element={<DeletedAccountsPage />} />
+            <Route path="/staff-maintenance" element={<MaintenanceRequestPage />} />
           </Route>
         </Route>
 

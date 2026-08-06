@@ -44,12 +44,12 @@ function StatCard({
     caption,
 }: StatCardProps) {
     return (
-        <div className="group relative flex-1 overflow-hidden rounded-xl border border-slate-200/70 bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300">
+        <div className="group relative flex-1 overflow-hidden rounded-xl border border-slate-200/70 bg-slate-800 px-3.5 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300">
             <span
                 className={`absolute inset-y-0 left-0 w-0.5 ${accent} opacity-0 transition-opacity group-hover:opacity-100`}
             />
             <div className="flex items-start justify-between gap-2">
-                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-slate-200">
                     {label}
                 </p>
                 <div
@@ -58,7 +58,7 @@ function StatCard({
                     {icon}
                 </div>
             </div>
-            <p className="mt-1.5 truncate text-[17px] font-semibold leading-tight tracking-tight text-slate-900">
+            <p className="mt-1.5 truncate text-[17px] font-semibold leading-tight tracking-tight text-slate-200">
                 {value}
             </p>
             <p className="mt-1 text-[11px] text-slate-400">{caption}</p>

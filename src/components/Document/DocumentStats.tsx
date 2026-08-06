@@ -76,13 +76,13 @@ const DocumentStats = (props: DocumentStatsProps) => {
       {buildStats(props).map((stat) => (
         <div
           key={stat.label}
-          className="group relative overflow-hidden rounded-xl border border-slate-200/70 bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300"
+          className="group relative overflow-hidden rounded-xl border border-slate-200/70 bg-slate-800 px-3.5 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:border-slate-300"
         >
           <span
             className={`absolute inset-y-0 left-0 w-0.5 ${stat.accent} opacity-0 transition-opacity group-hover:opacity-100`}
           />
           <div className="flex items-start justify-between gap-2">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+            <p className="text-[11px] font-medium uppercase tracking-wide text-slate-100">
               {stat.label}
             </p>
             <div
@@ -91,7 +91,7 @@ const DocumentStats = (props: DocumentStatsProps) => {
               <stat.icon size={14} />
             </div>
           </div>
-          <p className="mt-1.5 text-[17px] font-semibold leading-tight tracking-tight text-slate-900">
+          <p className="mt-1.5 text-[17px] font-semibold leading-tight tracking-tight text-slate-200">
             {stat.value}
           </p>
           <p className="mt-1 text-[11px] text-slate-400">{stat.description}</p>

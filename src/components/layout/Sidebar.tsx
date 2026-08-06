@@ -15,6 +15,7 @@ import {
   ScrollText,
   FolderOpen,
   NotepadText,
+  Wrench ,
   ArchiveRestore,
 } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react"
@@ -115,7 +116,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+        <div className="flex-1 overflow-y-auto px-3 py-1.5 space-y-0.5">
 
           <SectionLabel label="Main" />
           <SidebarItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/dashboard" onNavigate={closeAll} />
@@ -135,9 +136,15 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
 
           <SectionLabel label="Others" />
           <SidebarItem icon={<Shield size={16} />} label="Rules & Regulations" to="/rules" onNavigate={closeAll} />
+
+         {user?.user_type === "Staff" && (
+            <SidebarItem icon={<Wrench size={16} />} label="Maintenance" to="/staff-maintenance" onNavigate={closeAll} />
+          )}
+
           {user?.user_type === "Admin" && (
             <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/announcements" onNavigate={closeAll} />
           )}
+
           {user?.user_type === "Staff" && (
             <SidebarItem
               icon={<Bell size={16} />}
