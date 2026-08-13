@@ -26,9 +26,11 @@ export const useAuth = () => {
   const availableBoarders = useAuthStore((state) => state.availableBoarders);
   const getAvailableBorders = useAuthStore((state) => state.getAvailableBorders);
   const getAllDeletedUsers = useAuthStore((state) => state.getDeletedUsers);
-  const recoverDeletedUsers = useAuthStore((state) => state.recoverDeletedUser);  
+  const recoverDeletedUsers = useAuthStore((state) => state.recoverDeletedUser);
   const deletedUsers = useAuthStore((state) => state.deletedUsers);
-
+  const staff = useAuthStore((state) => state.staff);
+  const getAvailableStaff = useAuthStore((state) => state.getAvailableStaff);
+  const staffLoading = useAuthStore((state) => state.staffLoading);
 
   return {
     user,
@@ -59,6 +61,9 @@ export const useAuth = () => {
     getAvailableBorders,
     getAllDeletedUsers,
     recoverDeletedUsers,
-    deletedUsers
+    deletedUsers,
+    staff,
+    getAvailableStaff,
+    staffLoading
   };
 };

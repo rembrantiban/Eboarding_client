@@ -1,6 +1,14 @@
 "use client";
 
-import { MoreVertical, Eye, UserRoundPlus, RefreshCcw, ImageOff } from "lucide-react"
+import {
+  MoreVertical,
+  UserRoundPlus,
+  RefreshCcw,
+  ImageOff,
+  Maximize2,
+  ImageIcon,
+  PencilLine,
+} from "lucide-react"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore" // TODO: adjust import path
 import {
   DropdownMenu,
@@ -8,15 +16,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/hooks/useAuth"
 
 type Props = {
   request: MaintenanceRequest
   onView?: (request: MaintenanceRequest) => void
+  onViewImage?: (request: MaintenanceRequest) => void
   onAssign?: (request: MaintenanceRequest) => void
   onUpdateStatus?: (request: MaintenanceRequest) => void
 }
 
- const STATUS_STYLES: Record<string, string> = {
+const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
   "in progress": "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100",
   completed: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
@@ -37,7 +47,16 @@ const formatTime = (date: string) =>
     minute: "2-digit",
   })
 
-const MaintenanceRow = ({ request, onView, onAssign, onUpdateStatus }: Props) => {
+const MaintenanceRow = ({
+  request,
+  onView,
+  onViewImage,
+  onAssign,
+  onUpdateStatus,
+}: Props) => {
+
+  const { user } = useAuth()
+
   const statusClass =
     STATUS_STYLES[request.status?.toLowerCase()] ??
     "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
@@ -57,21 +76,33 @@ const MaintenanceRow = ({ request, onView, onAssign, onUpdateStatus }: Props) =>
       <td className="px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-2.5">
           {request.image_url ? (
-            <img
-              src={request.image_url}
-              alt={request.category}
-              onClick={() => onView?.(request)}
-              className="h-9 w-9 shrink-0 cursor-pointer rounded-lg object-cover ring-1 ring-slate-200 transition hover:ring-slate-400"
-            />
+            <button
+              type="button"
+              onClick={() => onViewImage?.(request)}
+              aria-label={`View image for ${request.request_number}`}
+              className="group relative h-9 w-9 shrink-0 overflow-hidden rounded-lg ring-1 ring-slate-200 transition hover:ring-slate-400"
+            >
+              <img
+                src={request.image_url}
+                alt={request.category}
+                className="h-full w-full object-cover"
+              />
+              <span className="absolute inset-0 flex items-center justify-center bg-slate-900/55 opacity-0 transition group-hover:opacity-100">
+                <Maximize2 className="h-3.5 w-3.5 text-white" />
+              </span>
+            </button>
           ) : (
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-100 ring-1 ring-slate-200">
               <ImageOff className="h-3.5 w-3.5 text-slate-400" />
             </div>
           )}
 
-          <div className="min-w-0">
-            <p className="truncate text-[11px] text-slate-400">
-              {request.description}
+          <div className="min-w-0 max-w-65">
+            <p
+              title={request.description}
+              className="truncate text-[12px] font-medium text-slate-800"
+            >
+              {request.description || "—"}
             </p>
           </div>
         </div>
@@ -98,7 +129,7 @@ const MaintenanceRow = ({ request, onView, onAssign, onUpdateStatus }: Props) =>
 
       <td className="whitespace-nowrap px-4 py-2.5">
         <span
-          className={`inline-flex rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${statusClass}`}
+          className={`inline-flex rounded-full px-2 py-0.5 text-[10.5px] font-semibold capitalize ${statusClass}`}
         >
           {request.status}
         </span>
@@ -130,19 +161,30 @@ const MaintenanceRow = ({ request, onView, onAssign, onUpdateStatus }: Props) =>
               className="w-44 rounded-xl border-slate-200 p-1 text-[12.5px]"
             >
               <DropdownMenuItem onClick={() => onView?.(request)} className="gap-2 rounded-lg">
-                <Eye size={14} /> View details
-              </DropdownMenuItem>
-
-              <DropdownMenuItem onClick={() => onAssign?.(request)} className="gap-2 rounded-lg">
-                <UserRoundPlus size={14} /> Assign staff
+                <PencilLine size={14} /> Update details
               </DropdownMenuItem>
 
               <DropdownMenuItem
-                onClick={() => onUpdateStatus?.(request)}
+                onClick={() => onViewImage?.(request)}
+                disabled={!request.image_url}
                 className="gap-2 rounded-lg"
               >
-                <RefreshCcw size={14} /> Update status
+                <ImageIcon size={14} /> View image
               </DropdownMenuItem>
+
+              {user?.user_type === "Admin" && (
+                <>
+                  <DropdownMenuItem onClick={() => onAssign?.(request)} className="gap-2 rounded-lg">
+                    <UserRoundPlus size={14} /> Assign staff
+                  </DropdownMenuItem>
+                </>
+              )}
+                <DropdownMenuItem
+                    onClick={() => onUpdateStatus?.(request)}
+                    className="gap-2 rounded-lg"
+                  >
+                    <RefreshCcw size={14} /> Update status
+                  </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

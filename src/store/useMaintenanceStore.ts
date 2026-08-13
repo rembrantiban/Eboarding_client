@@ -4,17 +4,33 @@ import { useStatusStore } from "./useStatusStore";
 import axios from "axios";
 
 
+export type MaintenanceStatus =
+  | "Pending"
+  | "In Progress"
+  | "Completed"
+  | "Closed"
+  | "Cancelled";
+
 export interface MaintenanceRequest {
     id: number;
     request_number: string;
+
+    user_id: number;
+    room_id: number;
+
     category: string;
     description: string;
     image_url: string | null;
-    status: string;
+
+    status: MaintenanceStatus;
+
     created_at: string;
+    updated_at?: string;
 
     room_number: string;
-    boarder?: string;
+    bed_number: string;
+
+    requested_by?: string;
     assigned_staff?: string;
 }
 
@@ -24,6 +40,7 @@ interface MaintenanceStore {
     submittedMaintenance: MaintenanceRequest[];
     myAssignedMaintenance: MaintenanceRequest[];
     maintenanceRequest: MaintenanceRequest[];
+    boarderRequest : MaintenanceRequest[];
 
     createMaintenanceRequest: (data: FormData) => Promise<boolean>;
 
@@ -37,6 +54,8 @@ interface MaintenanceStore {
 
     updateMaintenanceRequest: (id: number, data: FormData) => Promise<boolean>;
     getMySubmittedRequest: () => Promise<boolean>;
+
+    getBoarderRequestMaintenance: () => Promise<boolean>;
 }
 
 export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
@@ -49,6 +68,30 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
 
     maintenanceRequest: [],
 
+    boarderRequest: [],
+
+    getBoarderRequestMaintenance: async () => {
+
+        try {
+            set({ loading: true });
+
+            const res = await axiosInstance.get("/maintenance/boarder");
+
+            set({
+                boarderRequest: res.data,
+            });
+
+            return true;
+
+        } catch {
+            return false;
+        } finally {
+
+            set({ loading: false });
+
+        }
+
+    },
 
     getMySubmittedRequest: async () => {
 
@@ -189,13 +232,13 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
     },
 
     assignMaintenanceRequest: async (id, assigned_staff_id) => {
-
         const {
             showLoading,
             showSuccess,
             showError,
         } = useStatusStore.getState();
-
+        
+        set({ loading: true })
         try {
 
             showLoading(
@@ -215,6 +258,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
                 "Maintenance request assigned."
             );
 
+            set({ loading: false });
             return true;
 
         } catch (error) {
@@ -228,6 +272,8 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
                 );
 
             }
+
+            set({ loading: false });
 
             return false;
 

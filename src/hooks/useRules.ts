@@ -9,6 +9,8 @@ export const useRules = () => {
   const deleteRule = useRulesStore((state) => state.deleteRule);
   const publishRule = useRulesStore((state) => state.publishRule);
   const unpublishRule = useRulesStore((state) => state.unpublishRule);
+  const getPublishedRules = useRulesStore((state) => state.getPublishedRules);
+  const PublishedRule = useRulesStore((state) => state.PublishedRule);
 
   return {
     rules,
@@ -18,6 +20,9 @@ export const useRules = () => {
     updateRule,
     deleteRule,
     publishRule,
-    unpublishRule
+    unpublishRule,
+    getPublishedRules,
+    PublishedRule,
+
   };
 };

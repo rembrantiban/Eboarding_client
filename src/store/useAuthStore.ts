@@ -23,7 +23,9 @@ export interface User {
   email: string;
   username: string;
 
+  country_code: string;
   contact_number: string;
+  nationality: string;
   address?: string;
 
   avatar_url?: string;
@@ -56,6 +58,11 @@ export interface User {
   is_assigned: boolean;
   room_number?: string;
   bed_number?: string;
+
+  // maintenance Request Staff 
+  active_requests?: number;
+  completed_requests?: number;
+  closed_requests?: number;
 }
 
 type LoginPayload = {
@@ -68,7 +75,9 @@ type RegisterPayload = {
   last_name: string;
   email: string;
   username: string;
+  country_code: string;
   contact_number: string;
+  nationality: string;
   address: string;
   password: string;
   user_type: UserType;
@@ -110,10 +119,12 @@ type CreateUserByStaffPayload = {
   last_name: string;
   email: string;
   username: string;
+  country_code: string;
   contact_number: string;
   address: string;
   password: string;
   user_type: UserType;
+  nationality: string;
 
   gender?: string;
   age?: string;
@@ -162,6 +173,8 @@ type UpdateProfileSettingsData = {
   contact_number: string;
   password?: string;
   avatar?: File | null;
+  country_code?: string;
+  nationality?: string;
 };
 
 type UpdateProfileSettingsResponse = {
@@ -199,11 +212,16 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
+  staffLoading: boolean;
   users: User[];
   totalBoarders: number;
   availableBoarders: User[];
   deletedUsers: User[];
 
+  staff: User[];
+
+
+  getAvailableStaff: () => Promise<User[]>;
   register: (data: RegisterPayload) => Promise<void>;
   login: (data: LoginPayload) => Promise<void>;
   deleteUser: (id: number) => Promise<void>;
@@ -238,7 +256,42 @@ export const useAuthStore = create<AuthState>((set) => ({
   availableBoarders: [],
 
   deletedUsers: [],
+  staff: [],
+  staffLoading: false,
 
+
+  getAvailableStaff: async () => {
+  try {
+
+    set({
+      staffLoading: true,
+    });
+
+    const res = await axiosInstance.get<User[]>(
+      "/auth/available-staff"
+    );
+
+    set({
+      staff: res.data,
+      staffLoading: false,
+    });
+
+    return res.data;
+
+  } catch (error) {
+
+    set({
+      staffLoading: false,
+    });
+
+    console.error(
+      "Failed to fetch staff",
+      error
+    );
+
+    throw error;
+  }
+},
 
   getDeletedUsers: async () => {
   try {

@@ -5,6 +5,14 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import type { UserType } from "@/store/useAuthStore"; // TODO: adjust import path if UserType lives elsewhere
 import {
+    COUNTRIES,
+    DIAL_OPTIONS,
+    NATIONALITIES,
+    DEFAULT_DIAL,
+    DEFAULT_NATIONALITY,
+    flagOf,
+} from "@/constants/countries";
+import {
     X,
     UserPlus,
     MapPin,
@@ -24,13 +32,15 @@ type FormState = {
     first_name: string;
     last_name: string;
     username: string;
+    country_code: string;
     contact_number: string;
+    nationality: string;
     email: string;
     address: string;
     password: string;
     user_type: UserType;
     avatar: File | null;
-    valid_id_type: string,
+    valid_id_type: string;
     gender: string;
     age: string;
     emergency_contact_name: string;
@@ -71,7 +81,9 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
         first_name: "",
         last_name: "",
         username: "",
+        country_code: DEFAULT_DIAL,
         contact_number: "",
+        nationality: DEFAULT_NATIONALITY,
         email: "",
         address: "",
         password: "",
@@ -165,6 +177,18 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
         setForm((prev) => ({ ...prev, [name]: sanitize(value) }));
     };
 
+    // Changing the dial code clears both phone errors — the rule they were checked against changed.
+    const handleDialChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { value } = e.target;
+        setForm((prev) => ({ ...prev, country_code: value }));
+        setErrors((prev) => ({
+            ...prev,
+            country_code: "",
+            contact_number: "",
+            emergency_contact_number: "",
+        }));
+    };
+
     const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] ?? null;
         if (!file) return;
@@ -218,8 +242,20 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
     const nameRegex = /^[A-Za-z\s]+$/;
     const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^09\d{9}$/;
+    const phRegex = /^09\d{9}$/;
     const passwordRegex = /^.{6,}$/;
+
+    const isPH = form.country_code === "+63";
+
+    // PH numbers keep the strict 09XXXXXXXXX rule; other countries accept 6–15 digits.
+    const validatePhone = (value: string) =>
+        isPH ? phRegex.test(value) : /^\d{6,15}$/.test(value.replace(/[\s-]/g, ""));
+
+    const phoneHint = isPH ? "Format: 09XXXXXXXXX" : "Enter 6–15 digits";
+    const phonePlaceholder = isPH ? "09XXXXXXXXX" : "Phone number";
+
+    const selectedCountry =
+        COUNTRIES.find((c) => c.dial === form.country_code) ?? null;
 
     const validateForm = () => {
         const newErrors: Partial<Record<keyof FormState, string>> = {};
@@ -230,13 +266,15 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
         if (!form.gender) newErrors.gender = "Required";
         if (!form.age) newErrors.age = "Required";
         else if (Number(form.age) < 1 || Number(form.age) > 120) newErrors.age = "Enter a valid age";
+        if (!form.nationality) newErrors.nationality = "Required";
 
         if (!form.username) newErrors.username = "Required";
         else if (!usernameRegex.test(form.username)) newErrors.username = "4–20 chars, letters/numbers/_";
         if (!form.email) newErrors.email = "Required";
         else if (!emailRegex.test(form.email)) newErrors.email = "Invalid email";
+        if (!form.country_code) newErrors.country_code = "Required";
         if (!form.contact_number) newErrors.contact_number = "Required";
-        else if (!phoneRegex.test(form.contact_number)) newErrors.contact_number = "Format: 09XXXXXXXXX";
+        else if (!validatePhone(form.contact_number)) newErrors.contact_number = phoneHint;
         if (!form.address) newErrors.address = "Required";
         if (!form.password) newErrors.password = "Required";
         else if (!passwordRegex.test(form.password)) newErrors.password = "Min. 6 characters";
@@ -244,8 +282,8 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
         if (!form.valid_id_image) newErrors.valid_id_image = "Required";
         if (!form.emergency_contact_name) newErrors.emergency_contact_name = "Required";
         if (!form.emergency_contact_number) newErrors.emergency_contact_number = "Required";
-        else if (!phoneRegex.test(form.emergency_contact_number))
-            newErrors.emergency_contact_number = "Format: 09XXXXXXXXX";
+        else if (!validatePhone(form.emergency_contact_number))
+            newErrors.emergency_contact_number = phoneHint;
         if (!form.emergency_contact_relationship) newErrors.emergency_contact_relationship = "Required";
 
         return newErrors;
@@ -405,6 +443,15 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
                                 />
                                 <Field label="Age" name="age" placeholder="18" value={form.age} onChange={handleChange} type="number" error={errors.age} />
                             </div>
+
+                            <Select
+                                label="Nationality"
+                                name="nationality"
+                                value={form.nationality}
+                                onChange={handleChange}
+                                options={NATIONALITIES}
+                                error={errors.nationality}
+                            />
                         </section>
 
                         {/* Account details */}
@@ -413,7 +460,18 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <Field label="Username" name="username" placeholder="john_doe" value={form.username} onChange={handleChange} onBlur={handleBlur} error={errors.username} />
-                                <Field label="Contact number" name="contact_number" placeholder="09XXXXXXXXX" value={form.contact_number} onChange={handleChange} onBlur={handleBlur} error={errors.contact_number} />
+
+                                <PhoneField
+                                    label="Contact number"
+                                    name="contact_number"
+                                    dial={form.country_code}
+                                    onDialChange={handleDialChange}
+                                    value={form.contact_number}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    placeholder={phonePlaceholder}
+                                    error={errors.contact_number || errors.country_code}
+                                />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
@@ -466,7 +524,9 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
                                     <ErrorText text={errors.address} />
                                 ) : (
                                     <p className="text-[11px] text-slate-400">
-                                        Detected automatically — you can edit it if it's not exact.
+                                        {selectedCountry
+                                            ? `Detected automatically — ${flagOf(selectedCountry.iso)} ${selectedCountry.name}. You can edit it if it's not exact.`
+                                            : "Detected automatically — you can edit it if it's not exact."}
                                     </p>
                                 )}
                             </div>
@@ -478,7 +538,7 @@ const BoarderCreateUser = ({ open: _open, onClose }: Props) => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <Field label="Contact name" name="emergency_contact_name" placeholder="Jane Doe" value={form.emergency_contact_name} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_name} />
-                                <Field label="Contact number" name="emergency_contact_number" placeholder="09XXXXXXXXX" value={form.emergency_contact_number} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_number} />
+                                <Field label="Contact number" name="emergency_contact_number" placeholder={phonePlaceholder} value={form.emergency_contact_number} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_number} />
                             </div>
 
                             <Field label="Relationship" name="emergency_contact_relationship" placeholder="Mother, Father, Guardian..." value={form.emergency_contact_relationship} onChange={handleChange} onBlur={handleBlur} error={errors.emergency_contact_relationship} />
@@ -662,6 +722,76 @@ const Field = ({
                     : "border-slate-200 hover:border-slate-300"
                 }`}
         />
+        {error && <ErrorText text={error} />}
+    </div>
+);
+
+type PhoneFieldProps = {
+    label: string;
+    name: string;
+    dial: string;
+    onDialChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+    error?: string;
+};
+
+const PhoneField = ({
+    label,
+    name,
+    dial,
+    onDialChange,
+    value,
+    onChange,
+    onBlur,
+    placeholder,
+    error,
+}: PhoneFieldProps) => (
+    <div className="space-y-1.5">
+        <label className="block text-[12px] font-medium text-slate-600">
+            {label}
+        </label>
+
+        <div
+            className={`flex h-9 w-full items-center overflow-hidden rounded-lg border bg-white transition-all focus-within:ring-2
+            ${error
+                    ? "border-red-300 bg-red-50/30 focus-within:border-red-400 focus-within:ring-red-500/20"
+                    : "border-slate-200 hover:border-slate-300 focus-within:border-slate-400 focus-within:ring-slate-500/20"
+                }`}
+        >
+            <div className="relative shrink-0">
+                <select
+                    name="country_code"
+                    value={dial}
+                    onChange={onDialChange}
+                    aria-label="Country code"
+                    className="h-9 w-18.5 cursor-pointer appearance-none bg-transparent pl-2.5 pr-5 text-[13px] text-slate-700 outline-none"
+                >
+                    {DIAL_OPTIONS.map((c) => (
+                        <option key={c.iso} value={c.dial}>
+                            {flagOf(c.iso)} {c.dial} — {c.name}
+                        </option>
+                    ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-1 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400" />
+            </div>
+
+            <span className="h-4 w-px shrink-0 bg-slate-200" />
+
+            <input
+                name={name}
+                type="tel"
+                inputMode="numeric"
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                className="h-9 min-w-0 flex-1 bg-transparent px-3 text-[13px] text-slate-800 outline-none placeholder:text-slate-300"
+            />
+        </div>
+
         {error && <ErrorText text={error} />}
     </div>
 );

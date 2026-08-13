@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
     Dialog,
     DialogContent,
+    DialogTitle,
+    DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,8 +13,8 @@ import { Button } from "@/components/ui/button";
 
 import {
     Loader2,
-    CheckCircle2,
-    XCircle,
+    CircleCheck,
+    TriangleAlert,
     ShieldCheck,
 } from "lucide-react";
 
@@ -28,6 +30,8 @@ type Status =
     | "loading"
     | "success"
     | "error";
+
+const MAX_TITLE = 80;
 
 const CreateRuleModal = ({
     open,
@@ -46,7 +50,6 @@ const CreateRuleModal = ({
         title: "",
         description: "",
     });
-
 
     const handleChange = (
         e: React.ChangeEvent<
@@ -90,159 +93,146 @@ const CreateRuleModal = ({
         }
     };
 
+    const submitting = status === "loading";
+    const canSubmit =
+        form.title.trim() !== "" &&
+        form.description.trim() !== "" &&
+        !submitting &&
+        status !== "success";
+
     return (
         <Dialog
             open={open}
             onOpenChange={(val) => {
-                if (!val) onClose();
+                if (!val && !submitting) onClose();
             }}
         >
-            <DialogContent className="max-w-xl border-0 rounded-xl p-0 overflow-hidden">
-                {status === "loading" && (
-                    <div className="py-16 flex flex-col items-center justify-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-                            <Loader2
-                                size={30}
-                                className="animate-spin text-blue-600"
-                            />
-                        </div>
+            <DialogContent className="max-w-lg gap-0 overflow-hidden rounded-2xl border-slate-200/80 p-0 shadow-xl">
 
-                        <div className="text-center">
-                            <h2 className="font-semibold text-lg">
-                                Creating Rule
-                            </h2>
-
-                            <p className="text-sm text-muted-foreground mt-1">
-                                Please wait while we save the rule.
-                            </p>
-                        </div>
+                {/* HEADER */}
+                <div className="flex items-start gap-2.5 border-b border-slate-200/80 px-5 py-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900">
+                        <ShieldCheck className="h-4 w-4 text-white" />
                     </div>
-                )}
 
-      
-                {status === "success" && (
-                    <div className="py-16 flex flex-col items-center justify-center gap-4">
-
-                        <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
-                            <CheckCircle2
-                                size={32}
-                                className="text-green-600"
-                            />
-                        </div>
-
-                        <div className="text-center">
-                            <h2 className="font-semibold text-lg">
-                                Rule Created
-                            </h2>
-
-                            <p className="text-sm text-muted-foreground mt-1">
-                                The rule has been added successfully.
-                            </p>
-                        </div>
-
+                    <div className="min-w-0">
+                        <DialogTitle className="text-[14px] font-semibold leading-tight text-slate-900">
+                            Create rule
+                        </DialogTitle>
+                        <DialogDescription className="mt-0.5 text-[11px] leading-tight text-slate-400">
+                            Add a new boarding house rule or regulation.
+                        </DialogDescription>
                     </div>
-                )}
-                {status === "error" && (
-                    <div className="py-16 px-6 flex flex-col items-center justify-center gap-4">
+                </div>
 
-                        <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-                            <XCircle
-                                size={32}
-                                className="text-red-600"
-                            />
+                {/* BODY */}
+                <div className="space-y-4 px-5 py-4">
+
+                    {/* TITLE */}
+                    <div>
+                        <div className="mb-1.5 flex items-baseline justify-between">
+                            <label
+                                htmlFor="rule-title"
+                                className="text-[11.5px] font-medium text-slate-700"
+                            >
+                                Rule title <span className="text-rose-500">*</span>
+                            </label>
+                            <span className="text-[10.5px] tabular-nums text-slate-400">
+                                {form.title.length}/{MAX_TITLE}
+                            </span>
                         </div>
 
-                        <div className="text-center">
-                            <h2 className="font-semibold text-lg">
-                                Something went wrong
-                            </h2>
+                        <Input
+                            id="rule-title"
+                            name="title"
+                            maxLength={MAX_TITLE}
+                            placeholder="e.g. Quiet hours"
+                            value={form.title}
+                            onChange={handleChange}
+                            disabled={submitting}
+                            className="h-9 rounded-lg border-slate-200 text-[12.5px] text-slate-800 transition placeholder:text-slate-400 focus-visible:border-slate-900 focus-visible:ring-0 disabled:bg-slate-50"
+                        />
+                    </div>
 
-                            <p className="text-sm text-muted-foreground mt-1">
+                    {/* DESCRIPTION */}
+                    <div>
+                        <label
+                            htmlFor="rule-description"
+                            className="mb-1.5 block text-[11.5px] font-medium text-slate-700"
+                        >
+                            Description <span className="text-rose-500">*</span>
+                        </label>
+
+                        <Textarea
+                            id="rule-description"
+                            name="description"
+                            rows={7}
+                            placeholder={`Keep noise to a minimum between 10:00 PM and 6:00 AM.
+                        Use headphones after quiet hours begin.
+                        Report repeated disturbances to the caretaker.`}
+                            value={form.description}
+                            onChange={handleChange}
+                            disabled={submitting}
+                            className="resize-none rounded-lg border-slate-200 text-[12.5px] leading-relaxed text-slate-800 transition placeholder:text-slate-400 focus-visible:border-slate-900 focus-visible:ring-0 disabled:bg-slate-50"
+                        />
+
+                        <p className="mt-1.5 text-[11px] leading-relaxed text-slate-400">
+                            Each new line shows as its own paragraph on the rules page.
+                        </p>
+                    </div>
+                </div>
+
+                {/* FOOTER */}
+                <div className="flex flex-col gap-3 border-t border-slate-200/80 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-h-4 text-[11.5px]">
+                        {status === "success" ? (
+                            <p className="flex items-center gap-1.5 font-medium text-emerald-700">
+                                <CircleCheck className="h-3.5 w-3.5" />
+                                Rule created successfully.
+                            </p>
+                        ) : status === "error" ? (
+                            <p className="flex items-center gap-1.5 font-medium text-rose-700">
+                                <TriangleAlert className="h-3.5 w-3.5" />
                                 {error}
                             </p>
-                        </div>
+                        ) : (
+                            <p className="text-slate-400">
+                                {form.title.trim() === ""
+                                    ? "Add a title to continue."
+                                    : form.description.trim() === ""
+                                        ? "Add a description to continue."
+                                        : "Rules are unpublished until you publish them."}
+                            </p>
+                        )}
+                    </div>
 
+                    <div className="flex items-center gap-2">
                         <Button
-                            onClick={() => setStatus("idle")}
-                            className="rounded-xl"
+                            variant="outline"
+                            onClick={onClose}
+                            disabled={submitting}
+                            className="h-9 flex-1 rounded-lg border-slate-200 px-4 text-[12.5px] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900 sm:flex-none"
                         >
-                            Try Again
+                            Cancel
                         </Button>
 
+                        <Button
+                            onClick={handleCreate}
+                            disabled={!canSubmit}
+                            className="h-9 flex-1 rounded-lg bg-slate-900 px-4 text-[12.5px] font-medium text-white transition hover:bg-slate-800 disabled:opacity-40 sm:flex-none"
+                        >
+                            {submitting ? (
+                                <>
+                                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                "Create rule"
+                            )}
+                        </Button>
                     </div>
-                )}
-                {status === "idle" && (
-                    <div>
+                </div>
 
-                        <div className="border-b px-6 py-5 flex items-start gap-4">
-
-                            <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center">
-                                <ShieldCheck
-                                    size={24}
-                                    className="text-blue-600"
-                                />
-                            </div>
-                            <div>
-                                <h2 className="text-xl font-semibold">
-                                    Create Rule
-                                </h2>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    Add a new boarding house rule or regulation.
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* BODY */}
-                        <div className="p-6 space-y-5">
-
-                            {/* TITLE */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">
-                                    Rule Title
-                                </label>
-                                <Input
-                                    name="title"
-                                    placeholder="Enter rule title..."
-                                    value={form.title}
-                                    onChange={handleChange}
-                                    className="h-11 rounded-sm"
-                                />
-                            </div>
-                            {/* DESCRIPTION */}
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">
-                                    Description
-                                </label>
-                                <Textarea
-                                    name="description"
-                                    placeholder={`Example:
-                                    • Always keep noise levels low
-                                    • Visitors are not allowed after 10 PM
-                                    • Clean your assigned area regularly`}
-                                    value={form.description}
-                                    onChange={handleChange}
-                                    className="min-h-40 rounded-sm resize-none"
-                                />
-                            </div>
-                            {/* ACTIONS */}
-                            <div className="flex justify-end gap-3 pt-2">
-                                <Button
-                                    variant="outline"
-                                    onClick={onClose}
-                                    className="rounded-xl"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={handleCreate}
-                                    className="rounded-xl bg-black hover:bg-black/90"
-                                >
-                                    Create Rule
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </DialogContent>
         </Dialog>
     );

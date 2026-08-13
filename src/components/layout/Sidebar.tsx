@@ -132,10 +132,13 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           <SectionLabel label="Transactions" />
           <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/billing" onNavigate={closeAll} />
           <SidebarItem icon={<NotepadText size={16} />} label="History" to="/history" onNavigate={closeAll} />
-          <SidebarItem icon={<ScrollText size={16} />} label="Reports" to="/reports" onNavigate={closeAll} />
 
           <SectionLabel label="Others" />
           <SidebarItem icon={<Shield size={16} />} label="Rules & Regulations" to="/rules" onNavigate={closeAll} />
+           {user?.user_type === "Admin" && (
+            <SidebarItem icon={<Wrench size={16} />} label="Maintenance" to="/admin-maintenance" onNavigate={closeAll} />
+          )}
+
 
          {user?.user_type === "Staff" && (
             <SidebarItem icon={<Wrench size={16} />} label="Maintenance" to="/staff-maintenance" onNavigate={closeAll} />
@@ -144,8 +147,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           {user?.user_type === "Admin" && (
             <SidebarItem icon={<Bell size={16} />} label="Announcements" to="/announcements" onNavigate={closeAll} />
           )}
-
-          {user?.user_type === "Staff" && (
+           {user?.user_type === "Staff" && (
             <SidebarItem
               icon={<Bell size={16} />}
               label="Announcements"
@@ -158,6 +160,9 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
               }}
             />
           )}
+                    
+          <SidebarItem icon={<ScrollText size={16} />} label="Reports" to="/reports" onNavigate={closeAll} />
+         
         </div>
 
         {/* ── PROFILE FOOTER ── */}

@@ -12,6 +12,10 @@ export const useMaintenance = () => {
         myAssignedMaintenance,
         getMySubmittedRequest,
         maintenanceRequest,
+        assignMaintenanceRequest,
+        updateMaintenanceStatus,
+        getBoarderRequestMaintenance,
+        boarderRequest,
     } = useMaintenanceStore();
 
     return {
@@ -24,5 +28,10 @@ export const useMaintenance = () => {
         myAssignedMaintenance,
         getMySubmittedRequest,
         maintenanceRequest,
+        assignMaintenanceRequest,
+        updateMaintenanceStatus,
+
+        getBoarderRequestMaintenance,
+        boarderRequest,
     };
 };

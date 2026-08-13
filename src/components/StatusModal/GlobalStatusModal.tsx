@@ -31,7 +31,10 @@ export default function GlobalStatusModal() {
         }
       }}
     >
-      <DialogContent className="sm:max-w-sm rounded-2xl border border-slate-200 shadow-xl p-0 overflow-hidden">
+      <DialogContent
+        className="z-110 sm:max-w-sm rounded-2xl border border-slate-200 shadow-xl p-0 overflow-hidden"
+        overlayClassName="z-110"
+      >
 
         <div className="flex flex-col items-center px-8 pt-10 pb-8">
 

@@ -10,7 +10,10 @@ import {
     Bell,
     Layers,
     FolderOpen,
-    Wallet2
+    Wallet2,
+    Wrench,
+    ScrollText,
+    Newspaper
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnnouncement } from "@/hooks/useAnnouncement"
@@ -26,8 +29,11 @@ const navItems = [
      { label: "Billing", icon: Wallet2, path: "/boarder-billing" },
     { label: "History", icon: ReceiptSwissFranc, path: "/payment-history" },
     { label: "Announcements", icon: Bell, path: "/boarder/announcements" },
+    { label: "Maintenance", icon: Wrench, path: "/boarder-maintenance" },
+    { label: "Documents", icon: FolderOpen, path: "/boarder/documents" },
+    { label: "House Rules", icon: ScrollText, path: "/house-rules" },
+    { label: "Report", icon: Newspaper, path: "/report/boarder" }
 
-    { label: "Documents", icon: FolderOpen, path: "/boarder/documents" }
 ];
 
 export default function Sidebar() {
@@ -40,7 +46,6 @@ export default function Sidebar() {
         getUnreadCount()
     }, [getUnreadCount]);
 
-    console.log(unreadCount);
 
 
     const currentPath =

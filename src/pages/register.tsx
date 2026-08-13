@@ -6,6 +6,14 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useEffect, useRef, useState } from "react"
 import {
+  COUNTRIES,
+  DIAL_OPTIONS,
+  NATIONALITIES,
+  DEFAULT_DIAL,
+  DEFAULT_NATIONALITY,
+  flagOf,
+} from "@/constants/countries"
+import {
   ArrowRight,
   User,
   AtSign,
@@ -29,12 +37,14 @@ import {
   EyeOff,
   UploadCloud,
   CreditCard,
+  Globe,
 } from "lucide-react"
 
 const MAX_FILE_MB = 5;
 const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]+$/;
 const USERNAME_REGEX = /^[a-zA-Z0-9._-]{3,20}$/;
-const PHONE_REGEX = /^(09|\+639)\d{9}$/;
+const PH_PHONE_REGEX = /^(09|\+639)\d{9}$/;
+const INTL_PHONE_REGEX = /^\d{6,15}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RELATIONSHIP_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$/;
 
@@ -73,7 +83,9 @@ type FormState = {
   last_name: string;
   email: string;
   username: string;
+  country_code: string;
   contact_number: string;
+  nationality: string;
   address: string;
   password: string;
   confirmPassword: string;
@@ -101,7 +113,9 @@ const Register = () => {
     last_name: "",
     email: "",
     username: "",
+    country_code: DEFAULT_DIAL,
     contact_number: "",
+    nationality: DEFAULT_NATIONALITY,
     address: "",
     password: "",
     confirmPassword: "",
@@ -157,6 +171,23 @@ const Register = () => {
 
   const sanitize = (value: string) => value.trim().replace(/\s+/g, " ");
 
+  const isPH = form.country_code === "+63";
+
+  // PH numbers keep the strict 09XXXXXXXXX rule; other countries accept 6–15 digits.
+  const validatePhone = (value: string) =>
+    isPH
+      ? PH_PHONE_REGEX.test(value)
+      : INTL_PHONE_REGEX.test(value.replace(/\D/g, ""));
+
+  const phoneHint = isPH
+    ? "Use a valid phone number like 09171234567"
+    : "Enter 6–15 digits";
+
+  const phonePlaceholder = isPH ? "09XXXXXXXXX" : "Phone number";
+
+  const selectedCountry =
+    COUNTRIES.find((c) => c.dial === form.country_code) ?? null;
+
   const validateFile = (file: File) => {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       return "Use a JPG, PNG, or WEBP file";
@@ -192,6 +223,10 @@ const Register = () => {
       newErrors.age = "Enter a valid age";
     }
 
+    if (!form.nationality) {
+      newErrors.nationality = "Nationality is required";
+    }
+
     if (!form.username) {
       newErrors.username = "Username is required";
     } else if (!USERNAME_REGEX.test(form.username)) {
@@ -210,10 +245,14 @@ const Register = () => {
       newErrors.email = "Enter a valid email address";
     }
 
+    if (!form.country_code) {
+      newErrors.country_code = "Country code is required";
+    }
+
     if (!form.contact_number) {
       newErrors.contact_number = "Contact number is required";
-    } else if (!PHONE_REGEX.test(form.contact_number)) {
-      newErrors.contact_number = "Use a valid phone number like 09171234567";
+    } else if (!validatePhone(form.contact_number)) {
+      newErrors.contact_number = phoneHint;
     }
 
     if (!form.password) {
@@ -236,8 +275,8 @@ const Register = () => {
 
     if (!form.emergency_contact_number) {
       newErrors.emergency_contact_number = "Emergency contact number is required";
-    } else if (!PHONE_REGEX.test(form.emergency_contact_number)) {
-      newErrors.emergency_contact_number = "Use a valid phone number like 09171234567";
+    } else if (!validatePhone(form.emergency_contact_number)) {
+      newErrors.emergency_contact_number = phoneHint;
     }
 
     if (!form.emergency_contact_relationship) {
@@ -287,6 +326,18 @@ const Register = () => {
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
+  // Changing the dial code re-validates both phone fields against the new rule.
+  const handleDialChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setForm((prev) => ({ ...prev, country_code: value }));
+    setErrors((prev) => ({
+      ...prev,
+      country_code: "",
+      contact_number: "",
+      emergency_contact_number: "",
+    }));
+  };
+
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
     if (!file) return;
@@ -331,7 +382,9 @@ const Register = () => {
         last_name: form.last_name,
         email: form.email,
         username: form.username,
+        country_code: form.country_code,
         contact_number: form.contact_number,
+        nationality: form.nationality,
         address: form.address,
         password: form.password,
         user_type: "Boarder",
@@ -536,6 +589,24 @@ const Register = () => {
             </FormField>
           </div>
 
+          <div className="mt-3 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 xl:grid-cols-4">
+            <FormField label="Nationality" required error={errors.nationality}>
+              <Shell icon={Globe} error={errors.nationality} chevron>
+                <select
+                  name="nationality"
+                  value={form.nationality}
+                  onChange={handleChange}
+                  className={`${selectClass} ${form.nationality ? "text-slate-900" : "text-slate-400"}`}
+                >
+                  <option value="">Select nationality</option>
+                  {NATIONALITIES.map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </Shell>
+            </FormField>
+          </div>
+
           <Divider />
 
           {/* ── Account details ── */}
@@ -567,14 +638,42 @@ const Register = () => {
               </Shell>
             </FormField>
 
-            <FormField label="Contact number" required error={errors.contact_number}>
-              <Shell icon={Phone} error={errors.contact_number}>
+            <FormField
+              label="Contact number"
+              required
+              error={errors.contact_number || errors.country_code}
+              hint={selectedCountry ? `${flagOf(selectedCountry.iso)} ${selectedCountry.name}` : undefined}
+            >
+              <Shell error={errors.contact_number || errors.country_code}>
+                <div className="relative shrink-0">
+                  <select
+                    name="country_code"
+                    value={form.country_code}
+                    onChange={handleDialChange}
+                    aria-label="Country code"
+                    className="h-9 w-19 cursor-pointer appearance-none border-0 bg-transparent pl-3 pr-5 text-[13px] text-slate-900 outline-none"
+                  >
+                    {DIAL_OPTIONS.map((c) => (
+                      <option key={c.iso} value={c.dial}>
+                        {flagOf(c.iso)} {c.dial} — {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={13}
+                    className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
+                </div>
+
+                <span className="h-4 w-px shrink-0 bg-slate-200" />
+
                 <Input
                   name="contact_number"
-                  placeholder="09XXXXXXXXX"
+                  inputMode="numeric"
+                  placeholder={phonePlaceholder}
                   value={form.contact_number}
                   onChange={handleChange}
-                  className={inputClass}
+                  className={bareInputClass}
                 />
               </Shell>
             </FormField>
@@ -673,7 +772,8 @@ const Register = () => {
               <Shell icon={Phone} error={errors.emergency_contact_number}>
                 <Input
                   name="emergency_contact_number"
-                  placeholder="09XXXXXXXXX"
+                  inputMode="numeric"
+                  placeholder={phonePlaceholder}
                   value={form.emergency_contact_number}
                   onChange={handleChange}
                   className={inputClass}
@@ -761,7 +861,7 @@ const Register = () => {
 
           {/* ── Terms + submit ── */}
           <div className="mt-4 flex  border-t border-slate-100 pt-5 lg:items-center lg:justify-end">
-          
+
             <Button
               type="submit"
               disabled={isLoading}
@@ -835,6 +935,10 @@ const Register = () => {
 
 const inputClass =
   "h-9 w-full rounded-lg border-0 bg-transparent pl-9 pr-3 text-[13px] text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0";
+
+// Same as inputClass but without the left icon offset — used inside the phone shell.
+const bareInputClass =
+  "h-9 w-full min-w-0 rounded-lg border-0 bg-transparent px-3 text-[13px] text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0";
 
 const selectClass =
   "h-9 w-full cursor-pointer appearance-none border-0 bg-transparent pl-9 pr-8 text-[13px] outline-none";

@@ -35,9 +35,23 @@ import BoarderBilling from './pages/BoarderBilling'
 import DeletedAccountsPage from './pages/DeletedAccounts'
 import StaffAnnouncementsPage from "@/pages/StaffAnnouncement"
 import MaintenanceRequestPage from './pages/MaintenanceRequestPage'
+import AdminMaintenanceRequestPage from './pages/AdminMaintenance'
+import BoarderMaintenancePage from './pages/BoarderMaintenancePage'
+import BoarderHouseRulesPage from './pages/BoarderHouseRulesPage'
+import ReportBoarder from './pages/ReportBoarder'
+
+//Generated Reports 
+import FinancialReport from './pages/FinancialReport'
+import OccupancyReport from './pages/OccupancyReport'
+import PenaltyReport from './pages/PenaltyReport'
+import PaymentCollectionReport from './pages/PaymentCollectionReport'
+import RoomAvailabilityReport from './pages/RoomAvailabilityReport'
+import BoarderReport  from './pages/BoarderReport'
+
+
+
 
 function App() {
- 
 
   return (
     <>
@@ -60,6 +74,14 @@ function App() {
             <Route path='/rules' element={<Rules />} />
             <Route path='/billing' element={<Billing />} />
             <Route path='/reports' element={<Report />} />
+
+            <Route path='/financial-report' element={<FinancialReport />} />
+            <Route path='/occupancy-report' element={<OccupancyReport />} />
+            <Route path='/penalty-report' element={<PenaltyReport />} />
+            <Route path='/payment-collection-report' element={<PaymentCollectionReport />} />
+            <Route path='/room-availability-report' element={<RoomAvailabilityReport />} />
+            <Route path='/boarder-report' element={<BoarderReport />} />
+
             <Route path='/announcements' element={<Announcement />} />
             <Route path='/staff-announcements' element={<StaffAnnouncementsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -68,6 +90,8 @@ function App() {
             <Route path="/history" element={<History />} />
             <Route path="/deleted-accounts" element={<DeletedAccountsPage />} />
             <Route path="/staff-maintenance" element={<MaintenanceRequestPage />} />
+            <Route path="/admin-maintenance" element={<AdminMaintenanceRequestPage />} />
+
           </Route>
         </Route>
 
@@ -80,6 +104,9 @@ function App() {
             <Route path="/view-account" element={<ViewOwnAccount />} />
             <Route path="/payment-history" element={<PaymentHistoryPage />} />
             <Route path="/boarder-billing" element={<BoarderBilling />} />
+            <Route path='/boarder-maintenance' element={<BoarderMaintenancePage />} />
+            <Route path='/house-rules' element={<BoarderHouseRulesPage />} />
+            <Route path='/report/boarder' element={<ReportBoarder />} />
           </Route>
 
       </Routes>

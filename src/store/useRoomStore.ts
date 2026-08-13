@@ -204,6 +204,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       );
     }
   },
+  
   updateRoomStatus: async (id, status) => {
 
     const {

@@ -1,5 +1,6 @@
 import axiosInstance from "@/api/api";
 import { create } from "zustand";
+import { useStatusStore } from "@/store/useStatusStore";
 
 export interface Rule {
   id: number;
@@ -32,6 +33,7 @@ interface UpdateRulePayload {
 interface RulesState {
   rules: Rule[];
   loading: boolean;
+  PublishedRule: Rule[];
 
   getRules: () => Promise<void>;
 
@@ -55,13 +57,43 @@ interface RulesState {
   unpublishRule: (
     id: number
   ) => Promise<void>;
+
+  getPublishedRules:() => Promise<Rule | undefined>
+
 }
 
 
 export const useRulesStore = create<RulesState>((set, get) => ({
   rules: [],
   loading: false,
+  PublishedRule: [],
 
+
+
+
+getPublishedRules: async () => {
+  try {
+    set({ loading: true });
+
+    const res = await axiosInstance.get(
+      "/rules/published"
+    );
+
+    set({
+      PublishedRule: res.data,
+      loading: false,
+    });
+
+  } catch (error) {
+    console.error("Get published rules error:", error);
+
+    set({
+      loading: false,
+    });
+  }
+},
+
+  
   getRules: async () => {
   try {
     set({ loading: true });
@@ -87,22 +119,34 @@ export const useRulesStore = create<RulesState>((set, get) => ({
 },
 
   publishRule: async (id) => {
+    const { showLoading, showError, showSuccess } = useStatusStore.getState();
+
     try {
+      showLoading("Loading...", "publishing rule");
+
       await axiosInstance.put(
         `/rules/publish/${id}`
       );
 
       await get().getRules();
 
+      showSuccess("Success", "Rule published successfully.");
+
     } catch (error) {
       console.error(
         "Publish rule error:",
         error
       );
+
+      showError("Error", "Failed to publish rule.");
     }
   },
   createRule: async (data) => {
+    const { showLoading, showError, showSuccess } = useStatusStore.getState();
+
   try {
+    showLoading("Loading...", "creating new House Rule");
+
     await axiosInstance.post(
       "/rules/create",
       data
@@ -110,13 +154,20 @@ export const useRulesStore = create<RulesState>((set, get) => ({
 
     await get().getRules();
 
+
+    showSuccess("Success", "Rule created successfully.");
+
   } catch (error) {
     console.error(error);
+    showError("Error", "Failed to create rule.");
   }
 },
 
 updateRule: async (id, data) => {
+  const { showLoading, showError, showSuccess } = useStatusStore.getState();
   try {
+    showLoading("Loading...", "updating rule");
+
     await axiosInstance.put(
       `/rules/update/${id}`,
       data
@@ -124,13 +175,19 @@ updateRule: async (id, data) => {
 
     await get().getRules();
 
+    showSuccess("Success", "Rule updated successfully.");
   } catch (error) {
     console.error(error);
+    showError("Error", "Failed to update rule.");
   }
 },
 
   deleteRule: async (id) => {
+    const { showLoading, showError, showSuccess } = useStatusStore.getState();
+
     try {
+    showLoading("Loading...", "deleting rule")
+
       await axiosInstance.delete(
         `/rules/delete/${id}`
       );
@@ -141,24 +198,36 @@ updateRule: async (id, data) => {
         ),
       });
 
+
+      showSuccess("Success", "Rule deleted successfully.");
+
     } catch (error) {
       console.error("Delete rule error:", error);
+      showError("Error", "Failed to delete rule.");
     }
   },
 
 unpublishRule: async (id) => {
+  const { showLoading, showError, showSuccess } = useStatusStore.getState();
+
   try {
+    showLoading("Loading...", "unpublishing rule");
+
     await axiosInstance.put(
       `/rules/unpublish/${id}`
     );
 
     await get().getRules();
 
+    showSuccess("Success", "Rule unpublished successfully.");
+
   } catch (error) {
     console.error(
       "Unpublish rule error:",
       error
     );
+
+    showError("Error", "Failed to unpublish rule.");
   }
 },
 

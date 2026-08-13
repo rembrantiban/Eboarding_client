@@ -428,7 +428,7 @@ const upcomingPayments = calendarEvents
           onClick={() => setShowAllPayments(false)}
         >
           <div
-            className="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+            className="flex max-h-[80vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4">
@@ -488,7 +488,7 @@ const upcomingPayments = calendarEvents
           onClick={() => setSelected(null)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl"
+            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
