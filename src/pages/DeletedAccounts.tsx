@@ -34,7 +34,9 @@ export interface User {
     email: string;
     username: string;
 
+    country_code: string,
     contact_number: string;
+    nationality: string;
     address?: string;
 
     avatar_url?: string;
