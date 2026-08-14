@@ -87,7 +87,8 @@ export interface PaymentHistory {
     | "Paid"
     | "Overdue"
     | "Cancelled";
-
+    notes: string | null;
+    reason: string | null;
     amount: number;
     received_at: string;
 
@@ -163,6 +164,56 @@ export interface ActivePenalty {
     bed_number: string;
 }
 
+interface CancelBillingData {
+    billingId: number;
+    reason: string;
+    notes?: string;
+}
+
+//Financial Report Types 
+
+export interface BillingStats {
+    totalIncome: number;
+    totalIncomeChange: number;
+
+    lateFeesCollected: number;
+    lateFeesChange: number;
+
+    amountCollectedThisMonth: number;
+    amountCollectedChange: number;
+
+    collectionRate: number;
+    collectionRateChange: number;
+}
+
+export interface IncomeMix {
+    name: string;
+    value: number;
+    color: string;
+}
+
+export interface RevenueTrend {
+    month: string;
+    income: number;
+    lateFees: number;
+}
+
+
+export interface DetailedSummaryItem {
+    category: string;
+    thisMonth: number;
+    lastMonth: number;
+    change: number;
+    positive: boolean;
+}
+
+export interface DetailedSummary {
+    totalIncomeThisMonth: number;
+    totalIncomeLastMonth: number;
+    totalIncomeChange: number;
+    rows: DetailedSummaryItem[];
+}
+
 interface BillingStore {
 
     loading: boolean;
@@ -179,6 +230,10 @@ interface BillingStore {
 
     activePenalties: ActivePenalty[];
 
+    billingStats: BillingStats | null;
+    incomeMix: IncomeMix[];
+    revenueTrend: RevenueTrend[];
+    detailedSummary: DetailedSummary | null;
 
     getAllBillings: () => Promise<void>;
     recordPayment: (data: RecordPaymentData) => Promise<boolean>;
@@ -194,7 +249,13 @@ interface BillingStore {
     getCalendarEvents: () => Promise<boolean>;
     getActivePenalties: () => Promise<void>;
 
+    cancelBilling: (data: CancelBillingData) => Promise<boolean>;
 
+    //Fincial Report State
+    getBillingStats: () => Promise<boolean>;
+    getIncomeMix: () => Promise<boolean>;
+    getRevenueTrend: () => Promise<boolean>;
+    getDetailedSummary: () => Promise<void>;
 
 }
 
@@ -214,11 +275,215 @@ export const useBillingStore = create<BillingStore>((set) => ({
 
     activePenalties: [],
 
+    billingStats: null,
+    incomeMix: [],
+    revenueTrend: [],
+    detailedSummary: null,
+
+    getDetailedSummary: async () => {
+    try {
+        const response =
+            await axiosInstance.get(
+                "/billings/detailed-summary"
+            );
+
+        set({
+            detailedSummary:
+                response.data,
+        });
+    } catch (error) {
+        console.error(
+            "Get Detailed Summary Error:",
+            error
+        );
+    }
+},
+    getRevenueTrend: async () => {
+        try {
+
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/revenue-trend"
+            );
+
+            set({
+                revenueTrend: res.data,
+                loading: false,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Revenue Trend Error:",
+                error
+            );
+
+            set({
+                loading: false,
+            });
+
+            return false;
+        }
+    },
+
+    getIncomeMix: async () => {
+        try {
+
+            const res = await axiosInstance.get(
+                "/billings/income-mix"
+            );
+
+            set({
+                incomeMix: res.data,
+            });
+
+            console.log(res.data);
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Income Mix Error:",
+                error
+            );
+
+            return false;
+        }
+    },
+
+    getBillingStats: async () => {
+        try {
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/stats"
+            );
+
+            set({
+                billingStats: {
+                    totalIncome: Number(res.data.totalIncome),
+                    totalIncomeChange: Number(
+                        res.data.totalIncomeChange
+                    ),
+
+                    lateFeesCollected: Number(
+                        res.data.lateFeesCollected
+                    ),
+                    lateFeesChange: Number(
+                        res.data.lateFeesChange ?? 0
+                    ),
+
+                    amountCollectedThisMonth: Number(
+                        res.data.amountCollectedThisMonth
+                    ),
+                    amountCollectedChange: Number(
+                        res.data.amountCollectedChange ?? 0
+                    ),
+
+                    collectionRate: Number(
+                        res.data.collectionRate
+                    ),
+                    collectionRateChange: Number(
+                        res.data.collectionRateChange ?? 0
+                    ),
+                },
+
+                loading: false,
+            });
+            return true;
+
+
+        } catch (error) {
+
+            console.error(
+                "Get Billing Stats Error:",
+                error
+            );
+
+            set({
+                loading: false,
+            });
+
+            return false;
+        }
+    },
+
+    cancelBilling: async (data) => {
+
+        const {
+            showLoading,
+            showSuccess,
+            showError,
+        } = useStatusStore.getState();
+
+        try {
+
+            showLoading(
+                "Cancelling Billing",
+                "Please wait while the billing is being cancelled..."
+            );
+
+            await axiosInstance.put(
+                `/billings/cancel-billing/${data.billingId}`,
+                {
+                    reason: data.reason,
+                    notes: data.notes,
+                }
+            );
+
+            await Promise.all([
+                useBillingStore
+                    .getState()
+                    .getAllBillings(),
+
+                useBillingStore
+                    .getState()
+                    .getPaymentHistory(),
+            ]);
+
+            showSuccess(
+                "Billing Cancelled",
+                "Billing has been cancelled successfully."
+            );
+
+            return true;
+
+        } catch (error) {
+
+            if (axios.isAxiosError(error)) {
+
+                showError(
+                    "Cancel Billing Failed",
+                    error.response?.data?.message ??
+                    "Unable to cancel billing."
+                );
+
+            } else {
+
+                showError(
+                    "Cancel Billing Failed",
+                    "Unable to cancel billing."
+                );
+
+            }
+
+            return false;
+        }
+    },
+
 
     getActivePenalties: async () => {
         try {
             const res = await axiosInstance.get(
-                "/billing/all-active-penalties"
+                "/billings/all-active-penalties"
             );
 
             set({
@@ -257,8 +522,6 @@ export const useBillingStore = create<BillingStore>((set) => ({
                 paymentsOverview: res.data,
                 loading: false
             });
-
-            console.log(res.data);
 
             return true;
 

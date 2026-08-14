@@ -2,7 +2,8 @@
 import {
     Search, SlidersHorizontal, MoreVertical,
      ChevronLeft, ChevronRight,  Eye,
-    Tag, BanknoteArrowUp, BanknoteArrowDown
+    Tag, BanknoteArrowUp, BanknoteArrowDown,
+    FileX
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Billing } from "@/store/useBillingStore"
@@ -31,7 +32,6 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FaMoneyBill } from "react-icons/fa6";
 import PrintBillingButton from "./PrintBillingButton"
 import PrintPaymentsReportButton from "./Printpaymentsreportbutton";
 
@@ -47,6 +47,7 @@ interface BillingTableProps {
     onDeleteBilling?: (billing: Billing) => void;
     onApplyDiscount?: (billing: Billing) => void;
     onApplyLateFee?: (billing: Billing) => void;
+    onCancelBilling?: (billing: Billing) => void;
 }
 
 function formatCurrency(value: number) {
@@ -116,7 +117,7 @@ export default function BillingTable({
     onRecordPayment,
     onApplyDiscount,
     onApplyLateFee,
-    //onDeleteBilling,
+    onCancelBilling,
 }: BillingTableProps) {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<BillingStatus | "all">("all");
@@ -334,11 +335,11 @@ export default function BillingTable({
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem
-                                                        onClick={() => console.log?.(b)}
+                                                        onClick={() => onCancelBilling?.(b)}
                                                         className="gap-2 rounded-md py-1.5 text-[13px]"
                                                     >
-                                                        <FaMoneyBill className="h-3.5 w-3.5 text-emerald-600" />
-                                                        Record partial payment
+                                                        <FileX className="h-3.5 w-3.5 text-red-600" />
+                                                        Cancel payment
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuSeparator className="my-1 bg-slate-100" />

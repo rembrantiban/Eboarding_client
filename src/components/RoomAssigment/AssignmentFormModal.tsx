@@ -4,6 +4,7 @@ import { useRoom } from "@/hooks/useRoom"
 import { useRoomAssignment } from "@/hooks/useRoomAssignment";
 import { useEffect, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
+import { useStatus } from "@/hooks/useStatus"
 
 interface AssignRoomForm {
     user_id: string;
@@ -27,6 +28,7 @@ export default function AssignmentFormModal({
     const { loading, assignRoom } = useRoomAssignment();
     const { getAvailableRooms, availableRooms } = useRoom();
     const { availableBoarders, getAvailableBorders } = useAuth();
+    const { showError } = useStatus();
 
     const [draft, setDraft] = useState<AssignRoomForm>({
         user_id: "",
@@ -54,6 +56,41 @@ export default function AssignmentFormModal({
     const availableBeds = selectedRoom?.beds ?? [];
 
     const handleAssign = async () => {
+
+        const today = new Date().toISOString().split("T")[0];
+
+        if (draft.assigned_date < today) {
+            alert("Assigned date cannot be earlier than today.");
+            return;
+        }
+
+        if (draft.expected_checkout) {
+
+            if (draft.expected_checkout < today) {
+                showError("Checkout date cannot be earlier than today.");
+                return;
+            }
+
+            if (
+                draft.expected_checkout ===
+                draft.assigned_date
+            ) {
+                showError(
+                    "Assigned date and checkout date cannot be the same."
+                );
+                return;
+            }
+
+            if (
+                draft.expected_checkout <
+                draft.assigned_date
+            ) {
+                showError(
+                    "Checkout date must be later than assigned date."
+                );
+                return;
+            }
+        }
         try {
             await assignRoom({
                 user_id: Number(draft.user_id),
@@ -172,6 +209,7 @@ export default function AssignmentFormModal({
                                 <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="date"
+                                    min={new Date().toISOString().split("T")[0]}
                                     value={draft.assigned_date}
                                     onChange={(e) => setDraft({ ...draft, assigned_date: e.target.value })}
                                     className="h-10 w-full rounded-xl border border-slate-200 pl-9 pr-3 text-sm outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
@@ -184,6 +222,19 @@ export default function AssignmentFormModal({
                                 Expected Checkout <span className="font-normal text-slate-400">(optional)</span>
                             </label>
                             <input
+                                min={
+                                    draft.assigned_date
+                                        ? new Date(
+                                            new Date(draft.assigned_date)
+                                                .getTime() +
+                                            86400000
+                                        )
+                                            .toISOString()
+                                            .split("T")[0]
+                                        : new Date()
+                                            .toISOString()
+                                            .split("T")[0]
+                                }
                                 type="date"
                                 value={draft.expected_checkout}
                                 onChange={(e) => setDraft({ ...draft, expected_checkout: e.target.value })}

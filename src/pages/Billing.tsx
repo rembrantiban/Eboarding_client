@@ -9,6 +9,7 @@ import type { Billing as BillingType } from "@/store/useBillingStore";
 import ApplyDiscountModal from "@/components/Billing/ApplyDiscountModal";
 import ApplyLateFeeModal from "@/components/Billing/ApplyLateFeeModal";
 import ViewBilling from "@/components/Billing/ViewBillingModal"
+import CancelBillingModal from "@/components/Billing/CancelBillingModal";
 
 const Billing = () => {
 
@@ -19,12 +20,15 @@ const Billing = () => {
         recordPayment,
         applyLateFee,
         applyDiscount,
+        cancelBilling
     } = useBillingStore();
     const [selectedBilling, setSelectedBilling] = useState<BillingType | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
 
     const [discountOpen, setDiscountOpen] = useState(false);
     const [lateFeeOpen, setLateFeeOpen] = useState(false);
+    const [cancelOpen, setCancelOpen] = useState(false);
+
 
 
     const [viewOpen, setViewOpen] = useState(false);
@@ -116,6 +120,11 @@ const Billing = () => {
                     onViewBilling={(billing) => {
                         setSelectedBilling(billing);
                         setViewOpen(true);
+                    }}
+
+                    onCancelBilling={(billing) => {
+                        setSelectedBilling(billing);
+                        setCancelOpen(true);
                     }}
                 />
                 <RecordPaymentModal
@@ -233,6 +242,22 @@ const Billing = () => {
                     onPrint={(billing) => {
                         console.log("Print billing", billing);
                         // TODO: Generate PDF or window.print()
+                    }}
+                />
+
+                <CancelBillingModal
+                    open={cancelOpen}
+                    billing={selectedBilling}
+                    onOpenChange={(open) => {
+                        setCancelOpen(open);
+                        if (!open) setSelectedBilling(null);
+                    }}
+                    onConfirm={async ({ billingId, reason, notes }) => {
+                        await cancelBilling({
+                            billingId: Number(billingId),
+                            reason,
+                            notes,
+                        });
                     }}
                 />
             </div>

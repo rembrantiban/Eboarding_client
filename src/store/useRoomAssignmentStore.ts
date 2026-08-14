@@ -218,111 +218,111 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
     boarderAssignedRoom: null,
     dashboard: null,
     upcomingPayments: [],
-    
+
     getUpcomingPayments: async () => {
 
-    const { showError } = useStatusStore.getState();
+        const { showError } = useStatusStore.getState();
 
-    try {
+        try {
 
-        set({
-            loading: true,
-        });
+            set({
+                loading: true,
+            });
 
-        const res =
-            await axiosInstance.get(
-                "/room-assignment/get-my-upcoming-payments"
-            );
-        
+            const res =
+                await axiosInstance.get(
+                    "/room-assignment/get-my-upcoming-payments"
+                );
 
-        set({
-            upcomingPayments: res.data,
-        });
 
-        return true;
+            set({
+                upcomingPayments: res.data,
+            });
 
-    } catch (error) {
+            return true;
 
-        if (axios.isAxiosError(error)) {
+        } catch (error) {
 
-            showError(
-                "Unable to Load Dashboard",
-                error.response?.data?.message ??
-                "Failed to retrieve dashboard."
-            );
+            if (axios.isAxiosError(error)) {
 
-        } else {
+                showError(
+                    "Unable to Load Dashboard",
+                    error.response?.data?.message ??
+                    "Failed to retrieve dashboard."
+                );
 
-            showError(
-                "Unable to Load Dashboard",
-                "Failed to retrieve dashboard."
-            );
+            } else {
+
+                showError(
+                    "Unable to Load Dashboard",
+                    "Failed to retrieve dashboard."
+                );
+
+            }
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
 
         }
 
-        return false;
-
-    } finally {
-
-        set({
-            loading: false,
-        });
-
-    }
-
-},
+    },
 
     getDashboard: async () => {
 
-    const { showError } = useStatusStore.getState();
+        const { showError } = useStatusStore.getState();
 
-    try {
+        try {
 
-        set({
-            loading: true,
-        });
+            set({
+                loading: true,
+            });
 
-        const res =
-            await axiosInstance.get(
-                "/room-assignment/dashboard-stats"
-            );
+            const res =
+                await axiosInstance.get(
+                    "/room-assignment/dashboard-stats"
+                );
 
-        set({
-            dashboard: res.data,
-        });
+            set({
+                dashboard: res.data,
+            });
 
-        return true;
+            return true;
 
-    } catch (error) {
+        } catch (error) {
 
-        if (axios.isAxiosError(error)) {
+            if (axios.isAxiosError(error)) {
 
-            showError(
-                "Unable to Load Dashboard",
-                error.response?.data?.message ??
-                "Failed to retrieve dashboard."
-            );
+                showError(
+                    "Unable to Load Dashboard",
+                    error.response?.data?.message ??
+                    "Failed to retrieve dashboard."
+                );
 
-        } else {
+            } else {
 
-            showError(
-                "Unable to Load Dashboard",
-                "Failed to retrieve dashboard."
-            );
+                showError(
+                    "Unable to Load Dashboard",
+                    "Failed to retrieve dashboard."
+                );
+
+            }
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
 
         }
 
-        return false;
-
-    } finally {
-
-        set({
-            loading: false,
-        });
-
-    }
-
-},
+    },
 
     getBoarderAssignedRoom: async (userId) => {
 
@@ -441,7 +441,10 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
                         ? res.data.assignment
                         : b
                 ),
-            }));
+            }),
+        );
+
+            set({loading: false});
 
             return true;
 
@@ -468,10 +471,7 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
         }
     },
 
-    checkoutAssignment: async (
-        assignmentId
-    ) => {
-
+    checkoutAssignment: async (assignmentId) => {
         const {
             showLoading,
             showSuccess,
@@ -485,7 +485,9 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
                 "Please wait..."
             );
 
-            set({ loading: true });
+            set({
+                loading: true,
+            });
 
             const res = await axiosInstance.put(
                 `/room-assignment/checkout/${assignmentId}`
@@ -502,16 +504,46 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
                 ),
             }));
 
+            set({ loading: false });
             return true;
 
         } catch (error) {
 
             if (axios.isAxiosError(error)) {
 
-                showError(
-                    "Checkout Failed",
-                    error.response?.data?.message
-                );
+                const data = error.response?.data;
+
+                if (
+                    error.response?.status === 400 &&
+                    data?.summary
+                ) {
+
+                    showError(
+                        "Checkout Blocked",
+                        `
+                         Unpaid Billings: ${data.summary.unpaid_billings}
+
+                        Outstanding Balance:
+                        ₱${Number(
+                            data.summary.total_balance
+                        ).toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}
+
+                        Please settle or cancel the outstanding billing(s) before checking out.
+                `
+                    );
+
+                } else {
+
+                    showError(
+                        "Checkout Failed",
+                        data?.message ??
+                        "Unable to complete checkout."
+                    );
+
+                }
 
             } else {
 
@@ -523,14 +555,14 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
             }
 
             return false;
-
         } finally {
 
-            set({ loading: false });
+            set({
+                loading: false,
+            });
 
         }
     },
-  
 
     getAssignments: async () => {
 
@@ -563,7 +595,7 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
     },
 
-      assignRoom: async (data) => {
+    assignRoom: async (data) => {
         const { showLoading, showError, showSuccess } = useStatusStore.getState();
         try {
 
@@ -578,9 +610,9 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
                     "/room-assignment/assign",
                     data
                 );
-            
+
             showSuccess("Room Assigned", res.data.message);
-            
+
             set((state) => ({
                 assignedBoarders: [
                     ...state.assignedBoarders,
@@ -588,7 +620,9 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
                 ],
             }));
 
-            
+            set({ loading: false });
+
+
             return true;
 
         } catch (error: unknown) {

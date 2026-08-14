@@ -29,7 +29,7 @@ const StatCard = ({
     >
       <div className="flex items-center justify-between gap-2">
         <p
-          className="truncate text-[11px] font-medium text-slate-200"
+          className="truncate text-[13px] font-medium text-slate-200"
          
         >
           {title}

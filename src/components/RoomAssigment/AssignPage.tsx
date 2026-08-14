@@ -24,6 +24,7 @@ export default function RoomAssignmentPage() {
     const { assignedBoarders, getAssignments, checkoutAssignment, loading } = useRoomAssignment();
     const [transferAssignment, setTransferAssignment] = useState<AssignedBoarder | null>(null);
     const [checkout, setCheckout] = useState<AssignedBoarder | null>(null);
+        
 
     useEffect(() => {
         getAssignments();

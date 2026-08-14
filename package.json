@@ -22,6 +22,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "lucide-react": "^1.8.0",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
@@ -42,6 +44,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^24.12.4",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -54,5 +57,10 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",
     "vite": "^8.0.4"
+  },
+  "allowScripts": {
+    "exceljs@4.4.0": true,
+    "file-saver@2.0.5": true,
+    "@types/file-saver@2.0.7": true
   }
 }

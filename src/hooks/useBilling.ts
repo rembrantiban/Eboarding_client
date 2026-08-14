@@ -22,8 +22,21 @@ export const useBilling = () => {
         getCalendarEvents,
         activePenalties,
         getActivePenalties,
-    } = useBillingStore();
+        cancelBilling,
+        getBillingStats,
+        billingStats,
 
+        incomeMix,
+        getIncomeMix,
+
+        revenueTrend,
+        getRevenueTrend,
+
+
+        detailedSummary,
+        getDetailedSummary,
+
+    } = useBillingStore();
 
     return {
         billings,
@@ -47,5 +60,18 @@ export const useBilling = () => {
         getCalendarEvents,
         activePenalties,
         getActivePenalties,
+        cancelBilling,
+        getBillingStats,
+        billingStats,
+
+        incomeMix,
+        getIncomeMix,
+
+        revenueTrend,
+        getRevenueTrend,
+
+        detailedSummary,
+        getDetailedSummary,
+
     };
 };
