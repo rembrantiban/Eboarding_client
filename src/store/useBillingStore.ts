@@ -248,12 +248,14 @@ export const useBillingStore = create<BillingStore>((set) => ({
     getPaymentsOverview: async () => {
         try {
 
+            set({ loading: true });
             const res = await axiosInstance.get(
                 "/billings/payments-overview"
             );
 
             set({
                 paymentsOverview: res.data,
+                loading: false
             });
 
             console.log(res.data);
@@ -263,6 +265,7 @@ export const useBillingStore = create<BillingStore>((set) => ({
         } catch (error) {
 
             console.error(error);
+            set({ loading: false });
             return false;
 
         }

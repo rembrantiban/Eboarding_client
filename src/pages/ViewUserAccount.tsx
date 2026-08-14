@@ -305,7 +305,7 @@ const ViewUserPage = () => {
                               
                                 <Stat icon={Mail} label="Email" value={user.email} />
                           
-                                    <Stat icon={MapPin} label="Address" value={user.address || "Not specified"} />
+                                <Stat icon={MapPin} label="Address" value={user.address || "Not specified"} />
                             </div>
                         </SectionCard>
 

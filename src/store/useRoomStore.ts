@@ -106,6 +106,12 @@ export interface BedOccupancyChart {
   color: string;
 }
 
+export interface RoomOccupancyChart {
+  name: string;
+  value: number;
+  color: string;
+}
+
 interface RoomState {
   rooms: Room[];
   availableRooms: AvailableRoom[];
@@ -116,14 +122,15 @@ interface RoomState {
     occupiedBeds: number,
     availableBeds: number,
   };
+  roomOccupancyChart: RoomOccupancyChart[];
 
-  
+  getRoomOccupancyChart: () => Promise<boolean>;
 
   roomAvailabilityChart: RoomAvailabilityChart[];
 
   dashboard: DashboardData | null;
 
-   bedOccupancyChart: BedOccupancyChart[],
+  bedOccupancyChart: BedOccupancyChart[],
 
   getMyDashboard: () => Promise<void>;
   occupancyTrend: OccupancyTrend[],
@@ -164,47 +171,68 @@ export const useRoomStore = create<RoomState>((set) => ({
 
   roomAvailabilityChart: [],
   bedOccupancyChart: [],
+  roomOccupancyChart: [],
 
+  getRoomOccupancyChart: async () => {
+    try {
+      set({loading: true})
+      const response = await axiosInstance.get(
+        "/rooms/room-occupancy-chart"
+      );
 
+      set({
+        roomOccupancyChart: response.data,
+        loading: false
+      });
 
+      return true;
+    } catch (error) {
+      console.error(error);
+      set({loading: false});
+      return false;
+    }
+  },
 
   getBedOccupancyChart: async () => {
-  try {
-    const response = await axiosInstance.get(
-      "/rooms/bed-occupancy-chart"
-    );
+    try {
+      const response = await axiosInstance.get(
+        "/rooms/bed-occupancy-chart"
+      );
 
-    set({
-      bedOccupancyChart: response.data,
-    });
+      set({
+        bedOccupancyChart: response.data,
+      });
 
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-},
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  },
 
   getRoomAvailabilityChart: async () => {
     try {
+      set({ loading: true });
       const res = await axiosInstance.get(
         "/rooms/availability-chart"
       );
 
       set({
         roomAvailabilityChart: res.data,
+        loading: false
       });
 
-      console.log(res.data)
 
     } catch (error) {
       console.error(
         "Room availability chart error:",
         error
       );
+
+      set({ loading: false });
     }
   },
-  
+
   updateRoomStatus: async (id, status) => {
 
     const {

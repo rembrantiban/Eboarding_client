@@ -31,6 +31,8 @@ export const useAuth = () => {
   const staff = useAuthStore((state) => state.staff);
   const getAvailableStaff = useAuthStore((state) => state.getAvailableStaff);
   const staffLoading = useAuthStore((state) => state.staffLoading);
+  const dashboardStats = useAuthStore((state) => state.dashboardStats);
+  const getStaffDashboardStats = useAuthStore((state) => state.getStaffDashboardStats);
 
   return {
     user,
@@ -64,6 +66,8 @@ export const useAuth = () => {
     deletedUsers,
     staff,
     getAvailableStaff,
-    staffLoading
+    staffLoading,
+    dashboardStats,
+    getStaffDashboardStats
   };
 };

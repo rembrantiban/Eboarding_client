@@ -208,6 +208,18 @@ type totalBoardersResponse = {
   total: number;
 }
 
+type DashboardMetric = {
+  value: number;
+  delta: number;
+};
+
+type DashboardStats = {
+  totalBoarders: DashboardMetric;
+  totalRooms: DashboardMetric;
+  activePenalties: DashboardMetric;
+  monthlyRevenue: DashboardMetric;
+};
+
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -220,10 +232,14 @@ interface AuthState {
 
   staff: User[];
 
+  dashboardStats: DashboardStats | null;
+
+  getStaffDashboardStats: () => Promise<DashboardStats>;
+
 
   getAvailableStaff: () => Promise<User[]>;
   register: (data: RegisterPayload) => Promise<void>;
-  login: (data: LoginPayload) => Promise<void>;
+  login: (data: LoginPayload) => Promise<User>;
   deleteUser: (id: number) => Promise<void>;
   createUserByAdmin: (data: CreateUserByAdminPayload) => Promise<{ user: User }>;
   createUserByStaff: (data: CreateUserByStaffPayload) => Promise<{ user: User }>;
@@ -259,111 +275,134 @@ export const useAuthStore = create<AuthState>((set) => ({
   staff: [],
   staffLoading: false,
 
+  dashboardStats: null,
+
+
+  getStaffDashboardStats: async () => {
+    try {
+      const res = await axiosInstance.get<DashboardStats>(
+        "/auth/get-staff-dashboard-stats"
+      );
+
+      set({
+        dashboardStats: res.data,
+      });
+
+      return res.data;
+    } catch (error) {
+      const err = error as ApiError;
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to load dashboard stats"
+      );
+    }
+  },
 
   getAvailableStaff: async () => {
-  try {
+    try {
 
-    set({
-      staffLoading: true,
-    });
+      set({
+        staffLoading: true,
+      });
 
-    const res = await axiosInstance.get<User[]>(
-      "/auth/available-staff"
-    );
+      const res = await axiosInstance.get<User[]>(
+        "/auth/available-staff"
+      );
 
-    set({
-      staff: res.data,
-      staffLoading: false,
-    });
+      set({
+        staff: res.data,
+        staffLoading: false,
+      });
 
-    return res.data;
+      return res.data;
 
-  } catch (error) {
+    } catch (error) {
 
-    set({
-      staffLoading: false,
-    });
+      set({
+        staffLoading: false,
+      });
 
-    console.error(
-      "Failed to fetch staff",
-      error
-    );
+      console.error(
+        "Failed to fetch staff",
+        error
+      );
 
-    throw error;
-  }
-},
+      throw error;
+    }
+  },
 
   getDeletedUsers: async () => {
-  try {
-    const res = await axiosInstance.get<GetUsersResponse>(
-      "/auth/deleted-users"
-    );
+    try {
+      const res = await axiosInstance.get<GetUsersResponse>(
+        "/auth/deleted-users"
+      );
 
-    set({
-      deletedUsers: res.data.users,
-    });
+      set({
+        deletedUsers: res.data.users,
+      });
 
-    return res.data;
+      return res.data;
 
-  } catch (error) {
-    const err = error as ApiError;
-    throw (
-      err.response?.data?.message ||
-      "Failed to fetch deleted users"
-    );
-  }
-},
+    } catch (error) {
+      const err = error as ApiError;
+      throw (
+        err.response?.data?.message ||
+        "Failed to fetch deleted users"
+      );
+    }
+  },
 
-recoverDeletedUser: async (id: number) => {
-  const {
-    showLoading,
-    showSuccess,
-    showError,
-  } = useStatusStore.getState();
+  recoverDeletedUser: async (id: number) => {
+    const {
+      showLoading,
+      showSuccess,
+      showError,
+    } = useStatusStore.getState();
 
-  try {
+    try {
 
-    showLoading(
-      "Recovering User",
-      "Please wait while we recover the user account..."
-    );
+      showLoading(
+        "Recovering User",
+        "Please wait while we recover the user account..."
+      );
 
-    const res = await axiosInstance.put(
-      `/auth/recover-deleted-user/${id}`
-    );
+      const res = await axiosInstance.put(
+        `/auth/recover-deleted-user/${id}`
+      );
 
-    const recoveredUser = res.data.user;
+      const recoveredUser = res.data.user;
 
-    set((state) => ({
-      deletedUsers: state.deletedUsers.filter(
-        (u) => u.id !== id
-      ),
+      set((state) => ({
+        deletedUsers: state.deletedUsers.filter(
+          (u) => u.id !== id
+        ),
 
-      users: [recoveredUser, ...state.users],
-    }));
+        users: [recoveredUser, ...state.users],
+      }));
 
-    showSuccess(
-      "User Recovered",
-      "The user account has been recovered successfully."
-    );
+      showSuccess(
+        "User Recovered",
+        "The user account has been recovered successfully."
+      );
 
-    return recoveredUser;
+      return recoveredUser;
 
-  } catch (error) {
-    const err = error as ApiError;
+    } catch (error) {
+      const err = error as ApiError;
 
-    showError(
-      "Recovery Failed",
-      err.response?.data?.message ||
-      "Failed to recover user."
-    );
+      showError(
+        "Recovery Failed",
+        err.response?.data?.message ||
+        "Failed to recover user."
+      );
 
-    throw (
-      err.response?.data?.message ||
-      "Failed to recover user."
-    );
-  }
-},
+      throw (
+        err.response?.data?.message ||
+        "Failed to recover user."
+      );
+    }
+  },
 
   getAvailableBorders: async () => {
     try {

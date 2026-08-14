@@ -119,7 +119,13 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
         <div className="flex-1 overflow-y-auto px-3 py-1.5 space-y-0.5">
 
           <SectionLabel label="Main" />
-          <SidebarItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/dashboard" onNavigate={closeAll} />
+          {user?.user_type === "Admin" && (
+            <SidebarItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/dashboard" onNavigate={closeAll} />
+          )}
+          
+          {user?.user_type === "Staff" && (
+           <SidebarItem icon={<LayoutDashboard size={16} />} label="Dashboard" to="/staff-dashboard" onNavigate={closeAll} />
+          )}
 
           <SectionLabel label="Account" />
           <SidebarItem icon={<Users size={16} />} label="User Management" to="/user" onNavigate={closeAll} />

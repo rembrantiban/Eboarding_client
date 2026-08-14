@@ -47,7 +47,7 @@ import PenaltyReport from './pages/PenaltyReport'
 import PaymentCollectionReport from './pages/PaymentCollectionReport'
 import RoomAvailabilityReport from './pages/RoomAvailabilityReport'
 import BoarderReport  from './pages/BoarderReport'
-
+import StaffDasboard from './pages/StaffDashboard'
 
 
 
@@ -91,6 +91,7 @@ function App() {
             <Route path="/deleted-accounts" element={<DeletedAccountsPage />} />
             <Route path="/staff-maintenance" element={<MaintenanceRequestPage />} />
             <Route path="/admin-maintenance" element={<AdminMaintenanceRequestPage />} />
+            <Route path='/staff-dashboard' element={<StaffDasboard />} />
 
           </Route>
         </Route>

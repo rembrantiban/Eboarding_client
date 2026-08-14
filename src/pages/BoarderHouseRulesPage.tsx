@@ -94,7 +94,6 @@ const BoarderHouseRulesPage = ({
     [published]
   )
 
-  // Highlight the rule currently in view for the side index
   useEffect(() => {
     if (filtered.length === 0) return
 

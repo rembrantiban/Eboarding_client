@@ -18,7 +18,7 @@ import {
 
 const Login = () => {
   const navigate = useNavigate()
-  const { login, isLoading, user } = useAuth()
+  const { login, isLoading } = useAuth()
   const [openRules, setOpenRules] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
@@ -57,12 +57,32 @@ const Login = () => {
     }
     try {
       setModal({ type: "loading" });
-      await login({ identifier: form.identifier, password: form.password });
+      const loggedInUser = await login({ identifier: form.identifier, password: form.password });
       setModal({ type: "success", message: "Login successful 🎉" });
+
+     console.log(loggedInUser);
       setTimeout(() => {
-        if (user?.user_type === "Boarder") navigate("/boarder-dashboard");
-        else navigate("/dashboard");
-      }, 1200);
+      const role = loggedInUser.user_type?.trim().toLowerCase();
+
+      switch (role) {
+        case "boarder":
+          navigate("/boarder-dashboard");
+          break;
+
+        case "staff":
+          navigate("/staff-dashboard");
+          break;
+
+        case "admin":
+        case "administrator":
+          navigate("/dashboard");
+          break;
+
+        default:
+          navigate("/dashboard");
+          break;
+      }
+    }, 1200);
     } catch (err: unknown) {
       let message = "Invalid credentials";
       if (typeof err === "string") {
