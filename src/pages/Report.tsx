@@ -8,7 +8,6 @@ import {
     Download,
     Printer,
     Calendar,
-    Plus,
     Eye,
     ChevronRight,
     ChevronDown,
@@ -130,6 +129,27 @@ const summaryData = [
 
 const totalReports = summaryData.reduce((sum, d) => sum + d.value, 0);
 
+
+ const now = new Date();
+
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const lastDay = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0
+    );
+
+    const dateRange = `${firstDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+    })} – ${lastDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    })}`;
+
+
 export default function ReportManagement() {
     const navigate = useNavigate()
 
@@ -149,12 +169,7 @@ export default function ReportManagement() {
                     <div className="flex items-center gap-2">
                         <button className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300">
                             <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                            May 01 &ndash; May 31, 2025
-                            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-                        </button>
-                        <button className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-slate-800">
-                            <Plus className="h-3.5 w-3.5" />
-                            Create Custom Report
+                            {dateRange}
                         </button>
                     </div>
                 </div>

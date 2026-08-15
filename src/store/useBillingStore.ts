@@ -199,6 +199,8 @@ export interface RevenueTrend {
 }
 
 
+
+
 export interface DetailedSummaryItem {
     category: string;
     thisMonth: number;
@@ -213,6 +215,62 @@ export interface DetailedSummary {
     totalIncomeChange: number;
     rows: DetailedSummaryItem[];
 }
+
+
+// Payment Collection Report  types 
+export interface CollectionDashboardStats {
+    totalCollections: number;
+    totalCollectionsChange: number;
+
+    totalTransactions: number;
+    totalTransactionsChange: number;
+
+    paidBoarders: number;
+    paidBoardersChange: number;
+
+    collectionRate: number;
+
+    averageCollection: number;
+}
+
+
+export interface CollectionTrend {
+    month: string;
+    amount: number;
+}
+
+export interface RecentTransaction {
+    date: string;
+    billing: string;
+    boarder: string;
+    amount: number;
+    ref: string;
+    status: "Paid" | "Partial";
+}
+
+export interface BoarderBillingStatus {
+    name: string;
+    room: string | null;
+    billing: string;
+    due: string;
+    total: number;
+    paid: number;
+    balance: number;
+    status:
+    | "Partial"
+    | "Paid"
+    | "Overdue"
+    paidDate: string;
+}
+
+
+export interface CollectionSummary {
+    totalCollections: number;
+    totalTransactions: number;
+    paidBoarders: number;
+    collectionRate: number;
+}
+
 
 interface BillingStore {
 
@@ -235,6 +293,13 @@ interface BillingStore {
     revenueTrend: RevenueTrend[];
     detailedSummary: DetailedSummary | null;
 
+    collectionDashboardStats: CollectionDashboardStats | null;
+    collectionTrend: CollectionTrend[];
+    recentTransactions: RecentTransaction[];
+    boarderBillingStatus: BoarderBillingStatus[];
+    collectionSummary: CollectionSummary | null;
+
+
     getAllBillings: () => Promise<void>;
     recordPayment: (data: RecordPaymentData) => Promise<boolean>;
     applyDiscount: (data: ApplyDiscountData) => Promise<boolean>;
@@ -256,6 +321,13 @@ interface BillingStore {
     getIncomeMix: () => Promise<boolean>;
     getRevenueTrend: () => Promise<boolean>;
     getDetailedSummary: () => Promise<void>;
+
+    //Payment Collection Report 
+    getCollectionDashboardStats: () => Promise<boolean>;
+    getCollectionTrend: () => Promise<boolean>;
+    getRecentTransactions: () => Promise<boolean>;
+    getBoarderBillingStatus: () => Promise<boolean>;
+    getCollectionSummary: () => Promise<void>;
 
 }
 
@@ -280,24 +352,219 @@ export const useBillingStore = create<BillingStore>((set) => ({
     revenueTrend: [],
     detailedSummary: null,
 
-    getDetailedSummary: async () => {
+
+
+    collectionDashboardStats: null,
+    collectionTrend: [],
+    recentTransactions: [],
+    boarderBillingStatus: [],
+    collectionSummary: null,
+
+    getCollectionSummary: async () => {
     try {
-        const response =
-            await axiosInstance.get(
-                "/billings/detailed-summary"
-            );
+
+        const { data } = await axiosInstance.get(
+            "/billings/collection-summary"
+        );
 
         set({
-            detailedSummary:
-                response.data,
+            collectionSummary: data,
         });
+
     } catch (error) {
+
         console.error(
-            "Get Detailed Summary Error:",
+            "Get Collection Summary Error:",
             error
         );
     }
 },
+
+    getBoarderBillingStatus: async () => {
+        try {
+
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/boarder-billing-status"
+            );
+
+            set({
+                boarderBillingStatus: res.data,
+                loading: false,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Boarder Billing Status Error:",
+                error
+            );
+
+            set({
+                loading: false,
+            });
+
+            return false;
+        }
+    },
+
+    getRecentTransactions: async () => {
+        try {
+
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/recent-transactions"
+            );
+
+            set({
+                recentTransactions: res.data,
+                loading: false,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Recent Transactions Error:",
+                error
+            );
+
+            set({
+                loading: false,
+            });
+
+            return false;
+        }
+    },
+
+    getCollectionTrend: async () => {
+        try {
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/collection-trend"
+            );
+
+            set({
+                collectionTrend: res.data,
+                loading: false,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Collection Trend Error:",
+                error
+            );
+
+            set({
+                loading: false,
+            });
+
+            return false;
+        }
+    },
+
+    getCollectionDashboardStats: async () => {
+        try {
+
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/billings/collection-dashboard-stats"
+            );
+
+            set({
+                collectionDashboardStats: {
+                    totalCollections: Number(
+                        res.data.totalCollections
+                    ),
+
+                    totalCollectionsChange: Number(
+                        res.data.totalCollectionsChange
+                    ),
+
+                    totalTransactions: Number(
+                        res.data.totalTransactions
+                    ),
+
+                    totalTransactionsChange: Number(
+                        res.data.totalTransactionsChange
+                    ),
+
+                    paidBoarders: Number(
+                        res.data.paidBoarders
+                    ),
+
+                    paidBoardersChange: Number(
+                        res.data.paidBoardersChange
+                    ),
+
+                    collectionRate: Number(
+                        res.data.collectionRate
+                    ),
+
+                    averageCollection: Number(
+                        res.data.averageCollection
+                    ),
+                },
+
+                loading: false,
+
+            });
+
+            console.log(res.data);
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Collection Dashboard Stats Error:",
+                error
+            );
+
+            set({
+                loading: false,
+            });
+
+            return false;
+        }
+    },
+
+    getDetailedSummary: async () => {
+        try {
+            const response =
+                await axiosInstance.get(
+                    "/billings/detailed-summary"
+                );
+
+            set({
+                detailedSummary:
+                    response.data,
+            });
+        } catch (error) {
+            console.error(
+                "Get Detailed Summary Error:",
+                error
+            );
+        }
+    },
     getRevenueTrend: async () => {
         try {
 

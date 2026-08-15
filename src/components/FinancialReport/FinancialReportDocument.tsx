@@ -54,9 +54,7 @@ export interface FinancialReportDocumentProps {
     addressLine?: string;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
+
 
 const peso = (n: number) =>
     `₱${Number(n ?? 0).toLocaleString("en-PH", {
@@ -76,9 +74,7 @@ function referenceNo(d: Date) {
     return `FIN-${y}${m}-${seq}`;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Document                                                           */
-/* ------------------------------------------------------------------ */
+
 
 const FinancialReportDocument = forwardRef<
     HTMLDivElement,

@@ -286,6 +286,25 @@ export default function FinancialReport() {
         }
     );
 
+     const now = new Date();
+
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const lastDay = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0
+    );
+
+    const dateRange = `${firstDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+    })} – ${lastDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    })}`;
+
     return (
         <div className="h-screen overflow-hidden">
             <div className="h-full space-y-4 overflow-y-auto rounded-tl-2xl border-l border-t border-slate-200 bg-slate-50/70 px-4 pb-15 pt-4">
@@ -315,8 +334,7 @@ export default function FinancialReport() {
                     <div className="flex flex-wrap items-center gap-2">
                         <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
                             <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                            May 01 &ndash; May 31, 2025
-                            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                            {dateRange}
                         </button>
                         <button
                             className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50"

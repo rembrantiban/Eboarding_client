@@ -5,8 +5,6 @@ import {
     DoorOpen,
     TrendingUp,
     Calendar,
-    ChevronDown,
-    FileDown,
     FileSpreadsheet,
     Printer,
     Lightbulb,
@@ -19,6 +17,9 @@ import { useNavigate } from "react-router-dom";
 import { useRoom } from "@/hooks/useRoom";
 import { useEffect, useMemo, useState } from "react";
 import PrintOccupancyReportModal from "@/components/OccupancyReport/PrintOccupancyReportModal";
+import { exportOccupancyReportExcel } from "@/components/OccupancyReport/exportOccupancyReportExcel";
+import { Loader2 } from "lucide-react";
+
 
 export type ActivityAction = "Active" | "Checked-Out" | "Transferred";
 
@@ -134,8 +135,8 @@ function Pagination({
                             onClick={() => onChange(p)}
                             aria-current={p === page ? "page" : undefined}
                             className={`flex h-7 min-w-7 items-center justify-center rounded-lg px-1.5 text-[11.5px] font-medium tabular-nums transition-colors ${p === page
-                                    ? "bg-slate-900 text-white"
-                                    : "text-slate-500 hover:bg-slate-100"
+                                ? "bg-slate-900 text-white"
+                                : "text-slate-500 hover:bg-slate-100"
                                 }`}
                         >
                             {p}
@@ -177,6 +178,8 @@ export default function OccupancyReport() {
     const [activityPage, setActivityPage] = useState(1);
     const [printOpen, setPrintOpen] = useState(false);
     const [activeSlice, setActiveSlice] = useState<number | null>(null);
+    const [exporting, setExporting] = useState(false);
+
 
     useEffect(() => {
         getRoomReportStats();
@@ -189,9 +192,8 @@ export default function OccupancyReport() {
 
     useEffect(() => {
         const pageCount = Math.max(1, Math.ceil(roomReport.length / ROOMS_PER_PAGE));
-        if (roomPage > pageCount) 
-            //eslint-disable-next-line
-        setRoomPage(pageCount);
+        if (roomPage > pageCount)
+            setRoomPage(pageCount);
     }, [roomReport.length, roomPage]);
 
     useEffect(() => {
@@ -199,9 +201,8 @@ export default function OccupancyReport() {
             1,
             Math.ceil(recentActivities.length / ACTIVITIES_PER_PAGE)
         );
-        if (activityPage > pageCount) 
-         //eslint-disable-next-line
-         setActivityPage(pageCount);
+        if (activityPage > pageCount)
+            setActivityPage(pageCount);
     }, [recentActivities.length, activityPage]);
 
     const pagedRooms = useMemo(
@@ -249,6 +250,44 @@ export default function OccupancyReport() {
 
     const totalRooms = roomStatusReport.reduce((sum, d) => sum + d.value, 0);
 
+
+
+    const handleExcel = async () => {
+        setExporting(true);
+        try {
+            await exportOccupancyReportExcel({
+                roomReportStats,
+                roomStatusReport,
+                roomReport,
+                recentActivities,
+                insights: reportInsights?.insights ?? [],
+            });
+        } catch (err) {
+            console.error("Excel export failed:", err);
+        } finally {
+            setExporting(false);
+        }
+    };
+
+    const now = new Date();
+
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const lastDay = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0
+    );
+
+    const dateRange = `${firstDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+    })} – ${lastDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    })}`;
+
     return (
         <div className="h-screen overflow-hidden">
             <div className="h-full space-y-4 overflow-y-auto rounded-tl-2xl border-l border-t border-slate-200 bg-slate-50/70 px-4 pb-15 pt-4">
@@ -276,18 +315,22 @@ export default function OccupancyReport() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                        <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
+                        <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600">
                             <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                            May 01 &ndash; May 31, 2025
-                            <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                            {dateRange}
                         </button>
-                        <button className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
-                            <FileDown className="h-3.5 w-3.5 text-rose-500" />
-                            PDF
-                        </button>
-                        <button className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
-                            <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
-                            Excel
+
+                        <button
+                            onClick={handleExcel}
+                            disabled={exporting}
+                            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-60"
+                        >
+                            {exporting ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin text-slate-400" />
+                            ) : (
+                                <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
+                            )}
+                            {exporting ? "Preparing…" : "Excel"}
                         </button>
                         <button
                             onClick={() => setPrintOpen(true)}

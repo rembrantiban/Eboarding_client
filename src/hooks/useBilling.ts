@@ -36,6 +36,24 @@ export const useBilling = () => {
         detailedSummary,
         getDetailedSummary,
 
+
+        //Collection Report 
+        collectionDashboardStats,
+        getCollectionDashboardStats,
+
+        collectionTrend,
+        getCollectionTrend,
+
+
+         recentTransactions,
+         getRecentTransactions,
+
+         boarderBillingStatus,
+         getBoarderBillingStatus,
+
+        collectionSummary,
+        getCollectionSummary,
+
     } = useBillingStore();
 
     return {
@@ -72,6 +90,21 @@ export const useBilling = () => {
 
         detailedSummary,
         getDetailedSummary,
+
+        collectionDashboardStats,
+        getCollectionDashboardStats,
+
+        collectionTrend,
+        getCollectionTrend,
+
+        recentTransactions,
+        getRecentTransactions,
+
+        boarderBillingStatus,
+        getBoarderBillingStatus,
+
+        collectionSummary,
+        getCollectionSummary,
 
     };
 };

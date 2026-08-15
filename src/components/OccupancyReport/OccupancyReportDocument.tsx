@@ -24,7 +24,7 @@ export interface RoomReportRow {
 }
 
 export interface ActivityRow {
-    date: string;
+    date: string;   
     boarder: string;
     room: string | number;
     bed: string | number;
