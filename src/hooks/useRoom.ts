@@ -24,6 +24,22 @@ export const useRoom = () => {
   const roomOccupancyChart = useRoomStore((state) => state.roomOccupancyChart);
   const getRoomOccupancyChart = useRoomStore((state) => state.getRoomOccupancyChart);
   const roomAvailabilityChart = useRoomStore((state) => state.roomAvailabilityChart);
+
+  //Occupancy Report
+  const roomReportStats = useRoomStore((state) => state.roomReportStats);
+  const getRoomReportStats = useRoomStore((state) => state.getRoomReportStats);
+
+  const roomStatusReport = useRoomStore((state) => state.roomStatusReport);
+  const getRoomStatusReport = useRoomStore((state) => state.getRoomStatusReport);
+  const roomReport = useRoomStore((state) => state.roomReport);
+  const getRoomReport = useRoomStore((state) => state.getRoomReport);
+  const recentActivities = useRoomStore((state) => state.recentActivities);
+  const getRecentActivities = useRoomStore((state) => state.getRecentActivities);
+  const reportInsights = useRoomStore((state) => state.reportInsights);
+  const getReportInsights = useRoomStore((state) => state.getReportInsights);
+
+
+
   return {
     rooms,
     availableRooms,
@@ -46,6 +62,23 @@ export const useRoom = () => {
     getBedOccupancyChart,
     roomOccupancyChart,
     getRoomOccupancyChart,
-    roomAvailabilityChart
+    roomAvailabilityChart,
+
+
+    roomReportStats,
+    getRoomReportStats,
+
+    roomStatusReport,
+    getRoomStatusReport,
+
+    roomReport,
+    getRoomReport,
+
+    recentActivities,
+    getRecentActivities,
+
+    reportInsights,
+    getReportInsights
+
   };
 };

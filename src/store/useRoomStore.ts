@@ -112,6 +112,54 @@ export interface RoomOccupancyChart {
   color: string;
 }
 
+
+//Occupancy Report 
+export interface RoomReportStats {
+  totalRooms: number;
+  occupiedRooms: number;
+  availableRooms: number;
+  occupancyRate: string;
+}
+
+export interface RoomStatusReport {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export interface RoomReport {
+  number: string;
+  capacity: number;
+  occupied: number;
+  available: number;
+  status: "Available" | "Occupied" | "Under Maintenance";
+  date: string;
+}
+
+
+export type ActivityAction =
+  | "Active"
+  | "Checked-Out"
+  | "Transferred";
+
+export interface RecentActivity {
+  date: string;
+  boarder: string;
+  room: string;
+  bed: string;
+  action: ActivityAction;
+  by: string;
+}
+
+export interface ReportInsights {
+  occupancyRate: string;
+  totalRooms: number;
+  occupiedRooms: number;
+  availableRooms: number;
+  maintenanceRooms: number;
+  insights: string[];
+}
+
 interface RoomState {
   rooms: Room[];
   availableRooms: AvailableRoom[];
@@ -123,6 +171,15 @@ interface RoomState {
     availableBeds: number,
   };
   roomOccupancyChart: RoomOccupancyChart[];
+  roomReport: RoomReport[];
+
+
+  //Occupancy State
+  roomReportStats: RoomReportStats;
+  roomStatusReport: RoomStatusReport[];
+  recentActivities: RecentActivity[];
+  reportInsights: ReportInsights | null;
+
 
   getRoomOccupancyChart: () => Promise<boolean>;
 
@@ -150,6 +207,15 @@ interface RoomState {
   getRoomAvailabilityChart: () => Promise<void>;
   getBedOccupancyChart: () => Promise<boolean>;
 
+
+  //Occupancy Report State
+  getRoomReportStats: () => Promise<boolean>;
+  getRoomStatusReport: () => Promise<boolean>;
+  getRoomReport: () => Promise<void>;
+
+  getRecentActivities: () => Promise<void>;
+  getReportInsights: () => Promise<void>;
+
 }
 
 
@@ -172,10 +238,119 @@ export const useRoomStore = create<RoomState>((set) => ({
   roomAvailabilityChart: [],
   bedOccupancyChart: [],
   roomOccupancyChart: [],
+  roomReportStats: {
+    totalRooms: 0,
+    occupiedRooms: 0,
+    availableRooms: 0,
+    occupancyRate: "0%",
+  },
+  roomStatusReport: [],
+  roomReport: [],
+  recentActivities: [],
+  reportInsights: null,
 
+
+  getReportInsights: async () => {
+  try {
+    const res = await axiosInstance.get(
+      "/rooms/report-insights"
+    );
+
+    set({
+      reportInsights: res.data,
+    });
+
+  } catch (error) {
+    console.error(
+      "Report insights error:",
+      error
+    );
+  }
+},
+
+  getRecentActivities: async () => {
+    try {
+      const res = await axiosInstance.get(
+        "/rooms/recent-activities"
+      );
+
+      set({
+        recentActivities: res.data,
+      });
+
+    } catch (error) {
+      console.error(
+        "Recent activities error:",
+        error
+      );
+    }
+  },
+  getRoomReport: async () => {
+    try {
+      const res = await axiosInstance.get(
+        "/rooms/room-report"
+      );
+
+      set({
+        roomReport: res.data,
+      });
+
+    } catch (error) {
+      console.error(
+        "Room report error:",
+        error
+      );
+    }
+  },
+  getRoomStatusReport: async () => {
+    try {
+
+      const response = await axiosInstance.get(
+        "/rooms/room-status-report"
+      );
+
+      set({
+        roomStatusReport: response.data,
+      });
+
+      return true;
+
+    } catch (error) {
+
+      console.error(
+        "Room status report error:",
+        error
+      );
+
+      return false;
+    }
+  },
+  getRoomReportStats: async () => {
+    try {
+
+      const response = await axiosInstance.get(
+        "/rooms/room-report-stats"
+      );
+
+      set({
+        roomReportStats: response.data,
+      });
+
+      return true;
+
+    } catch (error) {
+
+      console.error(
+        "Room report stats error:",
+        error
+      );
+
+      return false;
+    }
+  },
   getRoomOccupancyChart: async () => {
     try {
-      set({loading: true})
+      set({ loading: true })
       const response = await axiosInstance.get(
         "/rooms/room-occupancy-chart"
       );
@@ -188,7 +363,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       return true;
     } catch (error) {
       console.error(error);
-      set({loading: false});
+      set({ loading: false });
       return false;
     }
   },
