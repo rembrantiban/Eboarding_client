@@ -164,9 +164,7 @@ function bodyRow(ws: WS, row: number, cols: number, zebra = false) {
     }
 }
 
-/* ------------------------------------------------------------------ */
-/*  Export                                                             */
-/* ------------------------------------------------------------------ */
+
 
 export async function exportPaymentCollectionExcel({
     collectionDashboardStats,

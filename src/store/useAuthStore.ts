@@ -220,6 +220,57 @@ type DashboardStats = {
   monthlyRevenue: DashboardMetric;
 };
 
+
+//Board Report Types
+type BoarderStats = {
+  totalBoarders: number;
+  maleBoarders: number;
+  femaleBoarders: number;
+  activeBoarders: number;
+
+  malePercentage: number;
+  femalePercentage: number;
+  activePercentage: number;
+};
+
+export type BoardersOverTime = {
+  month: string;
+  total: number;
+};
+
+export type RecentBoarder = {
+  user_id_no: string;
+  name: string;
+  room: string | null;
+  check_in: string | null;
+  status: AccountStatus;
+  contact: string;
+};
+
+export type BoarderList = {
+  user_id_no: string;
+  name: string;
+  gender: string;
+  age: number;
+  contact_number: string;
+  email: string;
+  account_status: "Active" | "Deactivate";
+  room_number: string | null;
+  check_in: string | null;
+};
+
+export type BoarderSummary = {
+  totalBoarders: number;
+  activeBoarders: number;
+  deactivateBoarders: number;
+  checkedOutBoarders: number;
+  maleBoarders: number;
+  femaleBoarders: number;
+  newThisMonth: number;
+  checkedOutThisMonth: number;
+  percentageChange: number;
+};
+
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -233,6 +284,16 @@ interface AuthState {
   staff: User[];
 
   dashboardStats: DashboardStats | null;
+
+  //Boarder Report 
+  boarderStats: BoarderStats | null;
+  boardersOverTime: BoardersOverTime[];
+  recentBoarders: RecentBoarder[];
+  boardersList: BoarderList[];
+  boardersListLoading: boolean;
+  boarderSummary: BoarderSummary | null;
+
+
 
   getStaffDashboardStats: () => Promise<DashboardStats>;
 
@@ -260,6 +321,14 @@ interface AuthState {
   getDeletedUsers: () => Promise<GetUsersResponse>;
 
   recoverDeletedUser: (id: number) => Promise<User>;
+
+  //Boarder Report 
+  getBoarderStats: () => Promise<BoarderStats>;
+  getBoardersOverTime: () => Promise<BoardersOverTime[]>;
+  getRecentBoarders: () => Promise<RecentBoarder[]>;
+  getBoardersList: () => Promise<BoarderList[]>;
+  getBoarderSummary: () => Promise<BoarderSummary>;
+
 }
 
 
@@ -276,6 +345,133 @@ export const useAuthStore = create<AuthState>((set) => ({
   staffLoading: false,
 
   dashboardStats: null,
+  boarderStats: null,
+  boardersOverTime: [],
+  recentBoarders: [],
+  boardersList: [],
+  boardersListLoading: false,
+  boarderSummary: null,
+
+
+  getBoarderSummary: async () => {
+    try {
+      const res =
+        await axiosInstance.get<BoarderSummary>(
+          "/auth/boarder-summary"
+        );
+
+      set({
+        boarderSummary: res.data,
+      });
+
+      return res.data;
+
+    } catch (error) {
+      const err = error as ApiError;
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to load boarder summary"
+      );
+    }
+  },
+  getBoardersList: async () => {
+    try {
+      set({
+        boardersListLoading: true,
+      });
+
+      const res = await axiosInstance.get<BoarderList[]>(
+        "/auth/boarders-list"
+      );
+
+      set({
+        boardersList: res.data,
+        boardersListLoading: false,
+      });
+
+      return res.data;
+
+    } catch (error) {
+
+      set({
+        boardersListLoading: false,
+      });
+
+      const err = error as ApiError;
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to load boarders list"
+      );
+    }
+  },
+  getRecentBoarders: async () => {
+    try {
+      const res = await axiosInstance.get<RecentBoarder[]>(
+        "/auth/recent-boarders"
+      );
+
+      set({
+        recentBoarders: res.data,
+      });
+
+      return res.data;
+
+    } catch (error) {
+      const err = error as ApiError;
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to load recent boarders"
+      );
+    }
+  },
+
+  getBoardersOverTime: async () => {
+    try {
+      const res = await axiosInstance.get<BoardersOverTime[]>(
+        "/auth/boarders-over-time"
+      );
+
+      set({
+        boardersOverTime: res.data,
+      });
+
+      return res.data;
+
+    } catch (error) {
+      const err = error as ApiError;
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to load boarder trends"
+      );
+    }
+  },
+
+  getBoarderStats: async () => {
+    try {
+      const res = await axiosInstance.get<BoarderStats>(
+        "/auth/boarder-stats"
+      );
+
+      set({
+        boarderStats: res.data,
+      });
+
+      return res.data;
+
+    } catch (error) {
+      const err = error as ApiError;
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to load boarder statistics"
+      );
+    }
+  },
+
 
 
   getStaffDashboardStats: async () => {

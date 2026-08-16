@@ -1,8 +1,5 @@
 import { forwardRef } from "react";
 
-/* ------------------------------------------------------------------ */
-/*  Types                                                              */
-/* ------------------------------------------------------------------ */
 
 export interface CollectionStatsShape {
     totalCollections: number;
@@ -49,7 +46,6 @@ export interface PaymentCollectionDocumentProps {
     organization?: string;
     addressLine?: string;
 }
-
 
 
 const peso = (n: number) =>

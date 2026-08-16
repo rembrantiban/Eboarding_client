@@ -33,6 +33,17 @@ export const useAuth = () => {
   const staffLoading = useAuthStore((state) => state.staffLoading);
   const dashboardStats = useAuthStore((state) => state.dashboardStats);
   const getStaffDashboardStats = useAuthStore((state) => state.getStaffDashboardStats);
+  const boarderStats = useAuthStore((state) => state.boarderStats);
+  const getBoarderStats = useAuthStore((state) => state.getBoarderStats);
+  const boardersOverTime = useAuthStore((state) => state.boardersOverTime);
+  const getBoardersOverTime = useAuthStore((state) => state.getBoardersOverTime);
+  const recentBoarders = useAuthStore((state) => state.recentBoarders);
+  const getRecentBoarders = useAuthStore((state) => state.getRecentBoarders);
+  const boardersList = useAuthStore((state) => state.boardersList);
+  const boardersListLoading = useAuthStore((state) => state.boardersListLoading);
+  const getBoardersList = useAuthStore((state) => state.getBoardersList);
+  const boarderSummary = useAuthStore((state) => state.boarderSummary);
+  const getBoarderSummary = useAuthStore((state) => state.getBoarderSummary);
 
   return {
     user,
@@ -68,6 +79,24 @@ export const useAuth = () => {
     getAvailableStaff,
     staffLoading,
     dashboardStats,
-    getStaffDashboardStats
+    getStaffDashboardStats,
+
+
+    //Boarder Report
+    boarderStats,
+    getBoarderStats,
+
+    boardersOverTime,
+    getBoardersOverTime,
+
+    recentBoarders,
+    getRecentBoarders,
+
+    getBoardersList,
+    boardersList,
+    boardersListLoading,
+    boarderSummary,
+    getBoarderSummary
+
   };
 };
