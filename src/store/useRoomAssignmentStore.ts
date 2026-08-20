@@ -326,10 +326,6 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
     getBoarderAssignedRoom: async (userId) => {
 
-        const {
-            showError,
-        } = useStatusStore.getState();
-
         try {
             set({
                 loading: true,
@@ -349,7 +345,7 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
             if (axios.isAxiosError(error)) {
 
-                showError(
+                console.log(
                     "Unable to Load",
                     error.response?.data?.message ??
                     "Unable to retrieve assigned room."
@@ -357,7 +353,7 @@ export const useRoomAssignmentStore = create<RoomAssignmentStore>((set) => ({
 
             } else {
 
-                showError(
+                console.log(
                     "Unable to Load",
                     "Unable to retrieve assigned room."
                 );

@@ -49,6 +49,7 @@ import RoomAvailabilityReport from './pages/RoomAvailabilityReport'
 import BoarderReport  from './pages/BoarderReport'
 import StaffDasboard from './pages/StaffDashboard'
 
+import PenaltiesPage from './pages/Penalties'
 
 
 function App() {
@@ -92,6 +93,7 @@ function App() {
             <Route path="/staff-maintenance" element={<MaintenanceRequestPage />} />
             <Route path="/admin-maintenance" element={<AdminMaintenanceRequestPage />} />
             <Route path='/staff-dashboard' element={<StaffDasboard />} />
+            <Route path="/penalties" element={<PenaltiesPage />} />
 
           </Route>
         </Route>

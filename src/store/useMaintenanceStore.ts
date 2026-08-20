@@ -5,34 +5,57 @@ import axios from "axios";
 
 
 export type MaintenanceStatus =
-  | "Pending"
-  | "In Progress"
-  | "Completed"
-  | "Closed"
-  | "Cancelled";
+    | "Pending"
+    | "In Progress"
+    | "Completed"
+    | "Closed"
+    | "Cancelled";
 
 export interface MaintenanceRequest {
     id: number;
-    request_number: string;
 
-    user_id: number;
-    room_id: number;
+    request_number?: string;
 
-    category: string;
-    description: string;
-    image_url: string | null;
+    user_id?: number;
+    room_id?: number;
+
+    category?: string;
+    title?: string;
+
+    description?: string;
+    image_url?: string | null;
 
     status: MaintenanceStatus;
 
     created_at: string;
     updated_at?: string;
 
-    room_number: string;
-    bed_number: string;
+    room_number?: string;
+    bed_number?: string;
 
-    requested_by?: string;
+    room?: string;
+    reporter?: string;
     assigned_staff?: string;
+
+    date?: string;
 }
+
+export interface MaintenanceRequest {
+    id: number;
+
+    title?: string;
+    room?: string;
+    reporter?: string;
+    assigned_staff?: string;
+
+    date?: string;
+
+    status: MaintenanceStatus;
+
+    created_at: string;
+}
+
+
 
 interface MaintenanceStore {
     loading: boolean;
@@ -40,7 +63,8 @@ interface MaintenanceStore {
     submittedMaintenance: MaintenanceRequest[];
     myAssignedMaintenance: MaintenanceRequest[];
     maintenanceRequest: MaintenanceRequest[];
-    boarderRequest : MaintenanceRequest[];
+    boarderRequest: MaintenanceRequest[];
+    assignedMaintenanceList: MaintenanceRequest[];
 
     createMaintenanceRequest: (data: FormData) => Promise<boolean>;
 
@@ -56,6 +80,9 @@ interface MaintenanceStore {
     getMySubmittedRequest: () => Promise<boolean>;
 
     getBoarderRequestMaintenance: () => Promise<boolean>;
+
+    getAllAssignedMaintenance: () => Promise<boolean>;
+    updateAssignedMaintenanceRequest: (id: number, status: MaintenanceStatus, remarks?: string) => Promise<boolean>;
 }
 
 export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
@@ -69,7 +96,115 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
     maintenanceRequest: [],
 
     boarderRequest: [],
+    assignedMaintenanceList: [],
 
+
+    updateAssignedMaintenanceRequest: async (
+        id,
+        status,
+        remarks
+    ) => {
+
+        const {
+            showLoading,
+            showSuccess,
+            showError,
+        } = useStatusStore.getState();
+
+        try {
+
+            set({
+                loading: true,
+            });
+
+            showLoading(
+                "Updating Request",
+                "Please wait..."
+            );
+
+            await axiosInstance.put(
+                `/maintenance/staff/update/${id}`,
+                {
+                    status,
+                    remarks,
+                }
+            );
+
+            showSuccess(
+                "Success",
+                "Maintenance request updated successfully."
+            );
+
+            /**
+             * Refresh Staff Assigned Requests
+             */
+            const res = await axiosInstance.get(
+                "/maintenance/my-assigned"
+            );
+
+            set({
+                myAssignedMaintenance: res.data,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            if (axios.isAxiosError(error)) {
+
+                showError(
+                    "Failed",
+                    error.response?.data?.message ??
+                    "Failed to update request."
+                );
+
+            }
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
+
+        }
+
+    },
+    getAllAssignedMaintenance: async () => {
+        try {
+
+            set({
+                loading: true,
+            });
+
+            const res = await axiosInstance.get(
+                "/maintenance/all-staff-assigned"
+            );
+
+            set({
+                assignedMaintenanceList: res.data,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Failed to fetch assigned maintenance",
+                error
+            );
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
+
+        }
+    },
     getBoarderRequestMaintenance: async () => {
 
         try {
@@ -237,7 +372,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
             showSuccess,
             showError,
         } = useStatusStore.getState();
-        
+
         set({ loading: true })
         try {
 

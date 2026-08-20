@@ -9,10 +9,13 @@ export const useAnnouncement = () => {
     getMyAnnouncements,
     createAnnouncement,
     updateAnnouncement,
+    deleteAnnouncement,
     getAnnouncements,
     markAsRead,
     getUnreadCount,
     markAllAsRead,
+    archiveAnnouncement,
+    restoreAnnouncement,
   } = useAnnouncementStore();
 
   return {
@@ -24,8 +27,11 @@ export const useAnnouncement = () => {
     getMyAnnouncements,
     createAnnouncement,
     updateAnnouncement,
+    deleteAnnouncement,
     getAnnouncements,
     markAsRead,
-    getUnreadCount
+    getUnreadCount,
+    archiveAnnouncement,
+    restoreAnnouncement,
   };
 };

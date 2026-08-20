@@ -37,7 +37,7 @@ export const useRoom = () => {
   const getRecentActivities = useRoomStore((state) => state.getRecentActivities);
   const reportInsights = useRoomStore((state) => state.reportInsights);
   const getReportInsights = useRoomStore((state) => state.getReportInsights);
-
+  const updateRoomStatus = useRoomStore((state) => state.updateRoomStatus);
 
 
   return {
@@ -78,7 +78,8 @@ export const useRoom = () => {
     getRecentActivities,
 
     reportInsights,
-    getReportInsights
+    getReportInsights,
 
+    updateRoomStatus
   };
 };

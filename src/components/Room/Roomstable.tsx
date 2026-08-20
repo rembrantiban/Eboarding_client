@@ -7,10 +7,13 @@ import { Search, Plus, RotateCcw, DoorOpen, PackageOpen } from "lucide-react";
 import AddRoomModal from "../modal/AddRoomModal";
 import { useRoom } from "@/hooks/useRoom";
 import ViewRoomModal from "../modal/ViewRoomModal";
-import type { Room } from "@/store/useRoomStore"
+import type { Room } from "@/store/useRoomStore";
 import UpdateRoomModal from "../modal/UpdateRoomModal";
 import DeleteRoomModal from "../modal/DeleteRoomModal";
-import { toast } from "sonner"
+import UpdateRoomStatusModal, {
+  type RoomStatus,
+} from "./UpdateRoomStatusModal";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -19,12 +22,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-
 const RoomsTable = () => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [addRoomOpen, setAddRoomOpen] = useState(false);
-  const { deleteRoom } = useRoom()
+  const { deleteRoom, updateRoomStatus } = useRoom();
 
   const { rooms, getRooms, loading } = useRoom();
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -34,6 +36,10 @@ const RoomsTable = () => {
   const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [statusOpen, setStatusOpen] = useState(false);
+  const [roomToUpdate, setRoomToUpdate] = useState<Room | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+
   useEffect(() => {
     getRooms();
   }, [getRooms]);
@@ -42,9 +48,8 @@ const RoomsTable = () => {
   const filteredRooms = rooms.filter((room) => {
     const matchSearch =
       room.room_number.toLowerCase().includes(search.toLowerCase()) ||
-      room.price_per_month.toString().includes(search)
-    const matchFilter =
-      filter === "All" || room.status === filter;
+      room.price_per_month.toString().includes(search);
+    const matchFilter = filter === "All" || room.status === filter;
 
     return matchSearch && matchFilter;
   });
@@ -54,11 +59,35 @@ const RoomsTable = () => {
     setFilter("All");
   };
 
+  const handleStatusConfirm = async (status: RoomStatus) => {
+    if (!roomToUpdate) return;
+
+    const toastId = toast.loading("Updating status...");
+    try {
+      setIsUpdatingStatus(true);
+
+      await updateRoomStatus(roomToUpdate.id, status);
+      await getRooms();
+
+      toast.success(`Room ${roomToUpdate.room_number} is now ${status}`, {
+        id: toastId,
+      });
+
+      setStatusOpen(false);
+      setRoomToUpdate(null);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Update failed", {
+        id: toastId,
+      });
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   const isFiltered = search !== "" || filter !== "All";
 
   return (
     <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
-
       {/* 🔷 Header */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-2.5">
@@ -91,10 +120,18 @@ const RoomsTable = () => {
               <SelectValue placeholder="Filter status" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
-              <SelectItem value="All" className="text-[12.5px]">All status</SelectItem>
-              <SelectItem value="Available" className="text-[12.5px]">Available</SelectItem>
-              <SelectItem value="Occupied" className="text-[12.5px]">Occupied</SelectItem>
-              <SelectItem value="Under Maintenance" className="text-[12.5px]">Under Maintenance</SelectItem>
+              <SelectItem value="All" className="text-[12.5px]">
+                All status
+              </SelectItem>
+              <SelectItem value="Available" className="text-[12.5px]">
+                Available
+              </SelectItem>
+              <SelectItem value="Occupied" className="text-[12.5px]">
+                Occupied
+              </SelectItem>
+              <SelectItem value="Under Maintenance" className="text-[12.5px]">
+                Under Maintenance
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -127,13 +164,14 @@ const RoomsTable = () => {
       <div className="overflow-hidden rounded-xl border border-slate-200/80">
         <div className="overflow-x-auto">
           <table className="w-full">
-
             <thead className="border-b border-slate-200/80 bg-slate-50/70">
               <tr className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500">
                 <th className="whitespace-nowrap px-4 py-2.5 text-left">Room</th>
                 <th className="whitespace-nowrap px-4 py-2.5 text-left">Capacity</th>
                 <th className="whitespace-nowrap px-4 py-2.5 text-left">Beds</th>
-                <th className="whitespace-nowrap px-4 py-2.5 text-left">Price / Month</th>
+                <th className="whitespace-nowrap px-4 py-2.5 text-left">
+                  Price / Month
+                </th>
                 <th className="whitespace-nowrap px-4 py-2.5 text-left">Status</th>
                 <th className="whitespace-nowrap px-4 py-2.5 text-right">Actions</th>
               </tr>
@@ -193,7 +231,10 @@ const RoomsTable = () => {
                     key={room.id}
                     room={{
                       ...room,
-                      status: room.status as "Available" | "Occupied" | "Under Maintenance",
+                      status: room.status as
+                        | "Available"
+                        | "Occupied"
+                        | "Under Maintenance",
                     }}
                     onView={(r) => {
                       setSelectedRoom(r);
@@ -203,6 +244,10 @@ const RoomsTable = () => {
                       setSelectedRoom(r);
                       setEditOpen(true);
                     }}
+                    onChangeStatus={(r) => {
+                      setRoomToUpdate(r);
+                      setStatusOpen(true);
+                    }}
                     onDelete={(room) => {
                       setRoomToDelete(room);
                       setDeleteOpen(true);
@@ -211,16 +256,12 @@ const RoomsTable = () => {
                 ))
               )}
             </tbody>
-
           </table>
         </div>
       </div>
 
       {/* ✅ MODAL */}
-      <AddRoomModal
-        open={addRoomOpen}
-        onClose={() => setAddRoomOpen(false)}
-      />
+      <AddRoomModal open={addRoomOpen} onClose={() => setAddRoomOpen(false)} />
       <ViewRoomModal
         open={viewOpen}
         onClose={() => setViewOpen(false)}
@@ -231,6 +272,18 @@ const RoomsTable = () => {
         onClose={() => setEditOpen(false)}
         room={selectedRoom}
       />
+
+      <UpdateRoomStatusModal
+        open={statusOpen}
+        onClose={() => {
+          setStatusOpen(false);
+          setRoomToUpdate(null);
+        }}
+        room={roomToUpdate}
+        loading={isUpdatingStatus}
+        onConfirm={handleStatusConfirm}
+      />
+
       <DeleteRoomModal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
@@ -239,19 +292,20 @@ const RoomsTable = () => {
         onConfirm={async () => {
           if (!roomToDelete) return;
 
+          const toastId = toast.loading("Deleting room...");
           try {
             setIsDeleting(true);
 
             await deleteRoom(roomToDelete.id);
 
-            const toastId = toast.loading("Deleting room...");
             toast.success("Room deleted 🗑️", { id: toastId });
 
             setDeleteOpen(false);
             setRoomToDelete(null);
-
           } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Delete failed");
+            toast.error(err instanceof Error ? err.message : "Delete failed", {
+              id: toastId,
+            });
           } finally {
             setIsDeleting(false);
           }

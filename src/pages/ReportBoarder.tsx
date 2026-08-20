@@ -1,28 +1,17 @@
 "use client";
 
+import { useBilling } from "@/hooks/useBilling";
 import {
     ClipboardList,
     Wallet,
-    Receipt,
+    PhilippinePeso,
     TriangleAlert,
     FileText,
-    ArrowRight,
-    Download,
     CircleCheck,
 } from "lucide-react";
+import { useEffect } from "react";
 
-/* ------------------------------------------------------------------ */
-/* MOCK DATA — swap these for your store/hook data                     */
-/* ------------------------------------------------------------------ */
 
-type Payment = {
-    id: number;
-    date: string;
-    description: string;
-    amount: number;
-    status: "Paid" | "Pending" | "Overdue";
-    receipt_url?: string;
-};
 
 type Penalty = {
     id: number;
@@ -39,19 +28,9 @@ const SUMMARY = {
     outstanding_penalties: 0,
 };
 
-const PAYMENTS: Payment[] = [
-    { id: 1, date: "2026-05-05", description: "Monthly Rent - May 2026", amount: 6000, status: "Paid", receipt_url: "#" },
-    { id: 2, date: "2026-04-05", description: "Monthly Rent - Apr 2026", amount: 6000, status: "Paid", receipt_url: "#" },
-    { id: 3, date: "2026-03-05", description: "Monthly Rent - Mar 2026", amount: 6000, status: "Paid", receipt_url: "#" },
-    { id: 4, date: "2026-02-05", description: "Monthly Rent - Feb 2026", amount: 6000, status: "Paid", receipt_url: "#" },
-    { id: 5, date: "2026-01-05", description: "Monthly Rent - Jan 2026", amount: 6000, status: "Paid", receipt_url: "#" },
-];
 
 const PENALTIES: Penalty[] = [];
-
-/* ------------------------------------------------------------------ */
-/* Formatters                                                          */
-/* ------------------------------------------------------------------ */
+ 
 
 const peso = (value: number) =>
     new Intl.NumberFormat("en-PH", {
@@ -73,6 +52,7 @@ const formatDate = (value?: string | null) => {
 
 const STATUS_STYLE: Record<string, string> = {
     Paid: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    Partial: "bg-amber-50 text-amber-700 ring-amber-100",
     Settled: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     Pending: "bg-amber-50 text-amber-700 ring-amber-100",
     Outstanding: "bg-rose-50 text-rose-700 ring-rose-100",
@@ -82,9 +62,20 @@ const STATUS_STYLE: Record<string, string> = {
 
 
 const BoarderReport = () => {
+
+    const { boarderPaymentSummary, getBoarderPaymentSummary, getMyRecentPayments, recentPayments } = useBilling();
+
+
+    useEffect(() => {
+        getBoarderPaymentSummary();
+        getMyRecentPayments();
+        //eslint-disable-next-line
+    }, []);
+
+
     return (
-    <div className="min-h-screen bg-slate-50/60 print:bg-white">
-      <div className="mx-auto max-w-5xl space-y-3 px-4 py-6 sm:px-6 lg:py-8">
+        <div className="min-h-screen bg-slate-50/60 print:bg-white">
+            <div className="mx-auto max-w-5xl space-y-3 px-4 py-6 sm:px-6 lg:py-8">
 
                 <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-linear-to-r from-slate-50 via-blue-50/60 to-slate-50/40 px-5 py-5">
                     <div className="pointer-events-none absolute -right-6 -top-10 hidden h-40 w-40 rounded-full bg-slate-100/50 blur-2xl sm:block" />
@@ -109,22 +100,24 @@ const BoarderReport = () => {
                     </div>
                 </div>
 
-                {/* ---------------------------------------------------- */}
-                {/* SUMMARY CARDS                                         */}
-                {/* ---------------------------------------------------- */}
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                     <SummaryCard
                         tone="emerald"
                         icon={Wallet}
-                        badgeIcon={Receipt}
+                        badgeIcon={PhilippinePeso }
                         title="Payment Records"
                         subtitle="View your payment history and status"
                         stats={[
-                            { label: "Total Payments Made", value: peso(SUMMARY.total_payments), highlight: true },
-                            { label: "Last Payment", value: formatDate(SUMMARY.last_payment_date) },
+                            {
+                                label: "Total Payments Made",
+                                value: peso(boarderPaymentSummary?.total_payments ?? 0),
+                                highlight: true,
+                            },
+                            {
+                                label: "Last Payment",
+                                value: formatDate(boarderPaymentSummary?.last_payment_date),
+                            },
                         ]}
-                        action="View Payment Records"
-                        onAction={() => { }}
                     />
 
                     <SummaryCard
@@ -137,14 +130,10 @@ const BoarderReport = () => {
                             { label: "Total Penalties", value: peso(SUMMARY.total_penalties), highlight: true },
                             { label: "Outstanding Penalties", value: peso(SUMMARY.outstanding_penalties) },
                         ]}
-                        action="View Penalty Records"
-                        onAction={() => { }}
                     />
                 </div>
 
-                {/* ---------------------------------------------------- */}
-                {/* RECENT TABLES                                         */}
-                {/* ---------------------------------------------------- */}
+             
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
 
                     {/* Recent payments */}
@@ -156,12 +145,12 @@ const BoarderReport = () => {
                         action="View All Payments"
                         onAction={() => { }}
                         footer={
-                            PAYMENTS.length > 0
-                                ? `Showing 1 to ${PAYMENTS.length} of ${PAYMENTS.length} payments`
+                            recentPayments.length > 0
+                                ? `Showing 1 to ${recentPayments.length} of ${recentPayments.length} payments`
                                 : undefined
                         }
                     >
-                        {PAYMENTS.length === 0 ? (
+                        {recentPayments.length === 0 ? (
                             <EmptyState
                                 title="No Payments Found"
                                 text="You have no payment records."
@@ -175,11 +164,10 @@ const BoarderReport = () => {
                                             <Th>Description</Th>
                                             <Th className="text-right">Amount</Th>
                                             <Th>Status</Th>
-                                            <Th className="text-right">Receipt</Th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {PAYMENTS.map((p) => (
+                                        {recentPayments.map((p) => (
                                             <tr
                                                 key={p.id}
                                                 className="border-b border-slate-50 transition-colors last:border-0 hover:bg-slate-50/60"
@@ -195,15 +183,6 @@ const BoarderReport = () => {
                                                 </Td>
                                                 <Td>
                                                     <StatusBadge status={p.status} />
-                                                </Td>
-                                                <Td className="text-right">
-                                                    <button
-                                                        type="button"
-                                                        aria-label={`Download receipt for ${p.description}`}
-                                                        className="inline-flex h-7 w-7 items-center justify-center rounded-md text-blue-500 transition-colors hover:bg-blue-50 hover:text-blue-600"
-                                                    >
-                                                        <Download size={14} />
-                                                    </button>
                                                 </Td>
                                             </tr>
                                         ))}
@@ -312,8 +291,6 @@ function SummaryCard({
     title,
     subtitle,
     stats,
-    action,
-    onAction,
 }: {
     tone: keyof typeof TONE;
     icon: IconType;
@@ -321,8 +298,6 @@ function SummaryCard({
     title: string;
     subtitle: string;
     stats: { label: string; value: string; highlight?: boolean }[];
-    action: string;
-    onAction: () => void;
 }) {
     const t = TONE[tone];
 
@@ -360,14 +335,6 @@ function SummaryCard({
                 ))}
             </div>
 
-            <button
-                type="button"
-                onClick={onAction}
-                className={`group mt-3.5 inline-flex items-center gap-1.5 text-[12.5px] font-semibold transition-colors ${t.link}`}
-            >
-                {action}
-                <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-            </button>
         </div>
     );
 }

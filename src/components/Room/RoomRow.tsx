@@ -8,6 +8,7 @@ import {
   Trash2,
   Eye,
   ImageOff,
+  RefreshCw,
 } from "lucide-react";
 import type { Room } from "@/store/useRoomStore";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +16,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -25,6 +27,7 @@ type Props = {
   onView: (room: Room) => void;
   onDelete?: (room: Room) => void;
   onEdit: (room: Room) => void;
+  onChangeStatus?: (room: Room) => void;
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -33,7 +36,7 @@ const STATUS_STYLES: Record<string, string> = {
   "Under Maintenance": "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
 };
 
-const RoomRow = ({ room, onView, onDelete, onEdit }: Props) => {
+const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
   const { user } = useAuth();
 
   const statusClass =
@@ -90,11 +93,23 @@ const RoomRow = ({ room, onView, onDelete, onEdit }: Props) => {
       </td>
 
       <td className="px-4 py-2.5">
-        <span
-          className={`inline-flex rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${statusClass}`}
-        >
-          {room.status}
-        </span>
+        {user?.user_type === "Admin" && onChangeStatus ? (
+          <button
+            type="button"
+            onClick={() => onChangeStatus(room)}
+            title="Change status"
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold transition hover:opacity-80 ${statusClass}`}
+          >
+            {room.status}
+            <RefreshCw size={9.5} className="opacity-60" />
+          </button>
+        ) : (
+          <span
+            className={`inline-flex rounded-full px-2 py-0.5 text-[10.5px] font-semibold ${statusClass}`}
+          >
+            {room.status}
+          </span>
+        )}
       </td>
 
       <td className="px-4 py-2.5 text-right">
@@ -123,6 +138,16 @@ const RoomRow = ({ room, onView, onDelete, onEdit }: Props) => {
                   <DropdownMenuItem onClick={() => onEdit(room)} className="gap-2 rounded-lg">
                     <Pencil size={14} /> Edit
                   </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => onChangeStatus?.(room)}
+                    className="gap-2 rounded-lg"
+                  >
+                    <RefreshCw size={14} /> Change Status
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="my-1 bg-slate-100" />
+
                   <DropdownMenuItem
                     onClick={() => onDelete?.(room)}
                     className="gap-2 rounded-lg text-red-500 focus:text-red-500"

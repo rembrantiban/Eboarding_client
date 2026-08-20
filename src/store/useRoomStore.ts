@@ -428,7 +428,7 @@ export const useRoomStore = create<RoomState>((set) => ({
       });
 
       const res = await axiosInstance.put(
-        `/rooms/update-room-status/${id}`,
+        `/rooms/status/${id}`,
         {
           status,
         }

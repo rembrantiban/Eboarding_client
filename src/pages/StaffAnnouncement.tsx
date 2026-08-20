@@ -9,7 +9,7 @@ import {
     Search,
 } from "lucide-react";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
-import type { Announcement } from "@/store/useAnnouncementStore";
+import type { Announcement, NotificationAnnouncement } from "@/store/useAnnouncementStore";
 import { useAuth } from "@/hooks/useAuth";
 
 type Category = "Maintenance" | "Billing" | "General";
@@ -31,7 +31,7 @@ export default function StaffAnnouncementsPage() {
     const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
     const [search, setSearch] = useState("");
     const { user } = useAuth();
-    const { loading, getAnnouncements, announcements, updateAnnouncement, createAnnouncement } = useAnnouncement();
+    const { loading, getAnnouncements, announcements, updateAnnouncement, createAnnouncement, deleteAnnouncement } = useAnnouncement();
     const [editing, setEditing] = useState<Announcement | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const audiences = ["Boarders", "Staff", "All"] as const;
@@ -43,7 +43,7 @@ export default function StaffAnnouncementsPage() {
         description: "",
     });
 
-    const [pendingDelete, setPendingDelete] = useState<Announcement | null>(null);
+    const [pendingDelete, setPendingDelete] = useState<NotificationAnnouncement | null>(null);
 
     useEffect(() => {
         getAnnouncements();
@@ -116,10 +116,10 @@ export default function StaffAnnouncementsPage() {
 
 
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (!pendingDelete) return;
-        // TODO: call your real delete mutation here
-        getAnnouncements();
+        await deleteAnnouncement(pendingDelete.announcement_id);
+        await getAnnouncements();
         setPendingDelete(null);
     };
 

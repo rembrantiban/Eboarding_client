@@ -271,6 +271,22 @@ export interface CollectionSummary {
     collectionRate: number;
 }
 
+export interface BoarderPaymentSummaryResponse {
+
+    total_payments: number;
+    last_payment_date: string | null;
+    total_penalties: number;
+    outstanding_penalties: number;
+}
+
+export interface RecentPayment {
+    id: number;
+    date: string;
+    description: string;
+    amount: number;
+    status: "Paid" | "Partial" | "Pending" | "Overdue";
+    receipt_no: string;
+}
 
 interface BillingStore {
 
@@ -298,6 +314,10 @@ interface BillingStore {
     recentTransactions: RecentTransaction[];
     boarderBillingStatus: BoarderBillingStatus[];
     collectionSummary: CollectionSummary | null;
+
+
+    boarderPaymentSummary: BoarderPaymentSummaryResponse | null;
+    recentPayments: RecentPayment[];
 
 
     getAllBillings: () => Promise<void>;
@@ -328,6 +348,10 @@ interface BillingStore {
     getRecentTransactions: () => Promise<boolean>;
     getBoarderBillingStatus: () => Promise<boolean>;
     getCollectionSummary: () => Promise<void>;
+
+    //Boarder Report
+    getBoarderPaymentSummary: () => Promise<boolean>;
+    getMyRecentPayments: () => Promise<void>;
 
 }
 
@@ -360,25 +384,72 @@ export const useBillingStore = create<BillingStore>((set) => ({
     boarderBillingStatus: [],
     collectionSummary: null,
 
-    getCollectionSummary: async () => {
+    boarderPaymentSummary: null,
+    recentPayments: [],
+
+
+    getMyRecentPayments: async () => {
     try {
+      const response = await axiosInstance.get(
+        "/billings/my-recent-payments"
+      );
 
-        const { data } = await axiosInstance.get(
-            "/billings/collection-summary"
-        );
-
-        set({
-            collectionSummary: data,
-        });
-
+      set({
+        recentPayments: response.data.payments || [],
+      });
     } catch (error) {
+      console.error("Failed to fetch recent payments", error);
 
-        console.error(
-            "Get Collection Summary Error:",
-            error
-        );
+      set({
+        recentPayments: [],
+      });
     }
-},
+  },
+
+    getBoarderPaymentSummary: async () => {
+        try {
+
+            const res = await axiosInstance.get(
+                "/billings/my-boarder-report-summary"
+            );
+
+            set({
+                boarderPaymentSummary: res.data.summary,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get Boarder Payment Summary:",
+                error
+            );
+
+            return false;
+        }
+    },
+
+
+    getCollectionSummary: async () => {
+        try {
+
+            const { data } = await axiosInstance.get(
+                "/billings/collection-summary"
+            );
+
+            set({
+                collectionSummary: data,
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Get Collection Summary Error:",
+                error
+            );
+        }
+    },
 
     getBoarderBillingStatus: async () => {
         try {

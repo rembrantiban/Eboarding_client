@@ -17,6 +17,7 @@ import {
   NotepadText,
   Wrench ,
   ArchiveRestore,
+  TriangleAlertIcon,
 } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
@@ -138,6 +139,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
           <SectionLabel label="Transactions" />
           <SidebarItem icon={<Wallet size={16} />} label="Billing" to="/billing" onNavigate={closeAll} />
           <SidebarItem icon={<NotepadText size={16} />} label="History" to="/history" onNavigate={closeAll} />
+          <SidebarItem icon={<TriangleAlertIcon size={16} />} label="Penalties" to="/penalties" onNavigate={closeAll} />
 
           <SectionLabel label="Others" />
           <SidebarItem icon={<Shield size={16} />} label="Rules & Regulations" to="/rules" onNavigate={closeAll} />

@@ -45,14 +45,22 @@ export const useBilling = () => {
         getCollectionTrend,
 
 
-         recentTransactions,
-         getRecentTransactions,
+        recentTransactions,
+        getRecentTransactions,
 
-         boarderBillingStatus,
-         getBoarderBillingStatus,
+        boarderBillingStatus,
+        getBoarderBillingStatus,
 
         collectionSummary,
         getCollectionSummary,
+
+
+        //Boarder Report
+        getBoarderPaymentSummary,
+        boarderPaymentSummary,
+        getMyRecentPayments,
+        recentPayments,
+
 
     } = useBillingStore();
 
@@ -105,6 +113,12 @@ export const useBilling = () => {
 
         collectionSummary,
         getCollectionSummary,
+
+        getBoarderPaymentSummary,
+        boarderPaymentSummary,
+        getMyRecentPayments,
+        recentPayments,
+
 
     };
 };

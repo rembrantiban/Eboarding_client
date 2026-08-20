@@ -67,9 +67,7 @@ function StatusChip({ status }: { status?: string }) {
     );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Skeletons                                                          */
-/* ------------------------------------------------------------------ */
+
 
 function Shimmer({ className = "" }: { className?: string }) {
     return (

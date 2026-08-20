@@ -16,6 +16,9 @@ export const useMaintenance = () => {
         updateMaintenanceStatus,
         getBoarderRequestMaintenance,
         boarderRequest,
+        assignedMaintenanceList,
+        getAllAssignedMaintenance,
+        updateAssignedMaintenanceRequest,
     } = useMaintenanceStore();
 
     return {
@@ -33,5 +36,8 @@ export const useMaintenance = () => {
 
         getBoarderRequestMaintenance,
         boarderRequest,
+        assignedMaintenanceList,
+        getAllAssignedMaintenance,
+        updateAssignedMaintenanceRequest,
     };
 };
