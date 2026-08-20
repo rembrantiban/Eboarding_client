@@ -38,6 +38,7 @@ export interface MaintenanceRequest {
     assigned_staff?: string;
 
     date?: string;
+    requested_by: string,
 }
 
 export interface MaintenanceRequest {

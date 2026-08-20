@@ -330,8 +330,8 @@ const BoarderMaintenancePage = () => {
       .filter(
         (r) =>
           q === "" ||
-          r.request_number.toLowerCase().includes(q) ||
-          r.description.toLowerCase().includes(q) ||
+          r.request_number?.toLowerCase().includes(q) ||
+          r.description?.toLowerCase().includes(q) ||
           String(r.category).toLowerCase().includes(q)
       )
       .sort(
