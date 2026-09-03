@@ -315,6 +315,7 @@ interface AuthState {
   updateProfileSettings: (data: UpdateProfileSettingsData) => Promise<UpdateProfileSettingsResponse>;
   deactivateUser: (id: number) => Promise<User>;
   activateUser: (id: number) => Promise<User>;
+  resetUserPassword: (id: number, newPassword: string) => Promise<void>;
   updateUserStatus: (id: number, status: UserStatus) => Promise<User>;
   getAvailableBorders: () => Promise<User[]>;
 
@@ -718,6 +719,40 @@ export const useAuthStore = create<AuthState>((set) => ({
       throw (
         err.response?.data?.message ||
         "Failed to deactivate account"
+      );
+    }
+  },
+
+  resetUserPassword: async (id: number, newPassword: string) => {
+    const { showLoading, showSuccess, showError } = useStatusStore.getState();
+    try {
+
+      showLoading(
+        "Resetting Password",
+        "Please wait while we reset the user's password..."
+      );
+
+      await axiosInstance.put(
+        `/auth/reset-user-password/${id}`,
+        { newPassword }
+      );
+
+      showSuccess(
+        "Password Reset",
+        "The user's password has been reset successfully."
+      );
+
+    } catch (error: unknown) {
+      const err = error as ApiError;
+
+      showError(
+        "Reset Failed",
+        err.response?.data?.message || "Failed to reset password"
+      );
+
+      throw (
+        err.response?.data?.message ||
+        "Failed to reset password"
       );
     }
   },

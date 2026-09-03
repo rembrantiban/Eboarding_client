@@ -22,6 +22,7 @@ export const useAuth = () => {
   const createUserByStaff = useAuthStore((state) => state.createUserByStaff);
   const deactivateUser = useAuthStore((state) => state.deactivateUser);
   const activateUser = useAuthStore((state) => state.activateUser);
+  const resetUserPassword = useAuthStore((state) => state.resetUserPassword);
   const updateUserStatus = useAuthStore((state) => state.updateUserStatus);
   const availableBoarders = useAuthStore((state) => state.availableBoarders);
   const getAvailableBorders = useAuthStore((state) => state.getAvailableBorders);
@@ -69,6 +70,7 @@ export const useAuth = () => {
     isAdmin: user?.user_type === "Admin",
     deactivateUser,
     activateUser,
+    resetUserPassword,
     updateUserStatus,
     availableBoarders,
     getAvailableBorders,

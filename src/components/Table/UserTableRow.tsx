@@ -1,4 +1,4 @@
-import { MoreVertical, Mail, Eye, UserRoundPen, Trash2, UserCheck, Ban, } from "lucide-react"
+import { MoreVertical, Mail, Eye, UserRoundPen, Trash2, UserCheck, Ban, KeyRound, } from "lucide-react"
 import type { User } from "@/store/useAuthStore"
 import {
   DropdownMenu,
@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom"
 import DeactivateUserModal from "../modal/DeactivateUserModal"
 import ActivateUserModal from "../modal/ActivateUserModal"
 import StatusReviewModal from "../modal/StatusReviewModal"
+import ResetUserPasswordModal from "../modal/ResetUserPasswordModal"
 
 
 type Props = {
@@ -27,6 +28,7 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
   const [openActivate, setOpenActivate] = useState(false);
   const [openDeactivate, setOpenDeactivate] = useState(false);
   const [openStatusReview, setOpenStatusReview] = useState(false);
+  const [openResetPassword, setOpenResetPassword] = useState(false);
   const navigate = useNavigate()
 
   const formatDate = (date: string) => {
@@ -154,6 +156,13 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
                 <UserRoundPen size={14} /> Update
               </DropdownMenuItem>
 
+              <DropdownMenuItem
+                onClick={() => setOpenResetPassword(true)}
+                className="gap-2 rounded-lg text-slate-600 focus:text-slate-900"
+              >
+                <KeyRound size={14} /> Reset Password
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
 
               <DropdownMenuItem
@@ -226,6 +235,14 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
         onSuccess={(updatedUser) => onUpdateSuccess(updatedUser)}
       />
 
+      <ResetUserPasswordModal
+        open={openResetPassword}
+        onClose={() => setOpenResetPassword(false)}
+        userId={user.id}
+        userName={`${user.first_name} ${user.last_name}`}
+        userEmail={user.email}
+        userAvatar={user.avatar_url}
+      />
 
     </>
   )

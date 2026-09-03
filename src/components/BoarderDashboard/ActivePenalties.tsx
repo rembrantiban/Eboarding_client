@@ -1,6 +1,7 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { useEffect } from "react";
+import { AlertTriangle, CheckCircle2, LoaderCircle } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -8,19 +9,28 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import { usePenalty } from "@/hooks/usePenalty";
 
-type Penalty = {
-  label: string;
-  amount: number;
+const peso = (v: number) =>
+  new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: 2,
+  }).format(Number.isFinite(v) ? v : 0);
+
+const n = (v: unknown) => {
+  const x = Number(v);
+  return Number.isFinite(x) ? x : 0;
 };
 
-type ActivePenaltiesProps = {
-  penalties?: Penalty[];
-  onViewAll?: () => void;
-};
+const ActivePenalties = () => {
+  const { myPenalties, myPenaltiesLoading, getMyPenalties } = usePenalty();
 
-const ActivePenalties = ({ penalties = [] }: ActivePenaltiesProps) => {
-  const hasPenalties = penalties.length > 0;
+  useEffect(() => {
+    getMyPenalties();
+  }, [getMyPenalties]);
+
+  const hasPenalties = myPenalties.length > 0;
 
   return (
     <Card className="w-full max-w-sm rounded-md border-gray-200 shadow-sm">
@@ -30,7 +40,8 @@ const ActivePenalties = ({ penalties = [] }: ActivePenaltiesProps) => {
             Active Penalties
           </CardTitle>
           <CardDescription className="text-sm text-gray-500">
-            You have {penalties.length} active penalt{penalties.length === 1 ? "y" : "ies"}
+            You have {myPenalties.length} active penalt
+            {myPenalties.length === 1 ? "y" : "ies"}
           </CardDescription>
         </div>
         <AlertTriangle
@@ -40,21 +51,35 @@ const ActivePenalties = ({ penalties = [] }: ActivePenaltiesProps) => {
       </CardHeader>
 
       <CardContent className="pt-2">
-        {hasPenalties ? (
+        {myPenaltiesLoading && myPenalties.length === 0 ? (
+          <div className="flex flex-col items-center py-6 text-center text-gray-400">
+            <LoaderCircle size={20} className="animate-spin" />
+            <p className="mt-3 text-sm">Loading penalties…</p>
+          </div>
+        ) : hasPenalties ? (
           <div className="space-y-1">
-            {penalties.map((penalty, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between rounded-xl px-2 py-3 transition hover:bg-gray-50"
-              >
-                <span className="text-sm font-medium text-gray-900">
-                  {penalty.label}
-                </span>
-                <span className="text-sm font-semibold text-red-500">
-                  ₱{penalty.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-            ))}
+            {myPenalties.map((penalty) => {
+              const outstanding = n(penalty.amount) - n(penalty.amount_paid);
+
+              return (
+                <div
+                  key={penalty.penalty_id}
+                  className="flex items-center justify-between rounded-xl px-2 py-3 transition hover:bg-gray-50"
+                >
+                  <div className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-gray-900">
+                      {penalty.penalty_name ?? penalty.reason ?? "Penalty"}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {penalty.status}
+                    </span>
+                  </div>
+                  <span className="shrink-0 text-sm font-semibold text-red-500">
+                    {peso(outstanding)}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center py-4 text-center">
@@ -69,8 +94,6 @@ const ActivePenalties = ({ penalties = [] }: ActivePenaltiesProps) => {
             </p>
           </div>
         )}
-
- 
       </CardContent>
     </Card>
   );
