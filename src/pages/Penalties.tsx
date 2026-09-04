@@ -495,6 +495,7 @@ export default function PenaltiesPage() {
                                                 <Td className="text-right">
                                                     <RowMenu
                                                         penalty={p}
+                                                        isAdmin={isAdmin}
                                                         onView={() => openModal("view", p)}
                                                         onEdit={() => openModal("edit", p)}
                                                         onSettle={() => openModal("settle", p)}
@@ -680,6 +681,7 @@ function StatusBadge({ status }: { status: PenaltyStatus }) {
 
 function RowMenu({
     penalty,
+    isAdmin,
     onView,
     onEdit,
     onSettle,
@@ -687,6 +689,7 @@ function RowMenu({
     onRemove,
 }: {
     penalty: Penalty;
+    isAdmin: boolean;
     onView: () => void;
     onEdit: () => void;
     onSettle: () => void;
@@ -720,27 +723,31 @@ function RowMenu({
                     <Pencil size={14} /> Edit
                 </DropdownMenuItem>
 
-                {settleable && (
+                {isAdmin && settleable && (
                     <DropdownMenuItem onClick={onSettle} className="gap-2 rounded-lg">
                         <BadgeCheck size={14} /> Record Settlement
                     </DropdownMenuItem>
                 )}
 
-                {settleable && (
+                {isAdmin && settleable && (
                     <DropdownMenuItem onClick={onWaive} className="gap-2 rounded-lg">
                         <Ban size={14} /> Waive
                     </DropdownMenuItem>
                 )}
 
-                <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                {isAdmin && (
+                    <>
+                        <DropdownMenuSeparator className="my-1 bg-slate-100" />
 
-                <DropdownMenuItem
-                    onClick={onRemove}
-                    variant="destructive"
-                    className="gap-2 rounded-lg"
-                >
-                    <Trash2 size={14} /> Remove
-                </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={onRemove}
+                            variant="destructive"
+                            className="gap-2 rounded-lg"
+                        >
+                            <Trash2 size={14} /> Remove
+                        </DropdownMenuItem>
+                    </>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
