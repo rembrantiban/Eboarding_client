@@ -38,14 +38,6 @@ interface UpdateBillingModalProps {
     onSubmit?: (payload: UpdateBillingPayload) => void;
 }
 
-const BILLING_TYPES = [
-    "Monthly Rent",
-    "Utilities",
-    "Security Deposit",
-    "Advance Payment",
-    "Other Charges",
-];
-
 const STATUS_STYLES: Record<BillingStatus, string> = {
     Upcoming: "bg-blue-50 text-blue-600 hover:bg-blue-50",
     Pending: "bg-slate-900 text-slate-100 hover:bg-slate-900",
@@ -216,30 +208,7 @@ export default function UpdateBillingModal({
                         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
                             Schedule
                         </p>
-                        <div className="grid gap-3 sm:grid-cols-3">
-                            <label className="block">
-                                <span className="mb-1 block text-[11px] font-medium text-slate-500">
-                                    Billing Type
-                                </span>
-                                <select
-                                    value={billingType}
-                                    onChange={(e) => setBillingType(e.target.value)}
-                                    disabled={locked}
-                                    className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm font-medium text-slate-900 outline-none transition focus:border-slate-400 disabled:cursor-not-allowed disabled:bg-slate-50"
-                                >
-                                    {BILLING_TYPES.map((type) => (
-                                        <option key={type} value={type}>
-                                            {type}
-                                        </option>
-                                    ))}
-                                    {!BILLING_TYPES.includes(billingType) && (
-                                        <option value={billingType}>
-                                            {billingType}
-                                        </option>
-                                    )}
-                                </select>
-                            </label>
-
+                        <div className="grid gap-3 sm:grid-cols-2">
                             <label className="block">
                                 <span className="mb-1 block text-[11px] font-medium text-slate-500">
                                     Billing Month
@@ -334,22 +303,6 @@ export default function UpdateBillingModal({
                                 <span className="text-slate-600">Room Fee</span>
                                 <span className="font-medium text-slate-900">
                                     {formatCurrency(num(roomFee))}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-slate-400">
-                                    Utilities Fee (unchanged)
-                                </span>
-                                <span className="font-medium text-slate-500">
-                                    {formatCurrency(utilitiesFee)}
-                                </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-slate-400">
-                                    Other Charges (unchanged)
-                                </span>
-                                <span className="font-medium text-slate-500">
-                                    {formatCurrency(otherCharges)}
                                 </span>
                             </div>
                             <div className="flex items-center justify-between">

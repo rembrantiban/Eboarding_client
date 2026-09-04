@@ -8,6 +8,8 @@ import {
   FileText,
   User,
   CircleXIcon,
+  ShieldCheck,
+  BadgeCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +22,10 @@ import DocumentStatusBadge from "./DocumentStatusBadge";
 import DocumentViewModal from "./DocumentViewModal";
 import type { Document } from "@/store/useDocumentStore";
 import { useDocument } from "@/hooks/useDocuments";
+import { useAuth } from "@/hooks/useAuth";
 import ApproveDocumentModal from "./ApproveDocumentModal";
 import RejectDocumentModal from "./RejectDocumentModal";
+import VerifyDocumentModal from "./VerifyDocumentModal";
 
 interface DocumentRowProps {
   document: Document;
@@ -33,8 +37,11 @@ const DocumentRow = ({ document }: DocumentRowProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [approveOpen, setApproveOpen] = useState(false);
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [verifyOpen, setVerifyOpen] = useState(false);
 
-  const { approveDocument, rejectDocument } = useDocument();
+  const { approveDocument, rejectDocument, verifyDocument } = useDocument();
+  const { user } = useAuth();
+  const isStaff = user?.user_type === "Staff";
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -89,7 +96,35 @@ const DocumentRow = ({ document }: DocumentRowProps) => {
 
         <td className={CELL}>
           <div className="flex items-center justify-end gap-1">
-            {isUnderReview ? (
+            {!isUnderReview ? (
+              <span
+                title={timeline}
+                className="flex h-7 w-7 items-center justify-center"
+              >
+                {isApproved ? (
+                  <CircleCheck size={14} className="text-emerald-500" />
+                ) : (
+                  <CircleXIcon size={14} className="text-rose-500" />
+                )}
+              </span>
+            ) : isStaff ? (
+              document.is_verified ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-1 text-[11px] font-medium text-indigo-600">
+                  <BadgeCheck size={12} />
+                  Verified
+                </span>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVerifyOpen(true)}
+                  className="h-7 gap-1.5 rounded-md border-indigo-200 px-2.5 text-[12px] font-medium text-indigo-600 shadow-none hover:bg-indigo-50 hover:text-indigo-700"
+                >
+                  <ShieldCheck size={13} />
+                  Verify
+                </Button>
+              )
+            ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
@@ -122,17 +157,6 @@ const DocumentRow = ({ document }: DocumentRowProps) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : (
-              <span
-                title={timeline}
-                className="flex h-7 w-7 items-center justify-center"
-              >
-                {isApproved ? (
-                  <CircleCheck size={14} className="text-emerald-500" />
-                ) : (
-                  <CircleXIcon size={14} className="text-rose-500" />
-                )}
-              </span>
             )}
 
             <Button
@@ -170,6 +194,13 @@ const DocumentRow = ({ document }: DocumentRowProps) => {
         onReject={async (id, reason) => {
           await rejectDocument(id, reason);
         }}
+      />
+
+      <VerifyDocumentModal
+        open={verifyOpen}
+        onClose={() => setVerifyOpen(false)}
+        document={document}
+        onVerify={(id) => verifyDocument(id)}
       />
     </>
   );

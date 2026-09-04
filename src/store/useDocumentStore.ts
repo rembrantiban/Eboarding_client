@@ -25,6 +25,9 @@ export interface Document {
 
   verified_by: string | null;
 
+  is_verified: boolean;
+  valid_id_verified_at: string | null;
+
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +45,7 @@ interface DocumentStore {
     id: number,
     rejection_reason: string
   ) => Promise<boolean>;
+  verifyDocument: (id: number) => Promise<boolean>;
   uploadDocument: (idType: string, file: File) => Promise<boolean>;
 }
 
@@ -205,6 +209,7 @@ export const useDocumentStore = create<DocumentStore>((set) => ({
                 ...doc,
                 valid_id_status: "Approved",
                 valid_id_rejection_reason: null,
+                is_verified: true,
               }
             : doc
         ),
@@ -270,6 +275,60 @@ export const useDocumentStore = create<DocumentStore>((set) => ({
       showSuccess(
         "Success",
         "Document rejected successfully."
+      );
+
+      return true;
+
+    } catch (error) {
+
+      if (axios.isAxiosError(error)) {
+        showError(
+          "Failed",
+          error.response?.data?.message
+        );
+      }
+
+      return false;
+    }
+  },
+
+  verifyDocument: async (id) => {
+    const {
+      showLoading,
+      showSuccess,
+      showError,
+    } = useStatusStore.getState();
+
+    try {
+
+      showLoading(
+        "Verifying Document",
+        "Please wait..."
+      );
+
+      const res = await axiosInstance.put(
+        `/documents/verify/${id}`
+      );
+
+      const verifiedAt =
+        res.data?.user?.valid_id_verified_at ??
+        new Date().toISOString();
+
+      set((state) => ({
+        documents: state.documents.map((doc) =>
+          doc.id === id
+            ? {
+                ...doc,
+                is_verified: true,
+                valid_id_verified_at: verifiedAt,
+              }
+            : doc
+        ),
+      }));
+
+      showSuccess(
+        "Success",
+        "Document verified successfully."
       );
 
       return true;

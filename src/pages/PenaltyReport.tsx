@@ -151,10 +151,144 @@ const boarders : Boarders[] = [
     { name: "Luis Mendoza", room: "201", total: 600, paid: 600, unpaid: 0, count: 0, status: "Paid" },
 ];
 
+const now = new Date();
+
+const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+const dateRange = `${firstDay.toLocaleDateString("en-PH", {
+    month: "short",
+    day: "2-digit",
+})} – ${lastDay.toLocaleDateString("en-PH", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+})}`;
+
+const toCSV = (rows: (string | number)[][]) =>
+    rows
+        .map((r) =>
+            r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+        )
+        .join("\r\n");
+
+const downloadCSV = (filename: string, rows: (string | number)[][]) => {
+    const blob = new Blob(["﻿" + toCSV(rows)], {
+        type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
 export default function PenaltyReport() {
 
     const navigate = useNavigate()
 
+    const handleExportCSV = () => {
+        const rows: (string | number)[][] = [
+            ["Penalty Report", dateRange],
+            [],
+            ["Recent Penalty Records"],
+            ["Date", "Boarder", "Room", "Type", "Reason", "Amount", "Status"],
+            ...records.map((r) => [
+                r.date,
+                r.boarder,
+                r.room,
+                r.type,
+                r.reason,
+                r.amount,
+                r.status,
+            ]),
+            [],
+            ["Penalty Breakdown by Boarder"],
+            [
+                "Boarder",
+                "Room",
+                "Total Penalties",
+                "Paid Amount",
+                "Unpaid Amount",
+                "Late Payment Count",
+                "Status",
+            ],
+            ...boarders.map((b) => [
+                b.name,
+                b.room,
+                b.total,
+                b.paid,
+                b.unpaid,
+                b.count,
+                b.status,
+            ]),
+        ];
+        downloadCSV("penalty-report.csv", rows);
+    };
+
+    const handlePrint = () => {
+        const win = window.open("", "_blank", "width=900,height=650");
+        if (!win) return;
+
+        const recordRows = records
+            .map(
+                (r) =>
+                    `<tr><td>${r.date}</td><td>${r.boarder}</td><td>${r.room}</td><td>${r.type}</td><td>${r.reason}</td><td class="num">${peso(r.amount)}</td><td>${r.status}</td></tr>`
+            )
+            .join("");
+
+        const boarderRows = boarders
+            .map(
+                (b) =>
+                    `<tr><td>${b.name}</td><td>${b.room}</td><td class="num">${peso(b.total)}</td><td class="num">${peso(b.paid)}</td><td class="num">${peso(b.unpaid)}</td><td class="num">${b.count}</td><td>${b.status}</td></tr>`
+            )
+            .join("");
+
+        win.document.write(`
+            <html>
+                <head>
+                    <title>Penalty Report</title>
+                    <style>
+                        body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #0f172a; }
+                        h1 { font-size: 20px; margin: 0 0 2px; }
+                        h2 { font-size: 14px; margin: 24px 0 8px; }
+                        p.range { font-size: 12px; color: #64748b; margin: 0 0 8px; }
+                        table { border-collapse: collapse; width: 100%; }
+                        th, td { border: 1px solid #e2e8f0; padding: 6px 10px; font-size: 12px; text-align: left; }
+                        th { background: #f8fafc; }
+                        td.num { text-align: right; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Penalty Report</h1>
+                    <p class="range">${dateRange}</p>
+
+                    <h2>Recent Penalty Records</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Date</th><th>Boarder</th><th>Room</th><th>Type</th><th>Reason</th><th>Amount</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>${recordRows}</tbody>
+                    </table>
+
+                    <h2>Penalty Breakdown by Boarder</h2>
+                    <table>
+                        <thead>
+                            <tr><th>Boarder</th><th>Room</th><th>Total Penalties</th><th>Paid Amount</th><th>Unpaid Amount</th><th>Late Payment Count</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>${boarderRows}</tbody>
+                    </table>
+                </body>
+            </html>
+        `);
+        win.document.close();
+        win.focus();
+        win.print();
+    };
 
     return (
         <div className="h-screen overflow-hidden">
@@ -178,18 +312,27 @@ export default function PenaltyReport() {
                     <div className="flex flex-wrap items-center gap-2">
                         <button className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300">
                             <Calendar className="h-3.5 w-3.5 text-slate-400" />
-                            May 01 &ndash; May 31, 2025
+                            {dateRange}
                             <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                         </button>
-                        <button className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-rose-700">
+                        <button
+                            onClick={handlePrint}
+                            className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-rose-700"
+                        >
                             <FileDown className="h-3.5 w-3.5" />
                             Export PDF
                         </button>
-                        <button className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700">
+                        <button
+                            onClick={handleExportCSV}
+                            className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-emerald-700"
+                        >
                             <FileSpreadsheet className="h-3.5 w-3.5" />
                             Export Excel
                         </button>
-                        <button className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300">
+                        <button
+                            onClick={handlePrint}
+                            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300"
+                        >
                             <Printer className="h-3.5 w-3.5 text-slate-400" />
                             Print
                         </button>

@@ -18,10 +18,12 @@ import { useAuth } from "@/hooks/useAuth";
 
 type Category = "Maintenance" | "Billing" | "General";
 type CategoryFilter = "All" | Category;
+type AudienceFilter = "All" | "Boarders" | "Staff";
 type ViewMode = "Active" | "Archived";
 
 const categories: Category[] = ["Maintenance", "Billing", "General"];
 const categoryFilters: CategoryFilter[] = ["All", ...categories];
+const audienceFilters: AudienceFilter[] = ["All", "Boarders", "Staff"];
 
 const categoryStyles: Record<Category, string> = {
     Maintenance: "bg-amber-50 text-amber-700 ring-amber-100",
@@ -31,6 +33,7 @@ const categoryStyles: Record<Category, string> = {
 
 export default function AdminAnnouncementsPage() {
     const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
+    const [activeAudience, setActiveAudience] = useState<AudienceFilter>("All");
     const [view, setView] = useState<ViewMode>("Active");
     const [search, setSearch] = useState("");
 
@@ -80,16 +83,23 @@ export default function AdminAnnouncementsPage() {
                 ? byView
                 : byView.filter((a) => a.category === activeCategory);
 
-        const query = search.trim().toLowerCase();
-        if (!query) return byCategory;
+        const byAudience =
+            activeAudience === "All"
+                ? byCategory
+                : byCategory.filter(
+                      (a) => a.audience === activeAudience || a.audience === "All"
+                  );
 
-        return byCategory.filter(
+        const query = search.trim().toLowerCase();
+        if (!query) return byAudience;
+
+        return byAudience.filter(
             (a) =>
                 a.title.toLowerCase().includes(query) ||
                 a.description.toLowerCase().includes(query) ||
                 a.created_by_name.toLowerCase().includes(query)
         );
-    }, [myAnnouncements, view, activeCategory, search]);
+    }, [myAnnouncements, view, activeCategory, activeAudience, search]);
 
     const openCreate = () => {
         setDraft({
@@ -177,7 +187,7 @@ export default function AdminAnnouncementsPage() {
             <div className="h-full overflow-y-auto border-l-2 border-t-2 rounded-tl-2xl bg-background">
                 {/* ===== Sticky header ===== */}
                 <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
-                    <div className="mx-auto max-w-3xl px-4 pt-5 pb-3 space-y-3.5">
+                    <div className="mx-auto max-w-3xl px-4 pt-5 pb-3 space-y-4.5">
                         {/* Title row */}
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
@@ -260,21 +270,42 @@ export default function AdminAnnouncementsPage() {
                             </div>
                         </div>
 
-                        {/* Category filter */}
-                        <div className="flex gap-1.5 overflow-x-auto pb-0.5">
-                            {categoryFilters.map((category) => (
-                                <button
-                                    key={category}
-                                    onClick={() => setActiveCategory(category)}
-                                    className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition-colors ${
-                                        activeCategory === category
-                                            ? "bg-slate-900 text-white ring-slate-900"
-                                            : "bg-white text-slate-500 ring-slate-200 hover:text-slate-900 hover:ring-slate-300"
-                                    }`}
-                                >
-                                    {category}
-                                </button>
-                            ))}
+                        {/* Category + Audience filters */}
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+                                {categoryFilters.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setActiveCategory(category)}
+                                        className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition-colors ${
+                                            activeCategory === category
+                                                ? "bg-slate-900 text-white ring-slate-900"
+                                                : "bg-white text-slate-500 ring-slate-200 hover:text-slate-900 hover:ring-slate-300"
+                                        }`}
+                                    >
+                                        {category}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="flex shrink-0 items-center gap-2 overflow-x-auto pb-0.5">
+                                <span className="shrink-0 text-[10.5px] font-medium uppercase tracking-wide text-slate-400">
+                                    Audience
+                                </span>
+                                {audienceFilters.map((audience) => (
+                                    <button
+                                        key={audience}
+                                        onClick={() => setActiveAudience(audience)}
+                                        className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition-colors ${
+                                            activeAudience === audience
+                                                ? "bg-emerald-600 text-white ring-emerald-600"
+                                                : "bg-white text-slate-500 ring-slate-200 hover:text-slate-900 hover:ring-slate-300"
+                                        }`}
+                                    >
+                                        {audience}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </header>
@@ -292,20 +323,24 @@ export default function AdminAnnouncementsPage() {
                                     )}
                                 </div>
                                 <p className="mt-3 text-[12.5px] font-semibold text-slate-900">
-                                    {search
+                                    {search || activeCategory !== "All" || activeAudience !== "All"
                                         ? "No matching announcements"
                                         : view === "Archived"
                                         ? "No archived announcements"
                                         : "Nothing here yet"}
                                 </p>
                                 <p className="mt-0.5 text-[11.5px] text-slate-500">
-                                    {search
-                                        ? "Try a different search term"
+                                    {search || activeCategory !== "All" || activeAudience !== "All"
+                                        ? "Try adjusting your filters"
                                         : view === "Archived"
                                         ? "Archived announcements will appear here"
                                         : "Create an announcement to get started"}
                                 </p>
-                                {!search && view === "Active" && isAdmin && (
+                                {!search &&
+                                    activeCategory === "All" &&
+                                    activeAudience === "All" &&
+                                    view === "Active" &&
+                                    isAdmin && (
                                     <button
                                         onClick={openCreate}
                                         className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-medium text-white transition-colors hover:bg-slate-800"

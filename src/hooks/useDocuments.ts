@@ -9,6 +9,7 @@ export const useDocument = ( ) => {
     getUserSubmittedDocument,
     approveDocument,
     rejectDocument,
+    verifyDocument,
     uploadDocument,
     uploading,
   } = useDocumentStore();
@@ -21,6 +22,7 @@ export const useDocument = ( ) => {
     getUserSubmittedDocument,
     approveDocument,
     rejectDocument,
+    verifyDocument,
     uploadDocument,
     uploading,
   };
