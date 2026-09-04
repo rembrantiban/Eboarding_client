@@ -38,6 +38,7 @@ import { BillingPageSkeleton, RoomPageSkeleton, SkeletonStyles } from "@/compone
 import { useMaintenance } from "@/hooks/useMaintenace";
 import { useState } from "react";
 import UpdateStatusModal from "@/components/StaffDashboard/UpdateStatusModal";
+import CalendarCard from "@/components/Dashboard/CalendarCard";
 import type { MaintenanceRequest, MaintenanceStatus } from "@/store/useMaintenanceStore";
 
 const getMaintenanceIcon = (category?: string) => {
@@ -470,6 +471,11 @@ export default function StaffDashboard() {
                             Compared with last month
                         </p>
                     </div>
+                </section>
+
+                {/* Calendar */}
+                <section>
+                    <CalendarCard />
                 </section>
 
                 {/* Maintenance + Billings */}
