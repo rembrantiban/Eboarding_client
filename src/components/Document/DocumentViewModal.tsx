@@ -6,9 +6,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {  User, FileText } from "lucide-react";
+import {  User, FileText, ShieldCheck } from "lucide-react";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 import type { Document } from "@/store/useDocumentStore";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DocumentViewModalProps {
   document: Document | null;
@@ -29,6 +30,8 @@ const DocumentViewModal = ({
   onOpenChange,
 
 }: DocumentViewModalProps) => {
+  const { isAdmin } = useAuth();
+
   if (!document) return null;
 
   return (
@@ -132,6 +135,18 @@ const DocumentViewModal = ({
                     {document.valid_id_status}
                   </dd>
                 </div>
+
+                {isAdmin && (
+                  <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2">
+                    <dt className="flex items-center gap-1.5 text-slate-500">
+                      <ShieldCheck size={13} className="text-slate-400" />
+                      Verified by
+                    </dt>
+                    <dd className="font-medium text-slate-700">
+                      {document.verified_by ?? "Not verified yet"}
+                    </dd>
+                  </div>
+                )}
               </dl>
             </div>
           </div>

@@ -7,10 +7,12 @@ import {
     X,
     Megaphone,
     Search,
+    Eye,
 } from "lucide-react";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 import type { Announcement, NotificationAnnouncement } from "@/store/useAnnouncementStore";
 import { useAuth } from "@/hooks/useAuth";
+import ViewAnnouncementModal from "@/components/Announcement/ViewAnnouncementModal";
 
 type Category = "Maintenance" | "Billing" | "General";
 type CategoryFilter = "All" | Category;
@@ -44,6 +46,7 @@ export default function StaffAnnouncementsPage() {
     });
 
     const [pendingDelete, setPendingDelete] = useState<NotificationAnnouncement | null>(null);
+    const [viewing, setViewing] = useState<NotificationAnnouncement | null>(null);
 
     useEffect(() => {
         getAnnouncements();
@@ -263,9 +266,19 @@ export default function StaffAnnouncementsPage() {
                                     <h3 className="mt-4 text-sm font-semibold text-slate-900">
                                         {item.title}
                                     </h3>
-                                    <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                                    <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-slate-600">
                                         {item.description}
                                     </p>
+
+                                    <div className="mt-4 flex justify-end border-t border-slate-100 pt-3">
+                                        <button
+                                            onClick={() => setViewing(item)}
+                                            className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+                                        >
+                                            <Eye size={13} />
+                                            View details
+                                        </button>
+                                    </div>
                                 </article>
                             ))
                         )}
@@ -426,6 +439,12 @@ export default function StaffAnnouncementsPage() {
                         </div>
                     </div>
                 )}
+
+                <ViewAnnouncementModal
+                    open={viewing !== null}
+                    onClose={() => setViewing(null)}
+                    announcement={viewing}
+                />
             </div>
         </div>
     );
