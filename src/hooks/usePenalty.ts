@@ -16,6 +16,10 @@ export const usePenalty = () => {
         myPenaltiesLoading,
         getMyPenalties,
 
+        myPenaltyRecords,
+        myPenaltyRecordsLoading,
+        getMyPenaltyRecords,
+
         settlements,
         settlementsLoading,
         getPenaltySettlements,
@@ -44,6 +48,10 @@ export const usePenalty = () => {
         myPenalties,
         myPenaltiesLoading,
         getMyPenalties,
+
+        myPenaltyRecords,
+        myPenaltyRecordsLoading,
+        getMyPenaltyRecords,
 
         settlements,
         settlementsLoading,

@@ -94,12 +94,14 @@ export default function StaffAnnouncementsPage() {
                     title: draft.title,
                     description: draft.description,
                     category: draft.category,
+                    audience: draft.audience,
                 });
             } else {
                 await createAnnouncement({
                     title: draft.title,
                     description: draft.description,
                     category: draft.category,
+                    audience: draft.audience,
                 });
             }
 

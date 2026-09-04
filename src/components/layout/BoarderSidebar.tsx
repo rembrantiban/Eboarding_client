@@ -13,7 +13,8 @@ import {
     Wallet2,
     Wrench,
     ScrollText,
-    Newspaper
+    Newspaper,
+    TriangleAlert
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useAnnouncement } from "@/hooks/useAnnouncement"
@@ -28,6 +29,7 @@ const navItems = [
     { label: "Edit profile", icon: User, path: "/edit-account" },
      { label: "Billing", icon: Wallet2, path: "/boarder-billing" },
     { label: "History", icon: ReceiptSwissFranc, path: "/payment-history" },
+    { label: "Penalties", icon: TriangleAlert, path: "/boarder/penalties" },
     { label: "Announcements", icon: Bell, path: "/boarder/announcements" },
     { label: "Maintenance", icon: Wrench, path: "/boarder-maintenance" },
     { label: "Documents", icon: FolderOpen, path: "/boarder/documents" },

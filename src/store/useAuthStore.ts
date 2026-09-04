@@ -989,7 +989,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       formData.append("last_name", data.last_name);
       formData.append("email", data.email);
       formData.append("username", data.username);
+      formData.append("country_code", data.country_code);
       formData.append("contact_number", data.contact_number);
+      formData.append("nationality", data.nationality);
       formData.append("address", data.address);
       formData.append("password", data.password);
       formData.append("user_type", data.user_type);

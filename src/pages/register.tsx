@@ -57,7 +57,6 @@ const RELATIONSHIP_OPTIONS = [
   "Spouse",
   "Relative",
   "Friend",
-  "Other",
 ];
 
 const ID_TYPES = [
@@ -71,11 +70,11 @@ const ID_TYPES = [
   "Postal ID",
   "Voter's ID",
   "School ID",
+  "Student ID",
   "Senior Citizen ID",
   "PWD ID",
   "Barangay ID",
   "Company ID",
-  "Other",
 ];
 
 type FormState = {

@@ -114,11 +114,15 @@ interface PenaltyStore {
     myPenalties: Penalty[];
     myPenaltiesLoading: boolean;
 
+    myPenaltyRecords: Penalty[];
+    myPenaltyRecordsLoading: boolean;
+
     settlements: PenaltySettlement[];
     settlementsLoading: boolean;
 
     getAllPenalties: () => Promise<boolean>;
     getMyPenalties: () => Promise<boolean>;
+    getMyPenaltyRecords: () => Promise<boolean>;
     createPenalty: (data: CreatePenaltyData) => Promise<boolean>;
     updatePenalty: (data: UpdatePenaltyData) => Promise<boolean>;
     removePenalty: (id: number) => Promise<boolean>;
@@ -142,6 +146,9 @@ export const usePenaltyStore = create<PenaltyStore>((set) => ({
 
     myPenalties: [],
     myPenaltiesLoading: false,
+
+    myPenaltyRecords: [],
+    myPenaltyRecordsLoading: false,
 
     settlements: [],
     settlementsLoading: false,
@@ -200,6 +207,34 @@ export const usePenaltyStore = create<PenaltyStore>((set) => ({
         } finally {
 
             set({ myPenaltiesLoading: false });
+
+        }
+    },
+
+    getMyPenaltyRecords: async () => {
+        try {
+
+            set({ myPenaltyRecordsLoading: true });
+
+            const res = await axiosInstance.get(
+                "/penalties/my/records"
+            );
+
+            set({
+                myPenaltyRecords: res.data.penalties || [],
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error("Get My Penalty Records Error:", error);
+
+            return false;
+
+        } finally {
+
+            set({ myPenaltyRecordsLoading: false });
 
         }
     },

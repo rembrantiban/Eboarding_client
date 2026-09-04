@@ -39,6 +39,7 @@ import AdminMaintenanceRequestPage from './pages/AdminMaintenance'
 import BoarderMaintenancePage from './pages/BoarderMaintenancePage'
 import BoarderHouseRulesPage from './pages/BoarderHouseRulesPage'
 import ReportBoarder from './pages/ReportBoarder'
+import BoarderPenalties from './pages/BoarderPenalties'
 
 //Generated Reports 
 import FinancialReport from './pages/FinancialReport'
@@ -110,6 +111,7 @@ function App() {
             <Route path='/boarder-maintenance' element={<BoarderMaintenancePage />} />
             <Route path='/house-rules' element={<BoarderHouseRulesPage />} />
             <Route path='/report/boarder' element={<ReportBoarder />} />
+            <Route path='/boarder/penalties' element={<BoarderPenalties />} />
           </Route>
 
       </Routes>
