@@ -414,32 +414,7 @@ const ErrorText = ({ text }: { text: string }) => (
     </p>
 );
 
-type FieldProps = {
-    label: string;
-    name: string;
-    placeholder: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    error?: string;
-};
 
-const Field = ({ label, name, placeholder, value, onChange, error }: FieldProps) => (
-    <div className="space-y-1.5">
-        <label className="block text-[12px] font-medium text-slate-600">{label}</label>
-        <input
-            name={name}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            className={`h-9 w-full rounded-lg border bg-white px-3 text-[13px] text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20
-                ${error
-                    ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
-                    : "border-slate-200 hover:border-slate-300"
-                }`}
-        />
-        {error && <ErrorText text={error} />}
-    </div>
-);
 
 type SelectProps = {
     label: string;
