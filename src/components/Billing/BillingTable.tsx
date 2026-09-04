@@ -3,7 +3,7 @@ import {
     Search, SlidersHorizontal, MoreVertical,
      ChevronLeft, ChevronRight,  Eye,
     Tag, BanknoteArrowUp, BanknoteArrowDown,
-    FileX
+    FileX, FilePen
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Billing } from "@/store/useBillingStore"
@@ -44,6 +44,7 @@ interface BillingTableProps {
     onExport?: () => void;
     onViewBilling?: (billing: Billing) => void;
     onRecordPayment?: (billing: Billing) => void;
+    onUpdateBilling?: (billing: Billing) => void;
     onDeleteBilling?: (billing: Billing) => void;
     onApplyDiscount?: (billing: Billing) => void;
     onApplyLateFee?: (billing: Billing) => void;
@@ -115,6 +116,7 @@ export default function BillingTable({
     loading,
     onViewBilling,
     onRecordPayment,
+    onUpdateBilling,
     onApplyDiscount,
     onApplyLateFee,
     onCancelBilling,
@@ -324,6 +326,18 @@ export default function BillingTable({
                                                     >
                                                         <Eye className="h-3.5 w-3.5 text-slate-500" />
                                                         View details
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem
+                                                        onClick={() => onUpdateBilling?.(b)}
+                                                        disabled={
+                                                            b.status === "Paid" ||
+                                                            b.status === "Cancelled"
+                                                        }
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <FilePen className="h-3.5 w-3.5 text-indigo-600" />
+                                                        Update information
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem

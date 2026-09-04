@@ -10,6 +10,7 @@ import ApplyDiscountModal from "@/components/Billing/ApplyDiscountModal";
 import ApplyLateFeeModal from "@/components/Billing/ApplyLateFeeModal";
 import ViewBilling from "@/components/Billing/ViewBillingModal"
 import CancelBillingModal from "@/components/Billing/CancelBillingModal";
+import UpdateBillingModal from "@/components/Billing/UpdateBillingModal";
 
 const Billing = () => {
 
@@ -20,7 +21,8 @@ const Billing = () => {
         recordPayment,
         applyLateFee,
         applyDiscount,
-        cancelBilling
+        cancelBilling,
+        updateBillingInfo
     } = useBillingStore();
     const [selectedBilling, setSelectedBilling] = useState<BillingType | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
@@ -28,6 +30,7 @@ const Billing = () => {
     const [discountOpen, setDiscountOpen] = useState(false);
     const [lateFeeOpen, setLateFeeOpen] = useState(false);
     const [cancelOpen, setCancelOpen] = useState(false);
+    const [updateOpen, setUpdateOpen] = useState(false);
 
 
 
@@ -106,6 +109,10 @@ const Billing = () => {
                     onRecordPayment={(billing) => {
                         setSelectedBilling(billing);
                         setPaymentOpen(true);
+                    }}
+                    onUpdateBilling={(billing) => {
+                        setSelectedBilling(billing);
+                        setUpdateOpen(true);
                     }}
                     onApplyDiscount={(billing) => {
                         setSelectedBilling(billing);
@@ -258,6 +265,28 @@ const Billing = () => {
                             reason,
                             notes,
                         });
+                    }}
+                />
+
+                <UpdateBillingModal
+                    open={updateOpen}
+                    billing={selectedBilling}
+                    onOpenChange={(open) => {
+                        setUpdateOpen(open);
+                        if (!open) setSelectedBilling(null);
+                    }}
+                    onSubmit={async (payload) => {
+                        if (!selectedBilling) return;
+
+                        const success = await updateBillingInfo({
+                            billingId: selectedBilling.id,
+                            ...payload,
+                        });
+
+                        if (success) {
+                            setUpdateOpen(false);
+                            setSelectedBilling(null);
+                        }
                     }}
                 />
             </div>

@@ -70,6 +70,16 @@ interface ApplyLateFeeData {
     lateFee: number;
 }
 
+interface UpdateBillingInfoData {
+    billingId: number;
+    billing_type: string;
+    billing_month: string | null;
+    due_date: string;
+    room_fee: number;
+    discount: number;
+    late_fee: number;
+}
+
 
 export interface PaymentHistory {
     id: number;
@@ -324,6 +334,7 @@ interface BillingStore {
     recordPayment: (data: RecordPaymentData) => Promise<boolean>;
     applyDiscount: (data: ApplyDiscountData) => Promise<boolean>;
     applyLateFee: (data: ApplyLateFeeData) => Promise<boolean>;
+    updateBillingInfo: (data: UpdateBillingInfoData) => Promise<boolean>;
     getPaymentHistory: () => Promise<boolean>;
     getOutstandingBalance: () => Promise<boolean>;
 
@@ -1146,6 +1157,68 @@ export const useBillingStore = create<BillingStore>((set) => ({
                 showError(
                     "Apply Discount Failed",
                     "Unable to apply discount."
+                );
+
+            }
+
+            return false;
+
+        }
+
+    },
+    updateBillingInfo: async (data) => {
+
+        const {
+            showLoading,
+            showSuccess,
+            showError,
+        } = useStatusStore.getState();
+
+        try {
+
+            showLoading(
+                "Updating Billing",
+                "Please wait while the billing information is being updated..."
+            );
+
+            await axiosInstance.put(
+                `/billings/update-info/${data.billingId}`,
+                {
+                    billing_type: data.billing_type,
+                    billing_month: data.billing_month,
+                    due_date: data.due_date,
+                    room_fee: data.room_fee,
+                    discount: data.discount,
+                    late_fee: data.late_fee,
+                }
+            );
+
+            await useBillingStore
+                .getState()
+                .getAllBillings();
+
+            showSuccess(
+                "Billing Updated",
+                "Billing information has been updated successfully."
+            );
+
+            return true;
+
+        } catch (error: unknown) {
+
+            if (axios.isAxiosError(error)) {
+
+                showError(
+                    "Update Failed",
+                    error.response?.data?.message ??
+                    "Unable to update billing information."
+                );
+
+            } else {
+
+                showError(
+                    "Update Failed",
+                    "Unable to update billing information."
                 );
 
             }
