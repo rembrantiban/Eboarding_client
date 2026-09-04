@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BadgeCheck, ChevronDown, LoaderCircle, PhilippinePeso } from "lucide-react";
+import { BadgeCheck, LoaderCircle, PhilippinePeso } from "lucide-react";
 import { usePenalty } from "@/hooks/usePenalty";
 import type { Penalty } from "@/store/usePenaltyStore";
 import {
@@ -21,8 +21,6 @@ type Props = {
     onDone?: () => void;
 };
 
-const METHODS = ["Cash", "GCash", "Bank Transfer", "Maya", "Other"];
-
 const today = () => new Date().toISOString().slice(0, 10);
 
 const SettlePenaltyModal = ({ open, onClose, penalty, onDone }: Props) => {
@@ -30,8 +28,6 @@ const SettlePenaltyModal = ({ open, onClose, penalty, onDone }: Props) => {
 
     const [amount, setAmount] = useState("");
     const [date, setDate] = useState(today());
-    const [method, setMethod] = useState("Cash");
-    const [reference, setReference] = useState("");
     const [remarks, setRemarks] = useState("");
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -44,8 +40,6 @@ const SettlePenaltyModal = ({ open, onClose, penalty, onDone }: Props) => {
         if (open && penalty) {
             setAmount(outstanding > 0 ? outstanding.toFixed(2) : "");
             setDate(today());
-            setMethod("Cash");
-            setReference("");
             setRemarks("");
             setError("");
         }
@@ -68,8 +62,7 @@ const SettlePenaltyModal = ({ open, onClose, penalty, onDone }: Props) => {
             id: penalty.penalty_id,
             amount_paid: val,
             payment_date: date || undefined,
-            payment_method: method,
-            payment_reference: reference.trim() || undefined,
+            payment_method: "Cash",
             remarks: remarks.trim() || undefined,
         });
         setSubmitting(false);
@@ -151,37 +144,11 @@ const SettlePenaltyModal = ({ open, onClose, penalty, onDone }: Props) => {
                 </div>
             </Field>
 
-            <div className="grid grid-cols-2 gap-3">
-                <Field label="Settlement Date">
-                    <input
-                        type="date"
-                        value={date}
-                        onChange={(e) => setDate(e.target.value)}
-                        className={inputClass()}
-                    />
-                </Field>
-
-                <Field label="Method">
-                    <div className="relative">
-                        <select
-                            value={method}
-                            onChange={(e) => setMethod(e.target.value)}
-                            className={`${inputClass()} appearance-none pr-8`}
-                        >
-                            {METHODS.map((m) => (
-                                <option key={m}>{m}</option>
-                            ))}
-                        </select>
-                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-                    </div>
-                </Field>
-            </div>
-
-            <Field label="Reference / OR No." optional>
+            <Field label="Settlement Date">
                 <input
-                    value={reference}
-                    onChange={(e) => setReference(e.target.value)}
-                    placeholder="OR-2025-00012"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                     className={inputClass()}
                 />
             </Field>

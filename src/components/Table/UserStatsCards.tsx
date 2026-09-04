@@ -1,12 +1,15 @@
 import { useMemo } from "react"
 import { Users, UserRound, Briefcase, Clock } from "lucide-react"
 import type { User } from "@/store/useAuthStore"
+import { useAuth } from "@/hooks/useAuth"
 
 type Props = {
   users: User[]
 }
 
 const UserStatsCards = ({ users }: Props) => {
+  const { isAdmin } = useAuth()
+
   const stats = useMemo(() => {
     const total = users.length
     const boarders = users.filter((u) => u.user_type === "Boarder").length
@@ -32,12 +35,16 @@ const UserStatsCards = ({ users }: Props) => {
       icon: UserRound,
       hint: "Tenant accounts",
     },
-    {
-      label: "Staff & Admin",
-      value: stats.staff,
-      icon: Briefcase,
-      hint: "Internal accounts",
-    },
+    ...(isAdmin
+      ? [
+          {
+            label: "Staff & Admin",
+            value: stats.staff,
+            icon: Briefcase,
+            hint: "Internal accounts",
+          },
+        ]
+      : []),
     {
       label: "Pending",
       value: stats.pending,
@@ -48,7 +55,7 @@ const UserStatsCards = ({ users }: Props) => {
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className={`grid grid-cols-2 gap-3 ${isAdmin ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
       {cards.map(({ label, value, icon: Icon, hint, primary, accent }) => (
         <div
           key={label}

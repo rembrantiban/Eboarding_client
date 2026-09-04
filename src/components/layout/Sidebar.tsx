@@ -23,6 +23,7 @@ import { useEffect, useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import ProfileModal from "../modal/profileModal"
+import LogoutConfirmModal from "../modal/LogoutConfirmModal"
 import { IoHomeSharp } from "react-icons/io5";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 
@@ -59,6 +60,7 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
   const navigate = useNavigate()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [openProfile, setOpenProfile] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
   const { unreadCount, getUnreadCount, markAllAsRead, } = useAnnouncement();
 
   useEffect(() => {
@@ -257,8 +259,8 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
                   label="Logout"
                   danger
                   onClick={() => {
-                    logout();
-                    navigate("/login");
+                    setDropdownOpen(false);
+                    setLogoutConfirmOpen(true);
                   }}
                 />
               </div>
@@ -269,6 +271,16 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
       </aside>
 
       <ProfileModal open={openProfile} onClose={() => setOpenProfile(false)} />
+
+      <LogoutConfirmModal
+        open={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        userName={user?.first_name}
+        onConfirm={() => {
+          logout();
+          navigate("/login");
+        }}
+      />
     </>
   )
 }

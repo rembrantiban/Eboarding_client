@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { AlertTriangle, CheckCircle2, LoaderCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AlertTriangle, CheckCircle2, LoaderCircle, ChevronRight } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -10,6 +10,8 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { usePenalty } from "@/hooks/usePenalty";
+import type { Penalty } from "@/store/usePenaltyStore";
+import ViewPenaltyDetailsModal from "./ViewPenaltyDetailsModal";
 
 const peso = (v: number) =>
   new Intl.NumberFormat("en-PH", {
@@ -25,6 +27,7 @@ const n = (v: unknown) => {
 
 const ActivePenalties = () => {
   const { myPenalties, myPenaltiesLoading, getMyPenalties } = usePenalty();
+  const [selectedPenalty, setSelectedPenalty] = useState<Penalty | null>(null);
 
   useEffect(() => {
     getMyPenalties();
@@ -33,6 +36,7 @@ const ActivePenalties = () => {
   const hasPenalties = myPenalties.length > 0;
 
   return (
+    <>
     <Card className="w-full max-w-sm rounded-md border-gray-200 shadow-sm">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div>
@@ -62,9 +66,11 @@ const ActivePenalties = () => {
               const outstanding = n(penalty.amount) - n(penalty.amount_paid);
 
               return (
-                <div
+                <button
                   key={penalty.penalty_id}
-                  className="flex items-center justify-between rounded-xl px-2 py-3 transition hover:bg-gray-50"
+                  type="button"
+                  onClick={() => setSelectedPenalty(penalty)}
+                  className="flex w-full items-center justify-between rounded-xl px-2 py-3 text-left transition hover:bg-gray-50"
                 >
                   <div className="min-w-0">
                     <span className="block truncate text-sm font-medium text-gray-900">
@@ -74,10 +80,13 @@ const ActivePenalties = () => {
                       {penalty.status}
                     </span>
                   </div>
-                  <span className="shrink-0 text-sm font-semibold text-red-500">
-                    {peso(outstanding)}
-                  </span>
-                </div>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <span className="text-sm font-semibold text-red-500">
+                      {peso(outstanding)}
+                    </span>
+                    <ChevronRight size={14} className="text-gray-300" />
+                  </div>
+                </button>
               );
             })}
           </div>
@@ -96,6 +105,13 @@ const ActivePenalties = () => {
         )}
       </CardContent>
     </Card>
+
+    <ViewPenaltyDetailsModal
+      open={selectedPenalty !== null}
+      onClose={() => setSelectedPenalty(null)}
+      penalty={selectedPenalty}
+    />
+    </>
   );
 };
 

@@ -13,7 +13,6 @@ export type MaintenanceCategory =
   | "Appliance"
   | "Internet"
   | "Aircon"
-  | "Others"
 
 export type MaintenancePriority = "Low" | "Normal" | "Urgent"
 
@@ -59,7 +58,6 @@ export const MAINTENANCE_CATEGORIES: MaintenanceCategory[] = [
   "Appliance",
   "Internet",
   "Aircon",
-  "Others",
 ]
 
 /**

@@ -38,6 +38,7 @@ import ViewPenaltyModal from "@/components/penalty/ViewPenaltyModal";
 import ConfirmPenaltyModal from "@/components/penalty/ConfirmPenaltyModal";
 import SettlePenaltyModal from "@/components/penalty/SettlePenaltyModal";
 import PenaltyRulesModal from "@/components/penalty/PenaltyRulesModal";
+import { useAuth } from "@/hooks/useAuth";
 
 /* ============================================================
    HELPERS
@@ -96,6 +97,7 @@ type ModalKind = "view" | "edit" | "settle" | "waive" | "remove" | null;
    ============================================================ */
 
 export default function PenaltiesPage() {
+    const { isAdmin } = useAuth();
     const {
         penalties,
         loading,
@@ -209,14 +211,16 @@ export default function PenaltiesPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button
-                            type="button"
-                            onClick={() => setRulesOpen(true)}
-                            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[12px] font-medium text-slate-700 transition-colors hover:bg-slate-50"
-                        >
-                            <ScrollText size={13.5} />
-                            Penalty Rules
-                        </button>
+                        {isAdmin && (
+                            <button
+                                type="button"
+                                onClick={() => setRulesOpen(true)}
+                                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[12px] font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                            >
+                                <ScrollText size={13.5} />
+                                Penalty Rules
+                            </button>
+                        )}
                         <button
                             type="button"
                             onClick={() => setAssignOpen(true)}

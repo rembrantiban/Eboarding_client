@@ -9,13 +9,15 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { useRoomAssignment } from "@/hooks/useRoomAssignment";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import AllUpcomingPaymentsModal from "./AllUpcomingPaymentsModal";
 
 
 
 const PaymentDueDates = () => {
   const { upcomingPayments, getUpcomingPayments } = useRoomAssignment();
-  
+  const [viewAllOpen, setViewAllOpen] = useState(false);
+
   useEffect(() => {
     getUpcomingPayments();
   }, [getUpcomingPayments]);
@@ -64,12 +66,18 @@ const PaymentDueDates = () => {
 
         <button
           type="button"
+          onClick={() => setViewAllOpen(true)}
           className="mt-2 flex w-full items-center justify-center gap-1 rounded-lg py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
         >
           View all
           <ArrowUpRight size={14} />
         </button>
       </CardContent>
+
+      <AllUpcomingPaymentsModal
+        open={viewAllOpen}
+        onClose={() => setViewAllOpen(false)}
+      />
     </Card>
   );
 };

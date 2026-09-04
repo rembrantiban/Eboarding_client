@@ -128,7 +128,7 @@ export default function BillingStatement() {
 
             {/* Description */}
             <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">
-              Great news! You don't have any pending, upcoming,
+              Great news! You don't have any pending,
               overdue, or partial billing statements at the moment.
             </p>
 

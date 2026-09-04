@@ -9,7 +9,8 @@ import {
     FileText,
     CircleCheck,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import AllPaymentsModal from "@/components/BoarderReport/AllPaymentsModal";
 
 
 
@@ -64,6 +65,7 @@ const STATUS_STYLE: Record<string, string> = {
 const BoarderReport = () => {
 
     const { boarderPaymentSummary, getBoarderPaymentSummary, getMyRecentPayments, recentPayments } = useBilling();
+    const [allPaymentsOpen, setAllPaymentsOpen] = useState(false);
 
 
     useEffect(() => {
@@ -143,7 +145,7 @@ const BoarderReport = () => {
                         iconTone="blue"
                         title="Recent Payments"
                         action="View All Payments"
-                        onAction={() => { }}
+                        onAction={() => setAllPaymentsOpen(true)}
                         footer={
                             recentPayments.length > 0
                                 ? `Showing 1 to ${recentPayments.length} of ${recentPayments.length} payments`
@@ -249,6 +251,11 @@ const BoarderReport = () => {
                     </Panel>
                 </div>
             </div>
+
+            <AllPaymentsModal
+                open={allPaymentsOpen}
+                onClose={() => setAllPaymentsOpen(false)}
+            />
         </div>
     );
 };

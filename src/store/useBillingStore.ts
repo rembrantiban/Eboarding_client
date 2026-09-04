@@ -85,6 +85,7 @@ export interface PaymentHistory {
     id: number;
     billing_id: number;
 
+    receipt_no: string;
     billing_no: string;
     billing_month: string | null;
     billing_type: string;

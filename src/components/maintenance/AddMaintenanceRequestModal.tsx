@@ -24,7 +24,6 @@ type Props = {
 
 type FormState = {
     category: string;
-    other_category: string;
     room_id: string;
     description: string;
     image: File | null;
@@ -39,7 +38,6 @@ const CATEGORIES = [
     "Furniture",
     "Water Supply",
     "Internet",
-    "Others",
 ];
 
 const MAX_IMAGE_MB = 5;
@@ -63,7 +61,6 @@ const AddMaintenanceRequestModal = ({
 
     const [form, setForm] = useState<FormState>({
         category: "",
-        other_category: "",
         room_id: "",
         description: "",
         image: null,
@@ -81,8 +78,6 @@ const AddMaintenanceRequestModal = ({
 
     if (!open) return null;
 
-    const isOther = form.category === "Others";
-
     const handleChange = (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -91,16 +86,6 @@ const AddMaintenanceRequestModal = ({
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
         setErrors((prev) => ({ ...prev, [name]: "" }));
-    };
-
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { value } = e.target;
-        setForm((prev) => ({
-            ...prev,
-            category: value,
-            other_category: value === "Others" ? prev.other_category : "",
-        }));
-        setErrors((prev) => ({ ...prev, category: "", other_category: "" }));
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -133,13 +118,6 @@ const AddMaintenanceRequestModal = ({
 
         if (!form.category) newErrors.category = "Pick a category";
 
-        if (isOther) {
-            if (!form.other_category.trim())
-                newErrors.other_category = "Please specify the category";
-            else if (form.other_category.trim().length < 3)
-                newErrors.other_category = "Too short — be a bit more specific";
-        }
-
         if (!form.room_id) newErrors.room_id = "Required";
 
         if (!form.description.trim()) newErrors.description = "Required";
@@ -163,7 +141,7 @@ const AddMaintenanceRequestModal = ({
 
         try {
             await createMaintenanceRequest({
-                category: isOther ? form.other_category.trim() : form.category,
+                category: form.category,
                 room_id: form.room_id,
                 description: form.description.trim(),
                 image: form.image,
@@ -228,23 +206,10 @@ const AddMaintenanceRequestModal = ({
                                 label="Issue category"
                                 name="category"
                                 value={form.category}
-                                onChange={handleCategoryChange}
+                                onChange={handleChange}
                                 options={CATEGORIES}
                                 error={errors.category}
                             />
-
-                            {isOther && (
-                                <div className="animate-in fade-in slide-in-from-top-1 duration-200">
-                                    <Field
-                                        label="Please specify"
-                                        name="other_category"
-                                        placeholder="e.g. Pest control, Window screen, Ceiling leak"
-                                        value={form.other_category}
-                                        onChange={handleChange}
-                                        error={errors.other_category}
-                                    />
-                                </div>
-                            )}
                         </section>
 
                         {/* Location */}

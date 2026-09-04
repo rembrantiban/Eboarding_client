@@ -1,29 +1,28 @@
 import StatCard from "@/components/Dashboard/StatCard"
 import OccupancyChart from "@/components/Dashboard/OccupancyChart"
-import { Users, Home, AlertTriangle, Wallet } from "lucide-react"
+import { Users, Home, AlertTriangle, Wallet, Calendar } from "lucide-react"
 import PaymentsOverviewChart from "@/components/Dashboard/PaymentsOverviewChart"
 import RoomAvailabilityChart from "@/components/Dashboard/RoomAvailabilityChart"
 import { useAuth } from "@/hooks/useAuth"
-import { useEffect, useRef } from "react"
+import { useEffect, useMemo } from "react"
 import { usePayment } from "@/hooks/usePayment"
 import { useRoom } from "@/hooks/useRoom"
-import { Button } from "@/components/ui/button"
-import { Printer } from "lucide-react"
-import DashboardPrint from "@/components/Dashboard/DashboardPrints"
-import { useReactToPrint } from "react-to-print"
+import { useBilling } from "@/hooks/useBilling"
 import ActivePenaltiesCard from "@/components/Dashboard/ActivePenaltiesCard"
 import CalendarCard from "@/components/Dashboard/CalendarCard"
 
 
 const Dashboard = () => {
     const { totalBoarders, getTotalBoarders } = useAuth();
-    const { getAnalytics, analytics, revenueAnalytics } = usePayment();
-    const { getDashboardStats, dashboardStats, occupancyTrend, getOccupancyTrend } = useRoom();
+    const { getAnalytics } = usePayment();
+    const { getDashboardStats, dashboardStats, getOccupancyTrend } = useRoom();
+    const { paymentsOverview, getPaymentsOverview } = useBilling();
 
-    const printRef = useRef<HTMLDivElement>(null)
-    const handlePrint = useReactToPrint({
-        contentRef: printRef,
-        documentTitle: "E-Boarding Report",
+    const today = new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
     })
 
     useEffect(() => {
@@ -31,7 +30,20 @@ const Dashboard = () => {
         getAnalytics();
         getOccupancyTrend();
         getDashboardStats();
-    }, [getTotalBoarders, getAnalytics, getDashboardStats, getOccupancyTrend]);
+        getPaymentsOverview();
+    }, [getTotalBoarders, getAnalytics, getDashboardStats, getOccupancyTrend, getPaymentsOverview]);
+
+    // Same computation as PaymentsOverviewChart so the two stay in sync.
+    const monthlyRevenue = useMemo(
+        () => paymentsOverview.reduce((sum, item) => sum + Number(item.value), 0),
+        [paymentsOverview]
+    );
+
+    const prevPoint = paymentsOverview.length > 1 ? paymentsOverview[paymentsOverview.length - 2] : null;
+    const revenueChange =
+        monthlyRevenue && prevPoint && Number(prevPoint.value) !== 0
+            ? ((monthlyRevenue - Number(prevPoint.value)) / Number(prevPoint.value)) * 100
+            : null;
 
     return (
         <div className="h-screen overflow-hidden">
@@ -43,18 +55,17 @@ const Dashboard = () => {
                             Overview of your boarding house status
                         </p>
                     </div>
-                    <Button onClick={handlePrint}>
-                        <Printer size={16} /> Print
-                    </Button>
-                    <div className="hidden">
-                        <div ref={printRef}>
-                            <DashboardPrint
-                                totalBoarders={totalBoarders}
-                                dashboardStats={dashboardStats}
-                                analytics={analytics}
-                                occupancyTrend={occupancyTrend}
-                                recentPaidUsers={revenueAnalytics?.recentPaidUsers || []}
-                            />
+                    <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700">
+                            <Calendar className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-medium uppercase tracking-wide text-slate-400">
+                                Today
+                            </p>
+                            <p className="text-[12.5px] font-semibold text-slate-900">
+                                {today}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -64,7 +75,13 @@ const Dashboard = () => {
                     <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-blue-600/70" />} />
                     <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-green-400/70" />} />
                     <StatCard title="Active Penalties" value={dashboardStats.occupiedBeds.toString()} icon={<AlertTriangle size={110} className="text-red-600/70" />} />
-                    <StatCard title="Monthly Revenue" value="₱84,500" icon={<Wallet className="text-amber-500" />} trend="+12%" />
+                    <StatCard
+                        title="Monthly Revenue"
+                        value={`₱${monthlyRevenue.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`}
+                        icon={<Wallet className="text-amber-500" />}
+                        trend={revenueChange !== null ? `${revenueChange > 0 ? "+" : ""}${revenueChange.toFixed(1)}%` : undefined}
+                        trendDirection={revenueChange !== null && revenueChange < 0 ? "down" : "up"}
+                    />
 
                 </div>
 
