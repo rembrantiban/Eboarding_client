@@ -168,7 +168,7 @@ const Register = () => {
     );
   }, []);
 
-  const sanitize = (value: string) => value.trim().replace(/\s+/g, " ");
+  const sanitize = (value: string) => value.replace(/\s+/g, " ").replace(/^ /, "");
 
   const isPH = form.country_code === "+63";
 
@@ -377,8 +377,8 @@ const Register = () => {
       setModal({ type: "loading" });
 
       await register({
-        first_name: form.first_name,
-        last_name: form.last_name,
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
         email: form.email,
         username: form.username,
         country_code: form.country_code,
@@ -389,7 +389,7 @@ const Register = () => {
         user_type: "Boarder",
         gender: form.gender,
         age: Number(form.age),
-        emergency_contact_name: form.emergency_contact_name,
+        emergency_contact_name: form.emergency_contact_name.trim(),
         emergency_contact_number: form.emergency_contact_number,
         emergency_contact_relationship: form.emergency_contact_relationship,
         avatar,

@@ -11,6 +11,7 @@ import {
     ArchiveRestore,
     Inbox,
     Loader2,
+    Trash2,
 } from "lucide-react";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 import type { Announcement } from "@/store/useAnnouncementStore";
@@ -46,12 +47,14 @@ export default function AdminAnnouncementsPage() {
         createAnnouncement,
         archiveAnnouncement,
         restoreAnnouncement,
+        deleteAnnouncement,
     } = useAnnouncement();
 
     const [editing, setEditing] = useState<Announcement | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [pendingArchive, setPendingArchive] = useState<Announcement | null>(null);
     const [pendingRestore, setPendingRestore] = useState<Announcement | null>(null);
+    const [pendingDelete, setPendingDelete] = useState<Announcement | null>(null);
     const [working, setWorking] = useState(false);
 
     const audiences = ["Boarders", "Staff", "All"] as const;
@@ -173,6 +176,19 @@ export default function AdminAnnouncementsPage() {
             await restoreAnnouncement(pendingRestore.id);
             await getMyAnnouncements();
             setPendingRestore(null);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setWorking(false);
+        }
+    };
+
+    const confirmDelete = async () => {
+        if (!pendingDelete) return;
+        setWorking(true);
+        try {
+            await deleteAnnouncement(pendingDelete.id);
+            setPendingDelete(null);
         } catch (error) {
             console.error(error);
         } finally {
@@ -444,6 +460,13 @@ export default function AdminAnnouncementsPage() {
                                                     Restore
                                                 </button>
                                             )}
+                                            <button
+                                                onClick={() => setPendingDelete(item)}
+                                                className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11.5px] font-medium text-rose-600 transition-colors hover:bg-rose-50"
+                                            >
+                                                <Trash2 size={13} />
+                                                Delete
+                                            </button>
                                         </div>
                                     )}
                                 </article>
@@ -667,6 +690,51 @@ export default function AdminAnnouncementsPage() {
                                 >
                                     {working && <Loader2 size={13} className="animate-spin" />}
                                     {working ? "Restoring..." : "Restore"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* ===== Delete confirmation ===== */}
+                {pendingDelete && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div
+                            className="absolute inset-0 bg-slate-900/40"
+                            onClick={() => !working && setPendingDelete(null)}
+                        />
+
+                        <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-slate-900/5">
+                            <div className="px-5 pt-5">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 ring-1 ring-rose-100">
+                                    <Trash2 size={16} className="text-rose-600" />
+                                </div>
+                                <h2 className="mt-3.5 text-[13px] font-semibold tracking-tight text-slate-900">
+                                    Delete this announcement?
+                                </h2>
+                                <p className="mt-1 text-[12px] leading-relaxed text-slate-500">
+                                    <span className="font-medium text-slate-700">
+                                        &ldquo;{pendingDelete.title}&rdquo;
+                                    </span>{" "}
+                                    will be permanently removed. This action cannot be undone.
+                                </p>
+                            </div>
+
+                            <div className="mt-5 flex justify-end gap-2 border-t border-slate-100 bg-slate-50/60 px-5 py-3">
+                                <button
+                                    onClick={() => setPendingDelete(null)}
+                                    disabled={working}
+                                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-60"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    disabled={working}
+                                    className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-rose-700 disabled:opacity-70"
+                                >
+                                    {working && <Loader2 size={13} className="animate-spin" />}
+                                    {working ? "Deleting..." : "Delete"}
                                 </button>
                             </div>
                         </div>
