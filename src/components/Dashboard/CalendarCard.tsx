@@ -130,7 +130,7 @@ export default function CalendarCard() {
   const { calendarEvents, getCalendarEvents } = useBilling()
 
   const today = new Date();
-  const [view, setView] = useState({ year: 2025, month: 4 });
+  const [view, setView] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [selected, setSelected] = useState<{ cell: CalendarCell; event: CalendarEvent } | null>(null);
   const [showAllPayments, setShowAllPayments] = useState(false);
 

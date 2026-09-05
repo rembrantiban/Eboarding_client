@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     ResponsiveContainer,
     PieChart,
@@ -71,17 +72,20 @@ const MAINTENANCE_STATUS_STYLES: Record<string, string> = {
     Closed: "bg-slate-100 text-slate-700 ring-slate-200",
     Cancelled: "bg-rose-50 text-rose-700 ring-rose-200",
 };
-const BILLINGS = [
-    { id: "b1", boarder: "Juan Dela Cruz", room: "102", due: "Due in 2 days", amount: 3500, status: "Upcoming" },
-    { id: "b2", boarder: "Maria Santos", room: "201", due: "Due today", amount: 4200, status: "Pending" },
-    { id: "b3", boarder: "Pedro Reyes", room: "103", due: "5 days overdue", amount: 3800, status: "Overdue" },
-    { id: "b4", boarder: "Ana Garcia", room: "301", due: "Due in 6 days", amount: 4000, status: "Upcoming" },
-];
-
-
-
 const peso = (n: number) => `₱${n.toLocaleString("en-PH")}`;
 
+const formatDueLabel = (dateStr: string) => {
+    const due = new Date(dateStr);
+    const today = new Date();
+    due.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.round((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Due today";
+    if (diffDays > 0) return `Due in ${diffDays} day${diffDays === 1 ? "" : "s"}`;
+    return `${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? "" : "s"} overdue`;
+};
 
 const STATUS_STYLES: Record<string, string> = {
     Upcoming: "bg-sky-50 text-sky-600 ring-sky-100",
@@ -92,8 +96,9 @@ const STATUS_STYLES: Record<string, string> = {
 export default function StaffDashboard() {
 
 
+    const navigate = useNavigate();
     const { dashboardStats, getStaffDashboardStats } = useAuth();
-    const { paymentsOverview, getPaymentsOverview, loading } = useBilling();
+    const { paymentsOverview, getPaymentsOverview, paymentsOverviewTrend, getPaymentsOverviewTrend, calendarEvents, getCalendarEvents, loading } = useBilling();
     const { roomOccupancyChart, getRoomOccupancyChart, roomAvailabilityChart, getRoomAvailabilityChart, loading: roomLoading } = useRoom();
     const { assignedMaintenanceList, getAllAssignedMaintenance, updateAssignedMaintenanceRequest } = useMaintenance();
     const [selectedRequest, setSelectedRequest] = useState<MaintenanceRequest | null>(null);
@@ -102,6 +107,8 @@ export default function StaffDashboard() {
     useEffect(() => {
         getStaffDashboardStats();
         getPaymentsOverview();
+        getPaymentsOverviewTrend();
+        getCalendarEvents();
         getRoomOccupancyChart();
         getRoomAvailabilityChart();
         getAllAssignedMaintenance();
@@ -162,11 +169,28 @@ export default function StaffDashboard() {
 
     const paymentData = useMemo(
         () =>
-            paymentsOverview.map((item) => ({
+            paymentsOverviewTrend.map((item) => ({
                 date: item.date,
                 amount: Number(item.value),
             })),
-        [paymentsOverview]
+        [paymentsOverviewTrend]
+    );
+
+    const billingSchedule = useMemo(
+        () =>
+            calendarEvents
+                .filter((event) => event.type === "payment" && event.status !== "Paid")
+                .slice()
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .map((event) => ({
+                    id: event.id,
+                    boarder: event.boarder,
+                    room: event.room,
+                    due: formatDueLabel(event.date),
+                    amount: event.amount,
+                    status: event.status,
+                })),
+        [calendarEvents]
     );
 
     const totalRooms = useMemo(
@@ -411,7 +435,7 @@ export default function StaffDashboard() {
                             <h2 className="text-base font-semibold text-slate-900">Payments Overview</h2>
                             <span className="text-xs text-slate-500">This month</span>
                         </div>
-                        <p className="mt-0.5 text-xs text-slate-500">Total collections</p>
+                        <p className="mt-0.5 text-xs text-slate-500">Total collections this Month</p>
 
                         <div className="mt-2 flex items-center gap-2">
                             <span className="text-2xl font-semibold tracking-tight text-slate-900">
@@ -419,7 +443,9 @@ export default function StaffDashboard() {
                             </span>
                         </div>
 
-                        <div className="mt-3 h-32.5 w-full">
+                        <p className="mt-4 text-xs font-medium text-slate-500">Last 6 months</p>
+
+                        <div className="mt-2 h-32.5 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={paymentData} margin={{ top: 4, right: 4, left: -14, bottom: 0 }}>
                                     <defs>
@@ -605,36 +631,43 @@ export default function StaffDashboard() {
                             </span>
                         </div>
 
-                        <ul className="mt-4 space-y-2.5">
-                            {BILLINGS.map((bill) => (
-                                <li
-                                    key={bill.id}
-                                    className="rounded-xl border border-slate-100 bg-slate-50/60 p-3 transition hover:border-slate-200 hover:bg-slate-50"
-                                >
-                                    <div className="flex items-start justify-between gap-2">
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-medium text-slate-900">
-                                                {bill.boarder}
-                                            </p>
-                                            <p className="mt-0.5 text-xs text-slate-500">
-                                                Room {bill.room} · {bill.due}
-                                            </p>
+                        {billingSchedule.length === 0 ? (
+                            <div className="mt-4 rounded-xl border border-dashed border-slate-200 py-8 text-center text-xs text-slate-400">
+                                No billing schedule to show.
+                            </div>
+                        ) : (
+                            <ul className="mt-4 max-h-80 space-y-2.5 overflow-y-auto pr-1">
+                                {billingSchedule.map((bill) => (
+                                    <li
+                                        key={bill.id}
+                                        className="rounded-xl border border-slate-100 bg-slate-50/60 p-3 transition hover:border-slate-200 hover:bg-slate-50"
+                                    >
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="min-w-0">
+                                                <p className="truncate text-sm font-medium text-slate-900">
+                                                    {bill.boarder}
+                                                </p>
+                                                <p className="mt-0.5 text-xs text-slate-500">
+                                                    Room {bill.room} · {bill.due}
+                                                </p>
+                                            </div>
+                                            <div className="shrink-0 text-right">
+                                                <p className="text-sm font-semibold text-slate-900">{peso(bill.amount)}</p>
+                                                <span
+                                                    className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ${STATUS_STYLES[bill.status]}`}
+                                                >
+                                                    {bill.status}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="shrink-0 text-right">
-                                            <p className="text-sm font-semibold text-slate-900">{peso(bill.amount)}</p>
-                                            <span
-                                                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ring-1 ${STATUS_STYLES[bill.status]}`}
-                                            >
-                                                {bill.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
 
                         <button
                             type="button"
+                            onClick={() => navigate("/billing")}
                             className="mt-4 w-full rounded-xl border border-slate-200 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                         >
                             View all billings

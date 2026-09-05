@@ -311,6 +311,7 @@ interface BillingStore {
     myPaymentHistory: PaymentHistory[];
 
     paymentsOverview: PaymentsOverview[];
+    paymentsOverviewTrend: PaymentsOverview[];
     calendarEvents: CalendarEvent[];
 
     activePenalties: ActivePenalty[];
@@ -343,6 +344,7 @@ interface BillingStore {
     getMyPaymentHistory: () => Promise<boolean>;
 
     getPaymentsOverview: () => Promise<boolean>;
+    getPaymentsOverviewTrend: () => Promise<boolean>;
     getCalendarEvents: () => Promise<boolean>;
     getActivePenalties: () => Promise<void>;
 
@@ -378,6 +380,7 @@ export const useBillingStore = create<BillingStore>((set) => ({
     myPaymentSummary: null,
     myPaymentHistory: [],
     paymentsOverview: [],
+    paymentsOverviewTrend: [],
     calendarEvents: [],
 
 
@@ -879,6 +882,27 @@ export const useBillingStore = create<BillingStore>((set) => ({
 
             console.error(error);
             set({ loading: false });
+            return false;
+
+        }
+    },
+
+    getPaymentsOverviewTrend: async () => {
+        try {
+
+            const res = await axiosInstance.get(
+                "/billings/payments-overview-trend"
+            );
+
+            set({
+                paymentsOverviewTrend: res.data,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(error);
             return false;
 
         }

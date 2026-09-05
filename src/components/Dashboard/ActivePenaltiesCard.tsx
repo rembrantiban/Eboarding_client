@@ -1,6 +1,6 @@
-import { useBilling } from "@/hooks/useBilling";
+import { usePenalty } from "@/hooks/usePenalty";
 import { ChevronRight, AlertTriangle, X, ShieldCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const VISIBLE_PENALTIES = 3;
 
@@ -19,11 +19,11 @@ function formatDate(date: string) {
 /* ---------- Row (shared by card + "view all" modal) ---------- */
 
 type PenaltyRowProps = {
+  penalty_id: number;
   initials: string;
   boarder: string;
   reason: string;
-  room_number: string | number;
-  bed_number: string | number;
+  status: string;
   amount: number;
   date: string;
 };
@@ -43,16 +43,13 @@ function PenaltyRow({ penalty }: { penalty: PenaltyRowProps }) {
           {penalty.reason}
         </p>
         <p className="mt-0.5 truncate text-[10.5px] text-gray-400">
-          Room {penalty.room_number} · {penalty.bed_number}
+          {penalty.status} · Due {formatDate(penalty.date)}
         </p>
       </div>
 
       <div className="flex shrink-0 flex-col items-end gap-1">
         <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-red-700 ring-1 ring-red-100">
           {formatCurrency(penalty.amount)}
-        </span>
-        <span className="text-[10.5px] tabular-nums text-gray-400">
-          {formatDate(penalty.date)}
         </span>
       </div>
     </div>
@@ -61,14 +58,14 @@ function PenaltyRow({ penalty }: { penalty: PenaltyRowProps }) {
 
 export default function ActivePenaltiesCard() {
   const {
-    activePenalties,
-    getActivePenalties,
-  } = useBilling();
+    penalties,
+    getAllPenalties,
+  } = usePenalty();
 
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    getActivePenalties();
+    getAllPenalties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -78,6 +75,22 @@ export default function ActivePenaltiesCard() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [showAll]);
+
+  const activePenalties: PenaltyRowProps[] = useMemo(
+    () =>
+      penalties
+        .filter((p) => p.status === "Pending" || p.status === "Partially Paid")
+        .map((p) => ({
+          penalty_id: p.penalty_id,
+          initials: `${p.first_name?.charAt(0) ?? ""}${p.last_name?.charAt(0) ?? ""}`.toUpperCase(),
+          boarder: `${p.first_name} ${p.last_name}`,
+          reason: p.penalty_name ?? p.reason ?? "Penalty",
+          status: p.status,
+          amount: Number(p.amount) - Number(p.amount_paid || 0),
+          date: p.due_date ?? p.penalty_date,
+        })),
+    [penalties]
+  );
 
   const visiblePenalties = activePenalties.slice(0, VISIBLE_PENALTIES);
   const totalAmount = activePenalties.reduce(
@@ -98,7 +111,7 @@ export default function ActivePenaltiesCard() {
               Active Penalties
             </h3>
             <p className="text-[11px] leading-tight text-gray-400">
-              Unsettled charges
+              Unsettled penalties
             </p>
           </div>
         </div>
@@ -126,7 +139,7 @@ export default function ActivePenaltiesCard() {
         <>
           <div className="space-y-1.5">
             {visiblePenalties.map((p) => (
-              <PenaltyRow key={p.id} penalty={p} />
+              <PenaltyRow key={p.penalty_id} penalty={p} />
             ))}
           </div>
 
@@ -182,7 +195,7 @@ export default function ActivePenaltiesCard() {
 
             <div className="min-h-0 flex-1 space-y-1.5 overflow-y-auto px-4 py-4">
               {activePenalties.map((p) => (
-                <PenaltyRow key={p.id} penalty={p} />
+                <PenaltyRow key={p.penalty_id} penalty={p} />
               ))}
             </div>
 

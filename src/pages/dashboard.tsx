@@ -8,6 +8,7 @@ import { useEffect, useMemo } from "react"
 import { usePayment } from "@/hooks/usePayment"
 import { useRoom } from "@/hooks/useRoom"
 import { useBilling } from "@/hooks/useBilling"
+import { usePenalty } from "@/hooks/usePenalty"
 import ActivePenaltiesCard from "@/components/Dashboard/ActivePenaltiesCard"
 import CalendarCard from "@/components/Dashboard/CalendarCard"
 
@@ -17,6 +18,7 @@ const Dashboard = () => {
     const { getAnalytics } = usePayment();
     const { getDashboardStats, dashboardStats, getOccupancyTrend } = useRoom();
     const { paymentsOverview, getPaymentsOverview } = useBilling();
+    const { penalties, getAllPenalties } = usePenalty();
 
     const today = new Date().toLocaleDateString("en-US", {
         weekday: "long",
@@ -31,12 +33,21 @@ const Dashboard = () => {
         getOccupancyTrend();
         getDashboardStats();
         getPaymentsOverview();
-    }, [getTotalBoarders, getAnalytics, getDashboardStats, getOccupancyTrend, getPaymentsOverview]);
+        getAllPenalties();
+    }, [getTotalBoarders, getAnalytics, getDashboardStats, getOccupancyTrend, getPaymentsOverview, getAllPenalties]);
 
     // Same computation as PaymentsOverviewChart so the two stay in sync.
     const monthlyRevenue = useMemo(
         () => paymentsOverview.reduce((sum, item) => sum + Number(item.value), 0),
         [paymentsOverview]
+    );
+
+    const activePenaltiesCount = useMemo(
+        () =>
+            penalties.filter(
+                (p) => p.status === "Pending" || p.status === "Partially Paid"
+            ).length,
+        [penalties]
     );
 
     const prevPoint = paymentsOverview.length > 1 ? paymentsOverview[paymentsOverview.length - 2] : null;
@@ -74,7 +85,7 @@ const Dashboard = () => {
                 <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-4">
                     <StatCard title="Total Boarders" value={totalBoarders.toString()} icon={<Users size={110} className="text-blue-600/70" />} />
                     <StatCard title="Total Rooms" value={dashboardStats.totalRooms.toString()} icon={<Home size={110} className="text-green-400/70" />} />
-                    <StatCard title="Active Penalties" value={dashboardStats.occupiedBeds.toString()} icon={<AlertTriangle size={110} className="text-red-600/70" />} />
+                    <StatCard title="Active Penalties" value={activePenaltiesCount.toString()} icon={<AlertTriangle size={110} className="text-red-600/70" />} />
                     <StatCard
                         title="Monthly Revenue"
                         value={`₱${monthlyRevenue.toLocaleString("en-PH", { maximumFractionDigits: 0 })}`}
