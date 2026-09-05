@@ -98,7 +98,9 @@ type CreateUserByAdminPayload = {
   last_name: string;
   email: string;
   username: string;
+  country_code: string;
   contact_number: string;
+  nationality: string;
   address: string;
   password: string;
   user_type: UserType;
@@ -770,7 +772,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       formData.append("first_name", data.first_name);
       formData.append("last_name", data.last_name);
       formData.append("username", data.username);
+      formData.append("country_code", data.country_code);
       formData.append("contact_number", data.contact_number);
+      formData.append("nationality", data.nationality);
       formData.append("email", data.email);
       formData.append("address", data.address);
       formData.append("password", data.password);
@@ -1136,7 +1140,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       formData.append("first_name", data.first_name);
       formData.append("last_name", data.last_name);
       formData.append("username", data.username);
+      formData.append("country_code", data.country_code);
       formData.append("contact_number", data.contact_number);
+      formData.append("nationality", data.nationality);
       formData.append("email", data.email);
       formData.append("address", data.address);
       formData.append("password", data.password);
