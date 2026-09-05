@@ -93,7 +93,7 @@ const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
       </td>
 
       <td className="px-4 py-2.5">
-        {user?.user_type === "Admin" && onChangeStatus ? (
+        {onChangeStatus ? (
           <button
             type="button"
             onClick={() => onChangeStatus(room)}
@@ -133,17 +133,19 @@ const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
                 <Eye size={14} /> View
               </DropdownMenuItem>
 
+              {onChangeStatus && (
+                <DropdownMenuItem
+                  onClick={() => onChangeStatus(room)}
+                  className="gap-2 rounded-lg"
+                >
+                  <RefreshCw size={14} /> Change Status
+                </DropdownMenuItem>
+              )}
+
               {user?.user_type === "Admin" && (
                 <>
                   <DropdownMenuItem onClick={() => onEdit(room)} className="gap-2 rounded-lg">
                     <Pencil size={14} /> Edit
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    onClick={() => onChangeStatus?.(room)}
-                    className="gap-2 rounded-lg"
-                  >
-                    <RefreshCw size={14} /> Change Status
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator className="my-1 bg-slate-100" />

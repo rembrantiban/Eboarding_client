@@ -14,7 +14,7 @@ import { useMaintenance } from "@/hooks/useMaintenace";
 
 
 const MaintenanceRequestPage = () => {
-    const { maintenanceRequest, loading, getMySubmittedRequest, updateAssignedMaintenanceRequest } = useMaintenance();
+    const { maintenanceRequest, loading, getMySubmittedRequest, updateMySubmittedMaintenanceRequest } = useMaintenance();
 
     const [open, setOpen] = useState(false)
     const [viewRequest, setViewRequest] = useState<MaintenanceRequest | null>(null)
@@ -28,7 +28,7 @@ const MaintenanceRequestPage = () => {
     }, [])
 
     const handleUpdateStatus = async (payload: UpdateMaintenanceStatusPayload) => {
-        const success = await updateAssignedMaintenanceRequest(
+        const success = await updateMySubmittedMaintenanceRequest(
             payload.request_id,
             payload.status,
             payload.notes
@@ -42,7 +42,7 @@ const MaintenanceRequestPage = () => {
     }
 
     const handleResolve = async (payload: ResolveMaintenanceRequestPayload) => {
-        const success = await updateAssignedMaintenanceRequest(
+        const success = await updateMySubmittedMaintenanceRequest(
             payload.request_id,
             "Resolved",
             payload.notes

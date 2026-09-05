@@ -10,8 +10,12 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { BedDouble, Users, History, Activity } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Room() {
+  const { user } = useAuth();
+  const isAdmin = user?.user_type === "Admin";
+
   return (
     <div className="h-screen overflow-auto rounded-tl-2xl border-l border-t bg-background px-6 py-5">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -45,13 +49,15 @@ export default function Room() {
               Assignments
             </TabsTrigger>
 
-            <TabsTrigger
-              value="history"
-              className="gap-1.5 pb-5 px-3 text-sm font-medium "
-            >
-              <History className="h-4 w-4" />
-              Occupancy History
-            </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger
+                value="history"
+                className="gap-1.5 pb-5 px-3 text-sm font-medium "
+              >
+                <History className="h-4 w-4" />
+                Occupancy History
+              </TabsTrigger>
+            )}
 
             <TabsTrigger
               value="monitor"
@@ -74,11 +80,13 @@ export default function Room() {
             <AssignementPage />
           </TabsContent>
 
-          <TabsContent
-            value="history"
-          >
-            <RoomHistoryTable />
-          </TabsContent>
+          {isAdmin && (
+            <TabsContent
+              value="history"
+            >
+              <RoomHistoryTable />
+            </TabsContent>
+          )}
 
           <TabsContent
             value="monitor"

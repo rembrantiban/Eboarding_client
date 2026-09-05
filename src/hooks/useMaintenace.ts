@@ -21,6 +21,7 @@ export const useMaintenance = () => {
         assignedMaintenanceList,
         getAllAssignedMaintenance,
         updateAssignedMaintenanceRequest,
+        updateMySubmittedMaintenanceRequest,
     } = useMaintenanceStore();
 
     return {
@@ -43,5 +44,6 @@ export const useMaintenance = () => {
         assignedMaintenanceList,
         getAllAssignedMaintenance,
         updateAssignedMaintenanceRequest,
+        updateMySubmittedMaintenanceRequest,
     };
 };

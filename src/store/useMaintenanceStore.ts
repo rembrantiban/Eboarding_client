@@ -92,6 +92,7 @@ interface MaintenanceStore {
 
     getAllAssignedMaintenance: () => Promise<boolean>;
     updateAssignedMaintenanceRequest: (id: number, status: MaintenanceStatus, remarks?: string) => Promise<boolean>;
+    updateMySubmittedMaintenanceRequest: (id: number, status: MaintenanceStatus, remarks?: string) => Promise<boolean>;
 }
 
 export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
@@ -154,6 +155,78 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
 
             set({
                 myAssignedMaintenance: res.data,
+            });
+
+            return true;
+
+        } catch (error) {
+
+            if (axios.isAxiosError(error)) {
+
+                showError(
+                    "Failed",
+                    error.response?.data?.message ??
+                    "Failed to update request."
+                );
+
+            }
+
+            return false;
+
+        } finally {
+
+            set({
+                loading: false,
+            });
+
+        }
+
+    },
+    updateMySubmittedMaintenanceRequest: async (
+        id,
+        status,
+        remarks
+    ) => {
+
+        const {
+            showLoading,
+            showSuccess,
+            showError,
+        } = useStatusStore.getState();
+
+        try {
+
+            set({
+                loading: true,
+            });
+
+            showLoading(
+                "Updating Request",
+                "Please wait..."
+            );
+
+            await axiosInstance.put(
+                `/maintenance/my-submitted/update/${id}`,
+                {
+                    status,
+                    remarks,
+                }
+            );
+
+            showSuccess(
+                "Success",
+                "Maintenance request updated successfully."
+            );
+
+            /**
+             * Refresh My Submitted Requests
+             */
+            const res = await axiosInstance.get(
+                "/maintenance/my-submitted"
+            );
+
+            set({
+                maintenanceRequest: res.data,
             });
 
             return true;

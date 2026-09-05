@@ -7,7 +7,7 @@ import {
   ImageOff,
   Maximize2,
   ImageIcon,
-  PencilLine,
+  Eye,
   CheckCheck,
 } from "lucide-react"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore" // TODO: adjust import path
@@ -166,7 +166,7 @@ const MaintenanceRow = ({
               className="w-44 rounded-xl border-slate-200 p-1 text-[12.5px]"
             >
               <DropdownMenuItem onClick={() => onView?.(request)} className="gap-2 rounded-lg">
-                <PencilLine size={14} /> Update details
+                <Eye size={14} /> View details
               </DropdownMenuItem>
 
               <DropdownMenuItem

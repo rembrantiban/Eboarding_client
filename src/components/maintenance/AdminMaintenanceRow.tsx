@@ -7,7 +7,7 @@ import {
     ImageOff,
     Maximize2,
     ImageIcon,
-    PencilLine,
+    Eye,
     Archive,
 } from "lucide-react"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore" // TODO: adjust import path
@@ -181,8 +181,8 @@ const MaintenanceRow = ({
                                     onClick={() => onView?.(request)}
                                     className="gap-2 rounded-lg"
                                 >
-                                    <PencilLine size={14} />
-                                    Update details
+                                    <Eye size={14} />
+                                    View details
                                 </DropdownMenuItem>
                             )}
 
