@@ -19,6 +19,7 @@ type Props = {
   onView?: (request: MaintenanceRequest) => void
   onAssign?: (request: MaintenanceRequest) => void
   onUpdateStatus?: (request: MaintenanceRequest) => void
+  onResolve?: (request: MaintenanceRequest) => void
 }
 
 const STATUS_OPTIONS = ["Pending", "In Progress", "Resolved"]
@@ -31,6 +32,7 @@ const MaintenanceTable = ({
   onView,
   onAssign,
   onUpdateStatus,
+  onResolve,
 }: Props) => {
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState("")
@@ -260,6 +262,7 @@ const MaintenanceTable = ({
                       onViewImage={setImageRequest}
                       onAssign={onAssign}
                       onUpdateStatus={onUpdateStatus}
+                      onResolve={onResolve}
                     />
                   ))
                 )}

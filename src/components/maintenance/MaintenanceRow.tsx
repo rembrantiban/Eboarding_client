@@ -8,6 +8,7 @@ import {
   Maximize2,
   ImageIcon,
   PencilLine,
+  CheckCheck,
 } from "lucide-react"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore" // TODO: adjust import path
 import {
@@ -24,6 +25,7 @@ type Props = {
   onViewImage?: (request: MaintenanceRequest) => void
   onAssign?: (request: MaintenanceRequest) => void
   onUpdateStatus?: (request: MaintenanceRequest) => void
+  onResolve?: (request: MaintenanceRequest) => void
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -53,6 +55,7 @@ const MaintenanceRow = ({
   onViewImage,
   onAssign,
   onUpdateStatus,
+  onResolve,
 }: Props) => {
 
   const { user } = useAuth()
@@ -60,6 +63,8 @@ const MaintenanceRow = ({
   const statusClass =
     STATUS_STYLES[request.status?.toLowerCase()] ??
     "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
+
+  const isSettled = request.status === "Resolved" || request.status === "Closed"
 
   return (
     <tr className="transition-colors hover:bg-slate-50/70">
@@ -172,19 +177,29 @@ const MaintenanceRow = ({
                 <ImageIcon size={14} /> View image
               </DropdownMenuItem>
 
-              {user?.user_type === "Admin" && (
-                <>
-                  <DropdownMenuItem onClick={() => onAssign?.(request)} className="gap-2 rounded-lg">
-                    <UserRoundPlus size={14} /> Assign staff
-                  </DropdownMenuItem>
-                </>
+              {user?.user_type === "Admin" && onAssign && (
+                <DropdownMenuItem onClick={() => onAssign(request)} className="gap-2 rounded-lg">
+                  <UserRoundPlus size={14} /> Assign staff
+                </DropdownMenuItem>
               )}
+
+              {onUpdateStatus && !isSettled && (
                 <DropdownMenuItem
-                    onClick={() => onUpdateStatus?.(request)}
-                    className="gap-2 rounded-lg"
-                  >
-                    <RefreshCcw size={14} /> Update status
-                  </DropdownMenuItem>
+                  onClick={() => onUpdateStatus(request)}
+                  className="gap-2 rounded-lg"
+                >
+                  <RefreshCcw size={14} /> Update status
+                </DropdownMenuItem>
+              )}
+
+              {onResolve && !isSettled && (
+                <DropdownMenuItem
+                  onClick={() => onResolve(request)}
+                  className="gap-2 rounded-lg text-emerald-700 focus:text-emerald-700"
+                >
+                  <CheckCheck size={14} /> Resolve request
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

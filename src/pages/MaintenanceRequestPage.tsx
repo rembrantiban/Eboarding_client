@@ -6,20 +6,54 @@ import MaintenanceStatsCards from "@/components/maintenance/MaintenanceStatsCard
 import MaintenanceTable from "@/components/maintenance/MaintenanceTable"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore"
 import AddMaintenanceRequestModal from "@/components/maintenance/AddMaintenanceRequestModal";
+import ViewMaintenanceRequestModal from "@/components/maintenance/ViewMaintenanceRequestModal";
+import ViewImageModal from "@/components/maintenance/ViewImageModal";
+import UpdateMaintenanceStatusModal, { type UpdateMaintenanceStatusPayload } from "@/components/maintenance/UpdateMaintenanceStatusModal";
+import ResolveMaintenanceRequestModal, { type ResolveMaintenanceRequestPayload } from "@/components/maintenance/ResolveMaintenanceRequestModal";
 import { useMaintenance } from "@/hooks/useMaintenace";
 
 
 const MaintenanceRequestPage = () => {
-    const { maintenanceRequest, loading, getMySubmittedRequest } = useMaintenance();
+    const { maintenanceRequest, loading, getMySubmittedRequest, updateAssignedMaintenanceRequest } = useMaintenance();
 
-    const [, setSelected] = useState<MaintenanceRequest | null>(null)
     const [open, setOpen] = useState(false)
+    const [viewRequest, setViewRequest] = useState<MaintenanceRequest | null>(null)
+    const [imageRequest, setImageRequest] = useState<MaintenanceRequest | null>(null)
+    const [updateRequest, setUpdateRequest] = useState<MaintenanceRequest | null>(null)
+    const [resolveRequest, setResolveRequest] = useState<MaintenanceRequest | null>(null)
 
-     
     useEffect(() => {
           getMySubmittedRequest();
           //eslint-disable-next-line
     }, [])
+
+    const handleUpdateStatus = async (payload: UpdateMaintenanceStatusPayload) => {
+        const success = await updateAssignedMaintenanceRequest(
+            payload.request_id,
+            payload.status,
+            payload.notes
+        );
+
+        if (!success) {
+            throw new Error("Failed to update maintenance status.");
+        }
+
+        await getMySubmittedRequest();
+    }
+
+    const handleResolve = async (payload: ResolveMaintenanceRequestPayload) => {
+        const success = await updateAssignedMaintenanceRequest(
+            payload.request_id,
+            "Resolved",
+            payload.notes
+        );
+
+        if (!success) {
+            throw new Error("Failed to resolve maintenance request.");
+        }
+
+        await getMySubmittedRequest();
+    }
 
     return (
         <div className="h-screen overflow-y-auto space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-5 py-6 bg-background ">
@@ -54,15 +88,44 @@ const MaintenanceRequestPage = () => {
             <MaintenanceTable
                 request={maintenanceRequest}
                 loading={loading}
-                onView={(r) => setSelected(r)}
-                onAssign={(r) => setSelected(r)}
-                onUpdateStatus={(r) => setSelected(r)}
+                onView={(r) => setViewRequest(r)}
+                onUpdateStatus={(r) => setUpdateRequest(r)}
+                onResolve={(r) => setResolveRequest(r)}
             />
 
             <AddMaintenanceRequestModal
                 open={open}
                 onClose={() => setOpen(false)}
                 onCreated={getMySubmittedRequest}
+            />
+
+            <ViewMaintenanceRequestModal
+                request={viewRequest}
+                onClose={() => setViewRequest(null)}
+                onViewImage={(r) => setImageRequest(r)}
+                onUpdateStatus={(r) => {
+                    setViewRequest(null)
+                    setUpdateRequest(r)
+                }}
+            />
+
+            <ViewImageModal
+                open={imageRequest !== null}
+                request={imageRequest}
+                onClose={() => setImageRequest(null)}
+            />
+
+            <UpdateMaintenanceStatusModal
+                open={updateRequest !== null}
+                request={updateRequest}
+                onClose={() => setUpdateRequest(null)}
+                onUpdate={handleUpdateStatus}
+            />
+
+            <ResolveMaintenanceRequestModal
+                request={resolveRequest}
+                onClose={() => setResolveRequest(null)}
+                onConfirm={handleResolve}
             />
         </div>
     )
