@@ -3,7 +3,7 @@ import {
     Search, SlidersHorizontal, MoreVertical,
      ChevronLeft, ChevronRight,  Eye,
     Tag, BanknoteArrowUp, BanknoteArrowDown,
-    FileX, FilePen
+    FileX, FilePen, ReceiptText
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Billing } from "@/store/useBillingStore"
@@ -34,6 +34,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import PrintBillingButton from "./PrintBillingButton"
 import PrintPaymentsReportButton from "./Printpaymentsreportbutton";
+import { useAuth } from "@/hooks/useAuth";
 
 export type BillingStatus = "Upcoming" | "Pending" | "Paid" | "Partial" | "Overdue" | "Cancelled";
 
@@ -49,6 +50,7 @@ interface BillingTableProps {
     onApplyDiscount?: (billing: Billing) => void;
     onApplyLateFee?: (billing: Billing) => void;
     onCancelBilling?: (billing: Billing) => void;
+    onGenerateReceipt?: (billing: Billing) => void;
 }
 
 function formatCurrency(value: number) {
@@ -120,7 +122,10 @@ export default function BillingTable({
     onApplyDiscount,
     onApplyLateFee,
     onCancelBilling,
+    onGenerateReceipt,
 }: BillingTableProps) {
+    const { user } = useAuth();
+    const isAdmin = user?.user_type === "Admin";
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState<BillingStatus | "all">("all");
     const [page, setPage] = useState(1);
@@ -337,7 +342,7 @@ export default function BillingTable({
                                                         className="gap-2 rounded-md py-1.5 text-[13px]"
                                                     >
                                                         <FilePen className="h-3.5 w-3.5 text-indigo-600" />
-                                                        Update information
+                                                        {isAdmin ? "Update Billing Information" : "Update Payment Record"}
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem
@@ -349,6 +354,15 @@ export default function BillingTable({
                                                     </DropdownMenuItem>
 
                                                     <DropdownMenuItem
+                                                        onClick={() => onGenerateReceipt?.(b)}
+                                                        disabled={Number(b.paid_amount) <= 0}
+                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                    >
+                                                        <ReceiptText className="h-3.5 w-3.5 text-slate-600" />
+                                                        Generate official receipt
+                                                    </DropdownMenuItem>
+
+                                                    <DropdownMenuItem
                                                         onClick={() => onCancelBilling?.(b)}
                                                         className="gap-2 rounded-md py-1.5 text-[13px]"
                                                     >
@@ -356,23 +370,27 @@ export default function BillingTable({
                                                         Cancel payment
                                                     </DropdownMenuItem>
 
-                                                    <DropdownMenuSeparator className="my-1 bg-slate-100" />
+                                                    {isAdmin && (
+                                                        <>
+                                                            <DropdownMenuSeparator className="my-1 bg-slate-100" />
 
-                                                    <DropdownMenuItem
-                                                        onClick={() => onApplyDiscount?.(b)}
-                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
-                                                    >
-                                                        <Tag className="h-3.5 w-3.5 text-blue-600" />
-                                                        Apply discount
-                                                    </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => onApplyDiscount?.(b)}
+                                                                className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                            >
+                                                                <Tag className="h-3.5 w-3.5 text-blue-600" />
+                                                                Apply discount
+                                                            </DropdownMenuItem>
 
-                                                    <DropdownMenuItem
-                                                        onClick={() => onApplyLateFee?.(b)}
-                                                        className="gap-2 rounded-md py-1.5 text-[13px]"
-                                                    >
-                                                        <BanknoteArrowUp className="h-3.5 w-3.5 text-rose-600" />
-                                                        Apply late payment fee
-                                                    </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                onClick={() => onApplyLateFee?.(b)}
+                                                                className="gap-2 rounded-md py-1.5 text-[13px]"
+                                                            >
+                                                                <BanknoteArrowUp className="h-3.5 w-3.5 text-rose-600" />
+                                                                Apply late payment fee
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    )}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>

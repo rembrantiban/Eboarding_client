@@ -11,6 +11,8 @@ import ApplyLateFeeModal from "@/components/Billing/ApplyLateFeeModal";
 import ViewBilling from "@/components/Billing/ViewBillingModal"
 import CancelBillingModal from "@/components/Billing/CancelBillingModal";
 import UpdateBillingModal from "@/components/Billing/UpdateBillingModal";
+import OfficialReceiptModal from "@/components/Billing/OfficialReceiptModal";
+import type { PaymentHistory } from "@/store/useBillingStore";
 
 const Billing = () => {
 
@@ -22,7 +24,9 @@ const Billing = () => {
         applyLateFee,
         applyDiscount,
         cancelBilling,
-        updateBillingInfo
+        updateBillingInfo,
+        getPaymentHistory,
+        paymentHistory,
     } = useBillingStore();
     const [selectedBilling, setSelectedBilling] = useState<BillingType | null>(null);
     const [paymentOpen, setPaymentOpen] = useState(false);
@@ -32,13 +36,24 @@ const Billing = () => {
     const [cancelOpen, setCancelOpen] = useState(false);
     const [updateOpen, setUpdateOpen] = useState(false);
 
-
+    const [officialReceipt, setOfficialReceipt] = useState<PaymentHistory | null>(null);
 
     const [viewOpen, setViewOpen] = useState(false);
 
     useEffect(() => {
         getAllBillings();
-    }, [getAllBillings]);
+        getPaymentHistory();
+    }, [getAllBillings, getPaymentHistory]);
+
+    const openReceiptFor = (billing: BillingType) => {
+        const latest = paymentHistory
+            .filter((p) => p.billing_id === billing.id)
+            .sort(
+                (a, b) => new Date(b.received_at).getTime() - new Date(a.received_at).getTime()
+            )[0];
+
+        if (latest) setOfficialReceipt(latest);
+    };
 
     // Temporary until you build a backend stats endpoint
     const stats = {
@@ -133,6 +148,8 @@ const Billing = () => {
                         setSelectedBilling(billing);
                         setCancelOpen(true);
                     }}
+
+                    onGenerateReceipt={openReceiptFor}
                 />
                 <RecordPaymentModal
                     open={paymentOpen}
@@ -142,11 +159,24 @@ const Billing = () => {
                         setSelectedBilling(null);
                     }}
                     onSubmit={async (data) => {
-                        await recordPayment({
+                        const success = await recordPayment({
                             billingId: data.billing_id,
                             amount: data.amount,
                         });
+
+                        if (success) {
+                            await getPaymentHistory();
+                            const latest = useBillingStore.getState().paymentHistory[0];
+                            if (latest?.billing_id === data.billing_id) {
+                                setOfficialReceipt(latest);
+                            }
+                        }
                     }}
+                />
+
+                <OfficialReceiptModal
+                    payment={officialReceipt}
+                    onClose={() => setOfficialReceipt(null)}
                 />
 
                 <ApplyDiscountModal
@@ -246,10 +276,7 @@ const Billing = () => {
                         setSelectedBilling(billing);
                         setLateFeeOpen(true);
                     }}
-                    onPrint={(billing) => {
-                        console.log("Print billing", billing);
-                        // TODO: Generate PDF or window.print()
-                    }}
+                    onGenerateReceipt={openReceiptFor}
                 />
 
                 <CancelBillingModal

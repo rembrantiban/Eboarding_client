@@ -14,7 +14,7 @@ const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/25",
   "in progress": "bg-indigo-400/15 text-indigo-300 ring-1 ring-indigo-400/25",
   completed: "bg-emerald-400/15 text-emerald-300 ring-1 ring-emerald-400/25",
-  cancelled: "bg-white/10 text-slate-300 ring-1 ring-white/15",
+  closed: "bg-white/10 text-slate-300 ring-1 ring-white/15",
   rejected: "bg-rose-400/15 text-rose-300 ring-1 ring-rose-400/25",
 }
 

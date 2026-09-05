@@ -12,7 +12,6 @@ import {
   Hammer,
   CheckCheck,
   Archive,
-  Ban,
   X,
   UserRound,
   MapPin,
@@ -53,11 +52,6 @@ const STATUS_META: Record<
     badge: "bg-slate-100 text-slate-700 ring-1 ring-slate-200",
     dot: "bg-slate-400",
     icon: Archive,
-  },
-  Cancelled: {
-    badge: "bg-rose-50 text-rose-700 ring-1 ring-rose-100",
-    dot: "bg-rose-500",
-    icon: Ban,
   },
 }
 
@@ -581,19 +575,17 @@ const BoarderMaintenancePage = () => {
         )}
       </div>
 
-      {boarderAssignedRoom && (
-        <SubmitMaintenanceRequestModal
-          open={open}
-          roomId={boarderAssignedRoom.room_id}
-          roomNumber={boarderAssignedRoom.room_number}
-          onClose={() => setOpen(false)}
-          onSubmit={async (formData) => {
-            const ok = await createMaintenanceRequest(formData);
-            if (ok) await getMySubmittedRequest();
-            return ok;
-          }}
-        />
-      )}
+      <SubmitMaintenanceRequestModal
+        open={open}
+        roomId={boarderAssignedRoom?.room_id}
+        roomNumber={boarderAssignedRoom?.room_number}
+        onClose={() => setOpen(false)}
+        onSubmit={async (formData) => {
+          const ok = await createMaintenanceRequest(formData);
+          if (ok) await getMySubmittedRequest();
+          return ok;
+        }}
+      />
       <RequestDetailsModal
         request={detailsRequest}
         onClose={() => setDetailsRequest(null)}

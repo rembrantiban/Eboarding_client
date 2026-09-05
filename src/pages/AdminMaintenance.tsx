@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react"
-import { Wrench } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { Wrench, Archive } from "lucide-react"
 import MaintenanceStatsCards from "@/components/maintenance/MaintenanceStatsCards"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore"
 import { useMaintenance } from "@/hooks/useMaintenace";
+import { useAuth } from "@/hooks/useAuth";
 import AdminMaintenanceTable from "@/components/maintenance/AdminMaintenanceTable";
 
 
 const AdminMaintenanceRequestPage = () => {
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const { submittedMaintenance, loading, getSubmittedMaintenance } = useMaintenance();
 
     const [, setSelected] = useState<MaintenanceRequest | null>(null)
@@ -36,6 +40,17 @@ const AdminMaintenanceRequestPage = () => {
                         </p>
                     </div>
                 </div>
+
+                {user?.user_type === "Admin" && (
+                    <button
+                        type="button"
+                        onClick={() => navigate("/admin-maintenance-history")}
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 text-[12.5px] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+                    >
+                        <Archive className="h-3.5 w-3.5" />
+                        View Maintenance History
+                    </button>
+                )}
             </div>
 
             <MaintenanceStatsCards requests={submittedMaintenance} />

@@ -17,6 +17,8 @@ import AssignMaintenanceRequestModal, { type AssignMaintenancePayload } from "./
 import { useAuth } from "@/hooks/useAuth"
 import { useMaintenance } from "@/hooks/useMaintenace";
 import UpdateMaintenanceStatusModal, { type UpdateMaintenanceStatusPayload } from "./UpdateMaintenanceStatusModal";
+import ViewMaintenanceRequestModal from "./ViewMaintenanceRequestModal";
+import CloseMaintenanceRequestModal, { type CloseMaintenanceRequestPayload } from "./CloseMaintenanceRequestModal";
 
 type Props = {
     request: MaintenanceRequest[]
@@ -26,14 +28,13 @@ type Props = {
     onUpdateStatus?: (request: MaintenanceRequest) => void
 }
 
-const STATUS_OPTIONS = ["Pending", "In Progress", "Completed"]
+const STATUS_OPTIONS = ["Pending", "In Progress", "Completed", "Closed"]
 const ITEMS_PER_PAGE = 7
 const COLUMN_COUNT = 8
 
 const MaintenanceTable = ({
     request,
     loading,
-    onView,
 }: Props) => {
     const [search, setSearch] = useState("")
     const [status, setStatus] = useState("")
@@ -41,6 +42,8 @@ const MaintenanceTable = ({
     const [currentPage, setCurrentPage] = useState(1)
     const [imageRequest, setImageRequest] = useState<MaintenanceRequest | null>(null)
     const [assignRequest, setAssignRequest] = useState<MaintenanceRequest | null>(null);
+    const [viewRequest, setViewRequest] = useState<MaintenanceRequest | null>(null);
+    const [closeRequest, setCloseRequest] = useState<MaintenanceRequest | null>(null);
     const { staff, getAvailableStaff, staffLoading } = useAuth()
     const { assignMaintenanceRequest, getSubmittedMaintenance, loading: maintenanceLoading, updateMaintenanceStatus } = useMaintenance()
     const [updateRequest, setUpdateRequest] = useState<MaintenanceRequest | null>(null);
@@ -165,6 +168,23 @@ const MaintenanceTable = ({
     await getAvailableStaff();
 
 };
+
+    const handleCloseMaintenance = async (
+        payload: CloseMaintenanceRequestPayload
+    ) => {
+        const success = await updateMaintenanceStatus(
+            payload.request_id,
+            "Closed",
+            payload.notes
+        );
+
+        if (!success) {
+            throw new Error("Failed to close maintenance request.");
+        }
+
+        await getSubmittedMaintenance();
+        await getAvailableStaff();
+    };
     return (
         <>
             <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
@@ -317,10 +337,11 @@ const MaintenanceTable = ({
                                         <AdminMaintenanceRow
                                             key={item.id}
                                             request={item}
-                                            onView={onView}
+                                            onView={setViewRequest}
                                             onViewImage={setImageRequest}
                                             onAssign={setAssignRequest}
                                             onUpdateStatus={setUpdateRequest}
+                                            onCloseRequest={setCloseRequest}
                                         />
                                     ))
                                 )}
@@ -410,6 +431,26 @@ const MaintenanceTable = ({
                 request={updateRequest}
                 onClose={() => setUpdateRequest(null)}
                 onUpdate={handleUpdateMaintenance}
+            />
+
+            <ViewMaintenanceRequestModal
+                request={viewRequest}
+                onClose={() => setViewRequest(null)}
+                onViewImage={setImageRequest}
+                onUpdateStatus={(r) => {
+                    setViewRequest(null)
+                    setUpdateRequest(r)
+                }}
+                onCloseRequest={(r) => {
+                    setViewRequest(null)
+                    setCloseRequest(r)
+                }}
+            />
+
+            <CloseMaintenanceRequestModal
+                request={closeRequest}
+                onClose={() => setCloseRequest(null)}
+                onConfirm={handleCloseMaintenance}
             />
         </>
     )

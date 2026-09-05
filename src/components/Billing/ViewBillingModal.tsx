@@ -1,8 +1,11 @@
 "use client";
 
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import {
     X,
     Receipt,
+    ReceiptText,
     CalendarClock,
     BedDouble,
     BanknoteArrowDown,
@@ -21,6 +24,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { Billing } from "@/store/useBillingStore";
+import { useAuth } from "@/hooks/useAuth";
+import BillingStatementPrint from "@/components/Billing/BillingStatementPrint";
 
 export type BillingStatus = "Pending" | "Paid" | "Partial" | "Overdue" | "Cancelled";
 
@@ -31,8 +36,16 @@ interface ViewBillingModalProps {
     onRecordPayment?: (billing: Billing) => void;
     onApplyDiscount?: (billing: Billing) => void;
     onApplyLateFee?: (billing: Billing) => void;
-    onPrint?: (billing: Billing) => void;
+    onGenerateReceipt?: (billing: Billing) => void;
 }
+
+const PRINT_PAGE_STYLE = `
+  @page { size: 80mm auto; margin: 4mm; }
+  @media print {
+    html, body { background: #fff; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+`;
 
 function formatCurrency(value: number) {
     return `₱${value.toLocaleString("en-PH", {
@@ -65,8 +78,18 @@ export default function ViewBillingModal({
     onRecordPayment,
     onApplyDiscount,
     onApplyLateFee,
-    onPrint,
+    onGenerateReceipt,
 }: ViewBillingModalProps) {
+    const { user } = useAuth();
+    const isAdmin = user?.user_type === "Admin";
+
+    const printRef = useRef<HTMLDivElement>(null);
+    const handlePrint = useReactToPrint({
+        contentRef: printRef,
+        documentTitle: billing ? `Billing-Statement-${billing.billing_no}` : "Billing-Statement",
+        pageStyle: PRINT_PAGE_STYLE,
+    });
+
     if (!billing) return null;
 
     // TODO: wire up once the Billing type/store exposes a late fee field.
@@ -237,28 +260,42 @@ export default function ViewBillingModal({
                     <div className="flex items-center gap-2">
                         <Button
                             variant="outline"
-                            onClick={() => onPrint?.(billing)}
+                            onClick={() => handlePrint()}
                             className="h-9 rounded-xl text-sm font-medium text-slate-600"
                         >
                             <Printer className="h-3.5 w-3.5" />
                             Print
                         </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => onApplyDiscount?.(billing)}
-                            className="h-9 rounded-xl text-sm font-medium text-blue-600"
-                        >
-                            <Tag className="h-3.5 w-3.5" />
-                            Discount
-                        </Button>
-                        <Button
-                            variant="outline"
-                            onClick={() => onApplyLateFee?.(billing)}
-                            className="h-9 rounded-xl text-sm font-medium text-rose-600"
-                        >
-                            <BanknoteArrowUp className="h-3.5 w-3.5" />
-                            Late Fee
-                        </Button>
+                        {paid > 0 && (
+                            <Button
+                                variant="outline"
+                                onClick={() => onGenerateReceipt?.(billing)}
+                                className="h-9 rounded-xl text-sm font-medium text-slate-600"
+                            >
+                                <ReceiptText className="h-3.5 w-3.5" />
+                                Official Receipt
+                            </Button>
+                        )}
+                        {isAdmin && (
+                            <>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => onApplyDiscount?.(billing)}
+                                    className="h-9 rounded-xl text-sm font-medium text-blue-600"
+                                >
+                                    <Tag className="h-3.5 w-3.5" />
+                                    Discount
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => onApplyLateFee?.(billing)}
+                                    className="h-9 rounded-xl text-sm font-medium text-rose-600"
+                                >
+                                    <BanknoteArrowUp className="h-3.5 w-3.5" />
+                                    Late Fee
+                                </Button>
+                            </>
+                        )}
                     </div>
                     <Button
                         onClick={() => onRecordPayment?.(billing)}
@@ -269,6 +306,12 @@ export default function ViewBillingModal({
                     </Button>
                 </DialogFooter>
             </DialogContent>
+
+            {/* Kept in the DOM but off-canvas — `hidden`/`display:none` would
+                give react-to-print an unrendered node with zero height. */}
+            <div className="pointer-events-none fixed -left-2499.75 top-0" aria-hidden>
+                <BillingStatementPrint ref={printRef} billing={billing} />
+            </div>
         </Dialog>
     );
 }

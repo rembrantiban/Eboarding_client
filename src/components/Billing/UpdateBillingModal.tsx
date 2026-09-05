@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { Billing } from "@/store/useBillingStore";
+import { useAuth } from "@/hooks/useAuth";
 
 export type BillingStatus =
     | "Upcoming"
@@ -71,6 +72,8 @@ export default function UpdateBillingModal({
     billing,
     onSubmit,
 }: UpdateBillingModalProps) {
+    const { user } = useAuth();
+    const isAdmin = user?.user_type === "Admin";
     const [billingType, setBillingType] = useState("Monthly Rent");
     const [billingMonth, setBillingMonth] = useState("");
     const [dueDate, setDueDate] = useState("");
@@ -158,7 +161,7 @@ export default function UpdateBillingModal({
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                             <FilePen className="h-4 w-4" />
                         </span>
-                        Update Billing Information
+                        {isAdmin ? "Update Billing Information" : "Update Payment Record "}
                     </DialogTitle>
                     <button
                         onClick={() => onOpenChange(false)}
@@ -245,7 +248,7 @@ export default function UpdateBillingModal({
                         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
                             Amounts
                         </p>
-                        <div className="grid gap-3 sm:grid-cols-3">
+                        <div className={`grid gap-3 ${isAdmin ? "sm:grid-cols-3" : "sm:grid-cols-1"}`}>
                             {[
                                 {
                                     label: "Room Fee",
@@ -253,18 +256,22 @@ export default function UpdateBillingModal({
                                     set: setRoomFee,
                                     hint: "Base monthly charge",
                                 },
-                                {
-                                    label: "Discount",
-                                    value: discountInput,
-                                    set: setDiscountInput,
-                                    hint: "Deducted from total",
-                                },
-                                {
-                                    label: "Late Fee",
-                                    value: lateFeeInput,
-                                    set: setLateFeeInput,
-                                    hint: "Added to total",
-                                },
+                                ...(isAdmin
+                                    ? [
+                                        {
+                                            label: "Discount",
+                                            value: discountInput,
+                                            set: setDiscountInput,
+                                            hint: "Deducted from total",
+                                        },
+                                        {
+                                            label: "Late Fee",
+                                            value: lateFeeInput,
+                                            set: setLateFeeInput,
+                                            hint: "Added to total",
+                                        },
+                                    ]
+                                    : []),
                             ].map((field) => (
                                 <label key={field.label} className="block">
                                     <span className="mb-1 block text-[11px] font-medium text-slate-500">

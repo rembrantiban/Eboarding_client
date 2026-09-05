@@ -9,6 +9,7 @@ import {
   ImagePlus,
   Trash2,
   ChevronDown,
+  DoorOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,9 +18,9 @@ import { MAINTENANCE_CATEGORIES } from "./maintenance";
 
 type Props = {
   open: boolean;
-  /** Pre-filled from the boarder's active contract — shown, not editable. */
-  roomId: number;
-  roomNumber: string;
+  /** Pre-filled from the boarder's active contract — shown, not editable. Absent while the assignment is still loading or missing. */
+  roomId?: number | null;
+  roomNumber?: string | null;
   onClose: () => void;
   /** Wire straight to useMaintenanceStore().createMaintenanceRequest */
   onSubmit: (data: FormData) => Promise<boolean>;
@@ -44,8 +45,10 @@ const SubmitMaintenanceRequestModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const hasRoom = Boolean(roomId && roomNumber);
+
   const canSubmit =
-    category !== "" && description.trim().length >= 10 && !submitting;
+    hasRoom && category !== "" && description.trim().length >= 10 && !submitting;
 
   // Reset on open
   useEffect(() => {
@@ -110,7 +113,7 @@ const SubmitMaintenanceRequestModal = ({
   };
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !roomId) return;
 
     setSubmitting(true);
     setError(null);
@@ -177,17 +180,32 @@ const SubmitMaintenanceRequestModal = ({
         {/* Body */}
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
           {/* Room — read only */}
-          <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200/80">
-            <div>
-              <p className="text-[10.5px] font-medium uppercase tracking-wider text-slate-400">
-                Your room
-              </p>
-              <p className="mt-1 text-[12.5px] font-semibold text-slate-900">
-                Room {roomNumber}
-              </p>
+          {hasRoom ? (
+            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200/80">
+              <div>
+                <p className="text-[10.5px] font-medium uppercase tracking-wider text-slate-400">
+                  Your room
+                </p>
+                <p className="mt-1 text-[12.5px] font-semibold text-slate-900">
+                  Room {roomNumber}
+                </p>
+              </div>
+              <p className="text-[11px] text-slate-400">From your contract</p>
             </div>
-            <p className="text-[11px] text-slate-400">From your contract</p>
-          </div>
+          ) : (
+            <div className="flex items-start gap-2.5 rounded-xl bg-amber-50 px-4 py-3 ring-1 ring-amber-200">
+              <DoorOpen className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+              <div className="min-w-0">
+                <p className="text-[12px] font-semibold text-amber-900">
+                  No room assigned yet
+                </p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-amber-700">
+                  We could not find an active room assignment for your account. Please
+                  contact the admin office before filing a maintenance request.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Category */}
           <div>
@@ -202,7 +220,7 @@ const SubmitMaintenanceRequestModal = ({
                 id="request-category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                disabled={submitting}
+                disabled={submitting || !hasRoom}
                 className="h-9 w-full appearance-none rounded-lg border border-slate-200 bg-white pl-3 pr-8 text-[12.5px] text-slate-800 outline-none transition focus:border-slate-900 disabled:bg-slate-50"
               >
                 <option value="">Select a category</option>
@@ -242,7 +260,7 @@ const SubmitMaintenanceRequestModal = ({
               value={description}
               maxLength={MAX_DESCRIPTION}
               onChange={(e) => setDescription(e.target.value)}
-              disabled={submitting}
+              disabled={submitting || !hasRoom}
               placeholder="Where is it, when did it start, and what happens? The more detail, the faster we can fix it."
               className="resize-none rounded-lg border-slate-200 text-[12.5px] text-slate-800 outline-none transition placeholder:text-slate-400 focus-visible:border-slate-900 focus-visible:ring-0 disabled:bg-slate-50"
             />
@@ -293,7 +311,7 @@ const SubmitMaintenanceRequestModal = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={submitting}
+                disabled={submitting || !hasRoom}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
@@ -325,11 +343,13 @@ const SubmitMaintenanceRequestModal = ({
               </p>
             ) : (
               <p className="text-slate-400">
-                {category === ""
-                  ? "Pick a category to continue."
-                  : description.trim().length < 10
-                    ? "Describe the problem to continue."
-                    : "Ready to send."}
+                {!hasRoom
+                  ? "A room assignment is required before you can file a request."
+                  : category === ""
+                    ? "Pick a category to continue."
+                    : description.trim().length < 10
+                      ? "Describe the problem to continue."
+                      : "Ready to send."}
               </p>
             )}
           </div>

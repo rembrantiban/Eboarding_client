@@ -4,7 +4,6 @@ export type MaintenanceStatus =
   | "In Progress"
   | "Completed"
   | "Closed"
-  | "Cancelled"
 
 export type MaintenanceCategory =
   | "Electrical"
@@ -153,7 +152,7 @@ export const SAMPLE_MAINTENANCE_REQUESTS: MaintenanceRequest[] = [
       "Requested an extra fan for the room, but I already bought one myself.",
     priority: "Low",
     image_url: null,
-    status: "Cancelled",
+    status: "Closed",
     assigned_staff: null,
     created_at: "2026-07-10T18:33:00+08:00",
     updated_at: "2026-07-11T10:05:00+08:00",

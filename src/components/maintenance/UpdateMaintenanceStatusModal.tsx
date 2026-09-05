@@ -13,7 +13,6 @@ import {
   Hammer,
   CheckCheck,
   Archive,
-  Ban,
   Check,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -26,7 +25,6 @@ export type MaintenanceStatus =
   | "In Progress"
   | "Completed"
   | "Closed"
-  | "Cancelled"
 
 export type UpdateMaintenanceStatusPayload = {
     request_id: number;
@@ -86,30 +84,21 @@ const STATUS_OPTIONS: StatusOption[] = [
     selected: "border-slate-400 bg-slate-50 ring-1 ring-slate-300",
     iconTile: "bg-slate-200 text-slate-700",
   },
-  {
-    value: "Cancelled",
-    description: "No longer needed or raised in error.",
-    icon: Ban,
-    badge: "bg-rose-50 text-rose-700 ring-1 ring-rose-100",
-    selected: "border-rose-300 bg-rose-50/50 ring-1 ring-rose-200",
-    iconTile: "bg-rose-100 text-rose-700",
-  },
 ]
 
 /** Which statuses a request can move to from where it is now. */
 const TRANSITIONS: Record<string, MaintenanceStatus[]> = {
-  pending: ["In Progress", "Completed", "Cancelled"],
-  "in progress": ["Completed", "Cancelled"],
+  pending: ["In Progress", "Completed"],
+  "in progress": ["Completed"],
   completed: ["Closed", "In Progress"],
   closed: [],
-  cancelled: ["Pending", "In Progress"],
 }
 
 const getOption = (status?: string) =>
   STATUS_OPTIONS.find((o) => o.value.toLowerCase() === status?.toLowerCase())
 
 /** Statuses that require a written note before the update can be saved. */
-const NOTE_REQUIRED: MaintenanceStatus[] = ["Completed", "Cancelled"]
+const NOTE_REQUIRED: MaintenanceStatus[] = ["Completed"]
 
 const NOTE_COPY: Record<string, { label: string; placeholder: string }> = {
   Pending: {
@@ -127,10 +116,6 @@ const NOTE_COPY: Record<string, { label: string; placeholder: string }> = {
   Closed: {
     label: "Closing remarks",
     placeholder: "Any final remarks before this request is archived...",
-  },
-  Cancelled: {
-    label: "Reason for cancelling",
-    placeholder: "Explain why this request is being cancelled...",
   },
 }
 

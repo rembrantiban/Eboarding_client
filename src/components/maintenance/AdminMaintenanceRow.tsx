@@ -8,6 +8,7 @@ import {
     Maximize2,
     ImageIcon,
     PencilLine,
+    Archive,
 } from "lucide-react"
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore" // TODO: adjust import path
 import {
@@ -25,13 +26,14 @@ type Props = {
     onViewImage?: (request: MaintenanceRequest) => void
     onAssign?: (request: MaintenanceRequest) => void
     onUpdateStatus?: (request: MaintenanceRequest) => void
+    onCloseRequest?: (request: MaintenanceRequest) => void
 }
 
 const STATUS_STYLES: Record<string, string> = {
     pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
     "in progress": "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100",
     completed: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
-    cancelled: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+    closed: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
     rejected: "bg-rose-50 text-rose-700 ring-1 ring-rose-100",
 }
 
@@ -54,10 +56,12 @@ const MaintenanceRow = ({
     onViewImage,
     onAssign,
     onUpdateStatus,
+    onCloseRequest,
 }: Props) => {
 
     const { user } = useAuth()
     const isAssigned = request.assigned_staff?.trim() !== "";
+    const isCompleted = request.status?.toLowerCase() === "completed";
 
     const statusClass =
         STATUS_STYLES[request.status?.toLowerCase()] ??
@@ -199,6 +203,15 @@ const MaintenanceRow = ({
                                     >
                                         <UserRoundPlus size={14} />
                                         {isAssigned ? "Already Assigned" : "Assign Staff"}
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem
+                                        disabled={!isCompleted}
+                                        onClick={() => onCloseRequest?.(request)}
+                                        className="gap-2 rounded-lg"
+                                    >
+                                        <Archive size={14} />
+                                        Close request
                                     </DropdownMenuItem>
                                 </>
                             )}

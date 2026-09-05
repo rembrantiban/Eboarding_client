@@ -14,6 +14,7 @@ import {
 import { useBilling } from "@/hooks/useBilling";
 import PrintModal from "@/components/BillingStatement/PrintModal";
 import StatementReceipt from "@/components/BillingStatement/StatementReceipt";
+import OfficialReceiptModal from "@/components/Billing/OfficialReceiptModal";
 
 
 const peso = (n: number) =>
@@ -77,13 +78,15 @@ function initials(first: string, last: string) {
 
 export default function BillingStatement() {
 
-  const { myPendingBilling, getMyPendingBilling } = useBilling();
+  const { myPendingBilling, getMyPendingBilling, myPaymentHistory, getMyPaymentHistory } = useBilling();
   const [activeId, setActiveId] = useState<number | null>(null);
   const [printOpen, setPrintOpen] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   useEffect(() => {
     getMyPendingBilling();
-  }, [getMyPendingBilling]);
+    getMyPaymentHistory();
+  }, [getMyPendingBilling, getMyPaymentHistory]);
 
 
   useEffect(() => {
@@ -156,6 +159,10 @@ export default function BillingStatement() {
   }
 
   const st = STATUS_STYLE[bill.status];
+
+  const latestPayment = myPaymentHistory
+    .filter((p) => p.billing_id === bill.id)
+    .sort((a, b) => new Date(b.received_at).getTime() - new Date(a.received_at).getTime())[0];
 
   const lineItems = [
     {
@@ -407,6 +414,14 @@ export default function BillingStatement() {
 
           {/* Actions */}
           <div className="px-6 py-4 md:px-8 flex justify-end gap-2 bg-slate-50 border-t border-slate-200">
+            {latestPayment && (
+              <button
+                onClick={() => setReceiptOpen(true)}
+                className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-100"
+              >
+                <ReceiptText size={15} /> Official Receipt
+              </button>
+            )}
             <button
               onClick={() => setPrintOpen(true)}
               className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium text-white bg-slate-900 hover:bg-slate-800"
@@ -427,6 +442,13 @@ export default function BillingStatement() {
       >
         <StatementReceipt bill={bill} />
       </PrintModal>
+
+      {receiptOpen && (
+        <OfficialReceiptModal
+          payment={latestPayment ?? null}
+          onClose={() => setReceiptOpen(false)}
+        />
+      )}
     </div>
   );
 }

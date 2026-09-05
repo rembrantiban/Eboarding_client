@@ -8,8 +8,7 @@ export type MaintenanceStatus =
     | "Pending"
     | "In Progress"
     | "Completed"
-    | "Closed"
-    | "Cancelled";
+    | "Closed";
 
 export interface MaintenanceRequest {
     id: number;
@@ -39,6 +38,12 @@ export interface MaintenanceRequest {
 
     date?: string;
     requested_by: string,
+
+    priority?: string;
+    remarks?: string;
+    resolved_at?: string | null;
+    boarder_confirmed?: boolean;
+    closed_by?: string;
 }
 
 export interface MaintenanceRequest {
@@ -66,10 +71,13 @@ interface MaintenanceStore {
     maintenanceRequest: MaintenanceRequest[];
     boarderRequest: MaintenanceRequest[];
     assignedMaintenanceList: MaintenanceRequest[];
+    maintenanceHistory: MaintenanceRequest[];
 
     createMaintenanceRequest: (data: FormData) => Promise<boolean>;
 
     getSubmittedMaintenance: () => Promise<boolean>;
+
+    getMaintenanceHistory: () => Promise<boolean>;
 
     getMyAssignedMaintenance: () => Promise<boolean>;
 
@@ -98,6 +106,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
 
     boarderRequest: [],
     assignedMaintenanceList: [],
+    maintenanceHistory: [],
 
 
     updateAssignedMaintenanceRequest: async (
@@ -320,6 +329,35 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
 
             set({
                 submittedMaintenance: res.data,
+            });
+
+            return true;
+
+        } catch {
+
+            return false;
+
+        } finally {
+
+            set({ loading: false });
+
+        }
+
+    },
+
+    getMaintenanceHistory: async () => {
+
+        try {
+
+            set({ loading: true });
+
+            const res =
+                await axiosInstance.get(
+                    "/maintenance/history"
+                );
+
+            set({
+                maintenanceHistory: res.data,
             });
 
             return true;

@@ -36,6 +36,7 @@ import DeletedAccountsPage from './pages/DeletedAccounts'
 import StaffAnnouncementsPage from "@/pages/StaffAnnouncement"
 import MaintenanceRequestPage from './pages/MaintenanceRequestPage'
 import AdminMaintenanceRequestPage from './pages/AdminMaintenance'
+import AdminMaintenanceHistoryPage from './pages/AdminMaintenanceHistory'
 import BoarderMaintenancePage from './pages/BoarderMaintenancePage'
 import BoarderHouseRulesPage from './pages/BoarderHouseRulesPage'
 import ReportBoarder from './pages/ReportBoarder'
@@ -93,6 +94,7 @@ function App() {
             <Route path="/deleted-accounts" element={<DeletedAccountsPage />} />
             <Route path="/staff-maintenance" element={<MaintenanceRequestPage />} />
             <Route path="/admin-maintenance" element={<AdminMaintenanceRequestPage />} />
+            <Route path="/admin-maintenance-history" element={<AdminMaintenanceHistoryPage />} />
             <Route path='/staff-dashboard' element={<StaffDasboard />} />
             <Route path="/penalties" element={<PenaltiesPage />} />
 
