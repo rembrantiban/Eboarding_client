@@ -45,7 +45,7 @@ const STATUS_META: Record<
     dot: "bg-indigo-500",
     icon: Hammer,
   },
-  Completed: {
+  Resolved: {
     badge: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
     dot: "bg-emerald-500",
     icon: CheckCheck,
@@ -130,7 +130,7 @@ const ViewMaintenanceRequestModal = ({ request, onClose, onViewImage, onUpdateSt
   const meta = STATUS_META[request.status] ?? STATUS_META.Pending
   const StatusIcon = meta.icon
   const isClosed = request.status === "Closed"
-  const isCompleted = request.status === "Completed"
+  const isCompleted = request.status === "Resolved"
   const requesterName = request.reporter || request.requested_by || "Unknown"
   const hasResolution = Boolean(request.remarks || request.resolved_at)
 

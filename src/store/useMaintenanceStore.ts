@@ -7,7 +7,7 @@ import axios from "axios";
 export type MaintenanceStatus =
     | "Pending"
     | "In Progress"
-    | "Completed"
+    | "Resolved"
     | "Closed";
 
 export interface MaintenanceRequest {

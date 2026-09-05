@@ -2,7 +2,7 @@
 export type MaintenanceStatus =
   | "Pending"
   | "In Progress"
-  | "Completed"
+  | "Resolved"
   | "Closed"
 
 export type MaintenanceCategory =
@@ -111,7 +111,7 @@ export const SAMPLE_MAINTENANCE_REQUESTS: MaintenanceRequest[] = [
       "Wi-Fi keeps disconnecting every few minutes on the second floor, especially in the evening.",
     priority: "Normal",
     image_url: null,
-    status: "Completed",
+    status: "Resolved",
     assigned_staff: "Carlo Reyes",
     assigned_staff_id: "stf_01",
     created_at: "2026-07-28T20:05:00+08:00",

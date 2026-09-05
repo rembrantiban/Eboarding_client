@@ -43,7 +43,7 @@ const STATUS_META: Record<
     dot: "bg-indigo-500",
     icon: Hammer,
   },
-  Completed: {
+  Resolved: {
     badge: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
     dot: "bg-emerald-500",
     icon: CheckCheck,
@@ -55,7 +55,7 @@ const STATUS_META: Record<
   },
 }
 
-const TABS = ["All", "Pending", "In Progress", "Completed", "Closed"] as const
+const TABS = ["All", "Pending", "In Progress", "Resolved", "Closed"] as const
 type Tab = (typeof TABS)[number]
 
 
@@ -310,7 +310,7 @@ const BoarderMaintenancePage = () => {
     () => ({
       pending: boarderRequest.filter((r) => r.status === "Pending").length,
       inProgress: boarderRequest.filter((r) => r.status === "In Progress").length,
-      completed: boarderRequest.filter((r) => r.status === "Completed").length,
+      completed: boarderRequest.filter((r) => r.status === "Resolved").length,
       total: boarderRequest.length,
     }),
     [boarderRequest]
@@ -381,7 +381,7 @@ const BoarderMaintenancePage = () => {
             tone="bg-indigo-50 text-indigo-700"
           />
           <StatCard
-            label="Completed"
+            label="Resolved"
             value={counts.completed}
             icon={CheckCheck}
             tone="bg-emerald-50 text-emerald-700"

@@ -68,7 +68,7 @@ const getMaintenanceIcon = (category?: string) => {
 const MAINTENANCE_STATUS_STYLES: Record<string, string> = {
     Pending: "bg-amber-50 text-amber-700 ring-amber-200",
     "In Progress": "bg-blue-50 text-blue-700 ring-blue-200",
-    Completed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    Resolved: "bg-emerald-50 text-emerald-700 ring-emerald-200",
     Closed: "bg-slate-100 text-slate-700 ring-slate-200",
 };
 const peso = (n: number) => `₱${n.toLocaleString("en-PH")}`;
@@ -164,6 +164,11 @@ export default function StaffDashboard() {
             },
         ],
         [dashboardStats]
+    );
+
+    const inProgressMaintenanceList = useMemo(
+        () => assignedMaintenanceList.filter((req) => req.status === "In Progress"),
+        [assignedMaintenanceList]
     );
 
     const paymentData = useMemo(
@@ -531,14 +536,14 @@ export default function StaffDashboard() {
 
                         {/* List */}
                         <ul className="divide-y divide-slate-100">
-                            {assignedMaintenanceList.length === 0 && (
+                            {inProgressMaintenanceList.length === 0 && (
                                 <li className="px-5 py-10 text-center">
                                     <p className="text-[12px] font-medium text-slate-700">No maintenance requests</p>
                                     <p className="mt-0.5 text-[11px] text-slate-400">New requests will appear here.</p>
                                 </li>
                             )}
 
-                            {assignedMaintenanceList.map((req) => {
+                            {inProgressMaintenanceList.map((req) => {
                                 const Icon = getMaintenanceIcon(req.category || req.title);
 
                                 return (
@@ -607,7 +612,7 @@ export default function StaffDashboard() {
                         <div className="flex items-center justify-between border-t border-slate-100 px-5 py-3">
                             <span className="text-[11px] text-slate-500">
                                 <span className="font-semibold tabular-nums text-slate-900">
-                                    {assignedMaintenanceList.length}
+                                    {inProgressMaintenanceList.length}
                                 </span>{" "}
                                 total requests
                             </span>

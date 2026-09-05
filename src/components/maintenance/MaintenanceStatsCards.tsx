@@ -17,7 +17,7 @@ const MaintenanceStatsCards = ({ requests }: Props) => {
       total: requests.length,
       pending: count("Pending"),
       inProgress: count("In Progress"),
-      completed: count("Completed"),
+      completed: count("Resolved"),
     }
   }, [requests])
 
@@ -44,7 +44,7 @@ const MaintenanceStatsCards = ({ requests }: Props) => {
       tint: "bg-indigo-50 text-indigo-600",
     },
     {
-      label: "Completed",
+      label: "Resolved",
       value: stats.completed,
       icon: CheckCircle2,
       hint: "Resolved requests",

@@ -29,7 +29,7 @@ type Props = {
 const STATUS_STYLES: Record<string, string> = {
   pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
   "in progress": "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100",
-  completed: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
+  resolved: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
   closed: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
   rejected: "bg-rose-50 text-rose-700 ring-1 ring-rose-100",
 }

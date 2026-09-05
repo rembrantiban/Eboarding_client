@@ -56,7 +56,7 @@ type Props = {
 const STATUS_STYLES: Record<string, string> = {
     pending: "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
     "in progress": "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100",
-    completed: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
+    resolved: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
     closed: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
     rejected: "bg-rose-50 text-rose-700 ring-1 ring-rose-100",
 }
@@ -489,7 +489,7 @@ const AssignMaintenanceRequestModal = ({
 
                                             <div className="mt-3.5 grid grid-cols-3 gap-2">
                                                 <Stat label="Active" value={selectedStaff.active_requests} />
-                                                <Stat label="Completed" value={selectedStaff.completed_requests} />
+                                                <Stat label="Resolved" value={selectedStaff.completed_requests} />
                                                 <Stat label="Closed" value={selectedStaff.closed_requests} />
                                             </div>
                                         </div>

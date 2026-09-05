@@ -171,7 +171,7 @@ const CloseMaintenanceRequestModal = ({ request, onClose, onConfirm }: Props) =>
             <div className="flex items-center gap-2 text-[11.5px] text-slate-600">
               <CalendarClock className="h-3.5 w-3.5 shrink-0 text-slate-400" />
               <span className="truncate">
-                Completed {formatDate(request.updated_at ?? request.created_at)}
+                Resolved {formatDate(request.updated_at ?? request.created_at)}
               </span>
             </div>
           </div>

@@ -23,7 +23,7 @@ import type { MaintenanceRequest } from "@/store/useMaintenanceStore"
 export type MaintenanceStatus =
   | "Pending"
   | "In Progress"
-  | "Completed"
+  | "Resolved"
   | "Closed"
 
 export type UpdateMaintenanceStatusPayload = {
@@ -69,7 +69,7 @@ const STATUS_OPTIONS: StatusOption[] = [
     iconTile: "bg-indigo-100 text-indigo-700",
   },
   {
-    value: "Completed",
+    value: "Resolved",
     description: "Repair is finished and ready for review.",
     icon: CheckCheck,
     badge: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100",
@@ -88,9 +88,9 @@ const STATUS_OPTIONS: StatusOption[] = [
 
 /** Which statuses a request can move to from where it is now. */
 const TRANSITIONS: Record<string, MaintenanceStatus[]> = {
-  pending: ["In Progress", "Completed"],
-  "in progress": ["Completed"],
-  completed: ["Closed", "In Progress"],
+  pending: ["In Progress", "Resolved"],
+  "in progress": ["Resolved"],
+  resolved: ["Closed", "In Progress"],
   closed: [],
 }
 
@@ -98,7 +98,7 @@ const getOption = (status?: string) =>
   STATUS_OPTIONS.find((o) => o.value.toLowerCase() === status?.toLowerCase())
 
 /** Statuses that require a written note before the update can be saved. */
-const NOTE_REQUIRED: MaintenanceStatus[] = ["Completed"]
+const NOTE_REQUIRED: MaintenanceStatus[] = ["Resolved"]
 
 const NOTE_COPY: Record<string, { label: string; placeholder: string }> = {
   Pending: {
@@ -109,7 +109,7 @@ const NOTE_COPY: Record<string, { label: string; placeholder: string }> = {
     label: "Work note",
     placeholder: "What is being done, and what parts or help are needed?",
   },
-  Completed: {
+  Resolved: {
     label: "Resolution summary",
     placeholder: "Describe the repair, parts replaced, and any follow-up needed...",
   },
@@ -174,7 +174,7 @@ const UpdateMaintenanceStatusModal = ({ open, request, onClose, onUpdate }: Prop
   const allowed = useMemo(() => {
     const next = TRANSITIONS[currentStatus.toLowerCase()] ?? [
       "In Progress",
-      "Completed",
+      "Resolved",
       "Closed",
     ]
     return STATUS_OPTIONS.filter((o) => next.includes(o.value))
@@ -237,7 +237,7 @@ const UpdateMaintenanceStatusModal = ({ open, request, onClose, onUpdate }: Prop
         request_id: request.id,
         status,
         notes: notes.trim(),
-        ...(status === "Completed" ? { resolved_at: resolvedAt } : {}),
+        ...(status === "Resolved" ? { resolved_at: resolvedAt } : {}),
         ...(status === "Closed" ? { boarder_confirmed: confirmed } : {}),
       })
 
@@ -402,14 +402,14 @@ const UpdateMaintenanceStatusModal = ({ open, request, onClose, onUpdate }: Prop
             </fieldset>
           )}
 
-          {/* Completion date */}
-          {status === "Completed" && (
+          {/* Resolution date */}
+          {status === "Resolved" && (
             <div>
               <label
                 htmlFor="resolved-at"
                 className="mb-1.5 block text-[11.5px] font-medium text-slate-700"
               >
-                Date completed
+                Date resolved
               </label>
               <input
                 id="resolved-at"

@@ -28,7 +28,7 @@ type Props = {
     onUpdateStatus?: (request: MaintenanceRequest) => void
 }
 
-const STATUS_OPTIONS = ["Pending", "In Progress", "Completed", "Closed"]
+const STATUS_OPTIONS = ["Pending", "In Progress", "Resolved", "Closed"]
 const ITEMS_PER_PAGE = 7
 const COLUMN_COUNT = 8
 

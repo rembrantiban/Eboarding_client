@@ -62,7 +62,7 @@ const TONE: Record<Tone, { strip: string; badge: string; dot: string }> = {
 const toneOf = (value?: string | null): Tone => {
     if (!value) return "slate"
     const v = String(value).toLowerCase()
-    if (["approved", "active", "verified", "assigned", "completed"].includes(v)) return "emerald"
+    if (["approved", "active", "verified", "assigned", "completed", "resolved"].includes(v)) return "emerald"
     if (["under review", "pending", "review", "unassigned", "on hold"].includes(v)) return "amber"
     if (["rejected", "suspended", "banned", "inactive", "deactivated", "closed"].includes(v)) return "rose"
     return "slate"
@@ -386,7 +386,7 @@ const ViewUserPage = () => {
                                     />
                                     <Tile
                                         icon={CircleCheck}
-                                        label="Completed"
+                                        label="Resolved"
                                         value={String(user.completed_requests ?? 0)}
                                     />
                                     <Tile

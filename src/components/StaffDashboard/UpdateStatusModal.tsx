@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Loader2, CheckCircle2, ClipboardCheck } from "lucide-react";
 import type { MaintenanceRequest } from "@/store/useMaintenanceStore";
 
-type MaintenanceStatus = "Completed";
+type MaintenanceStatus = "Resolved";
 
 interface UpdateStatusModalProps {
     open: boolean;
@@ -42,7 +42,7 @@ export default function UpdateStatusModal({
 
     if (!open || !request) return null;
 
-    const alreadyCompleted = request.status === "Completed";
+    const alreadyCompleted = request.status === "Resolved";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -105,7 +105,7 @@ export default function UpdateStatusModal({
                         <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
                         <div className="min-w-0">
                             <p className="text-[13px] font-medium leading-tight text-emerald-800">
-                                Completed
+                                Resolved
                             </p>
                             <p className="mt-0.5 text-[11px] text-emerald-700/70">
                                 Work is finished and verified.
@@ -115,7 +115,7 @@ export default function UpdateStatusModal({
 
                     {alreadyCompleted && (
                         <p className="mt-2 text-[11px] text-slate-400">
-                            This request is already marked as completed.
+                            This request is already marked as resolved.
                         </p>
                     )}
 
@@ -147,11 +147,11 @@ export default function UpdateStatusModal({
                     <button
                         type="button"
                         disabled={loading || alreadyCompleted}
-                        onClick={() => onSubmit(request.id, "Completed", remarks.trim() || undefined)}
+                        onClick={() => onSubmit(request.id, "Resolved", remarks.trim() || undefined)}
                         className="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                     >
                         {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                        Mark as Completed
+                        Mark as Resolved
                     </button>
                 </div>
             </div>
