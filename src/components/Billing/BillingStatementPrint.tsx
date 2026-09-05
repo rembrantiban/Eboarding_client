@@ -29,7 +29,7 @@ interface BillingStatementPrintProps {
 
 const ORG_DEFAULT = {
     name: "E-Boarding House",
-    tagline: "A computerized boarding house management system for Ermings",
+    tagline: "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
     code: "ERMS · EBH",
 };
 

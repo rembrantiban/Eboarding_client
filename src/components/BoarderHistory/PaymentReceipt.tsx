@@ -79,7 +79,7 @@
     export default function PaymentReceipt({
         payment: p,
         companyName = "E-Boarding House",
-        tagline = "A computerized boarding house management system",
+        tagline = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
         stampSubtext = "EBH",
     }: PaymentReceiptProps) {
         useReceiptFonts();

@@ -172,8 +172,8 @@ export async function exportPaymentCollectionExcel({
     recentTransactions = [],
     boarderBillingStatus = [],
     periodLabel,
-    organization = "E-Boarding House Management",
-    addressLine = "Guihulngan City, Negros Oriental, Philippines",
+    organization = "E-Boarding House",
+    addressLine = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
     preparedBy = "",
 }: ExportPaymentCollectionOptions) {
     const now = new Date();

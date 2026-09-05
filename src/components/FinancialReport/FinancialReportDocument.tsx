@@ -88,8 +88,8 @@ const FinancialReportDocument = forwardRef<
         periodLabel,
         preparedBy = "________________________",
         notedBy = "________________________",
-        organization = "E-Boarding House Management",
-        addressLine = "Guihulngan City, Negros Oriental, Philippines",
+        organization = "E-Boarding House",
+        addressLine = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
     },
     ref
 ) {

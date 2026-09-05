@@ -142,8 +142,8 @@ export async function exportFinancialReportExcel({
     revenueTrend = [],
     detailedSummary,
     periodLabel,
-    organization = "E-Boarding House Management",
-    addressLine = "Guihulngan City, Negros Oriental, Philippines",
+    organization = "E-Boarding House",
+    addressLine = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
     preparedBy = "",
 }: ExportFinancialReportOptions) {
     const now = new Date();

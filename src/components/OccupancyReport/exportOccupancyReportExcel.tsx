@@ -165,8 +165,8 @@ export async function exportOccupancyReportExcel({
     recentActivities = [],
     insights = [],
     periodLabel,
-    organization = "E-Boarding House Management",
-    addressLine = "Guihulngan City, Negros Oriental, Philippines",
+    organization = "E-Boarding House",
+    addressLine = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
     preparedBy = "",
 }: ExportOccupancyReportOptions) {
     const now = new Date();

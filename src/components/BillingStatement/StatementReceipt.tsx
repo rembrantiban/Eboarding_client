@@ -156,7 +156,7 @@ const sampleBill: StatementBill = {
 export default function StatementReceipt({
     bill = sampleBill,
     companyName = "E-Boarding House",
-    tagline = "A Computerized Boarding House Management System for Ermings",
+    tagline = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
 }: StatementReceiptProps) {
     const accent = accentByStatus[bill.status];
     const isDue = bill.status === "Pending" || bill.status === "Partial" || bill.status === "Overdue";

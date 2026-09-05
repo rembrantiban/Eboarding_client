@@ -197,7 +197,7 @@ const DashboardPrints = ({
         }}
       >
         <span>
-          E-Boarding — A Computerized Boarding House Management System for
+          E-Boarding House — A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS
         </span>
         <span>Page 1 of 1</span>
       </div>

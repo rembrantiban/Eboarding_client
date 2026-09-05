@@ -37,10 +37,10 @@ const PaymentPrint = forwardRef<HTMLDivElement, Props>(({ payments }, ref) => {
       {/* ── BRAND ── */}
       <div style={{ textAlign: "center", marginBottom: "6px" }}>
         <div style={{ fontSize: "20px", fontWeight: 900, letterSpacing: "2px", textTransform: "uppercase" }}>
-          E-BOARDING
+          E-Boarding House
         </div>
         <div style={{ fontSize: "11px", color: "#555", letterSpacing: "1px", marginTop: "2px" }}>
-         E-BOARDING: A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS
+          A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS
         </div>
       </div>
 

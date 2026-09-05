@@ -130,6 +130,21 @@ function ChartTooltip({ active, payload, label }: ChartTooltipProps) {
 
 const PER_PAGE = 8;
 
+function currentMonthRangeLabel() {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    return `${firstDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+    })} – ${lastDay.toLocaleDateString("en-PH", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    })}`;
+}
+
 function getPageItems(current: number, total: number): (number | "ellipsis")[] {
     if (total <= 6) return Array.from({ length: total }, (_, i) => i + 1);
 
@@ -166,6 +181,7 @@ export default function BoarderReport() {
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [activeSlice, setActiveSlice] = useState<number | null>(null);
+    const dateRange = useMemo(() => currentMonthRangeLabel(), []);
 
     useEffect(() => {
         getBoarderStats();
@@ -315,7 +331,7 @@ export default function BoarderReport() {
                     <div className="flex flex-wrap items-center gap-1.5">
                         <button className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
                             <Calendar className="h-3 w-3 text-slate-400" />
-                            May 01 &ndash; May 31, 2025
+                            {dateRange}
                             <ChevronDown className="h-3 w-3 text-slate-400" />
                         </button>
                         <button className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">

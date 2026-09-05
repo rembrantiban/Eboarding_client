@@ -76,7 +76,7 @@ const OfficialReceiptModal = ({
     payment,
     onClose,
     orgName = "E-Boarding House",
-    orgTagline = "Official record of payment",
+    orgTagline = "A COMPUTERIZED BOARDING HOUSE MANAGEMENT SYSTEM FOR ERMINGS",
 }: OfficialReceiptModalProps) => {
     const printRef = useRef<HTMLDivElement>(null);
     const handlePrint = useReactToPrint({
