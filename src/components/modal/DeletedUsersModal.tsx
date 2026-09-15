@@ -48,6 +48,7 @@ const DeletedUsersModal = ({ open, onClose }: Props) => {
     }
   };
 
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent className="flex max-h-[85vh] w-full max-w-6xl! flex-col gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl">
