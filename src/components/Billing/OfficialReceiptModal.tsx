@@ -5,14 +5,14 @@ import { useReactToPrint } from "react-to-print";
 import {
     X,
     Printer,
-    Home,
-    ShieldCheck,
     ReceiptText,
+    ShieldCheck,
     UserRound,
     BedDouble,
     CalendarDays,
 } from "lucide-react";
 import type { PaymentHistory } from "@/store/useBillingStore";
+import { RECEIPT_MONO, TornEdge, DotRow, Barcode } from "@/components/receipt/ReceiptPrimitives";
 
 interface OfficialReceiptModalProps {
     payment: PaymentHistory | null;
@@ -21,27 +21,51 @@ interface OfficialReceiptModalProps {
     orgTagline?: string;
 }
 
+const RECEIPT_WIDTH_MM = 80;
+// A fixed (rather than "auto") height is what actually makes browsers register
+// this as a real custom receipt-roll paper size in the print dialog/PDF output.
+const RECEIPT_HEIGHT_MM = 250;
+
 const PRINT_PAGE_STYLE = `
-  @page { size: A5 portrait; margin: 10mm; }
+  @page { size: ${RECEIPT_WIDTH_MM}mm ${RECEIPT_HEIGHT_MM}mm; margin: 0; }
   @media print {
-    html, body { background: #fff; }
+    html, body {
+      background: #fff;
+      margin: 0;
+    }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* position:fixed is relative to the page box itself, so this keeps the
+       receipt centered even when the printer/driver ignores the custom
+       @page size above and falls back to a larger default sheet (A4/Letter) —
+       sizing the body to match the receipt and centering it inside there
+       (the previous approach) only works when the fallback doesn't happen. */
+    body > .max-w-md {
+      position: fixed;
+      inset: 0;
+      margin: 0 !important;
+      padding: 0 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 100% !important;
+    }
+    .max-w-105 {
+      width: ${RECEIPT_WIDTH_MM}mm;
+      max-width: 100% !important;
+    }
   }
 `;
 
-const STATUS_ACCENT: Record<
-    PaymentHistory["status"],
-    { badge: string; bar: string; label: string }
-> = {
-    Paid: { badge: "bg-emerald-50 text-emerald-700 ring-emerald-200", bar: "from-emerald-600 to-emerald-500", label: "PAID IN FULL" },
-    Partial: { badge: "bg-amber-50 text-amber-700 ring-amber-200", bar: "from-amber-600 to-amber-500", label: "PARTIAL PAYMENT" },
-    Pending: { badge: "bg-slate-100 text-slate-600 ring-slate-200", bar: "from-slate-700 to-slate-600", label: "PENDING" },
-    Overdue: { badge: "bg-rose-50 text-rose-700 ring-rose-200", bar: "from-rose-600 to-rose-500", label: "OVERDUE" },
-    Cancelled: { badge: "bg-slate-100 text-slate-500 ring-slate-200", bar: "from-slate-500 to-slate-400", label: "VOIDED" },
+const STATUS_LABEL: Record<PaymentHistory["status"], string> = {
+    Paid: "PAID IN FULL",
+    Partial: "PARTIAL PAYMENT",
+    Pending: "PENDING",
+    Overdue: "OVERDUE",
+    Cancelled: "VOIDED",
 };
 
 function peso(value?: number | string) {
-    return `₱${Number(value ?? 0).toLocaleString("en-PH", {
+    return `P ${Number(value ?? 0).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     })}`;
@@ -50,8 +74,8 @@ function peso(value?: number | string) {
 function formatDate(value?: string | null) {
     if (!value) return "—";
     return new Date(value).toLocaleDateString("en-PH", {
-        month: "long",
-        day: "numeric",
+        month: "short",
+        day: "2-digit",
         year: "numeric",
     });
 }
@@ -64,13 +88,6 @@ function formatDateTime(value?: string | null) {
         { hour: "numeric", minute: "2-digit" }
     )}`;
 }
-
-const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div>
-        <p className="text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-        <p className="mt-0.5 text-[13px] font-semibold text-slate-900">{value}</p>
-    </div>
-);
 
 const OfficialReceiptModal = ({
     payment,
@@ -87,7 +104,7 @@ const OfficialReceiptModal = ({
 
     if (!payment) return null;
 
-    const accent = STATUS_ACCENT[payment.status] ?? STATUS_ACCENT.Pending;
+    const label = STATUS_LABEL[payment.status] ?? STATUS_LABEL.Pending;
 
     const breakdown = [
         { label: "Room fee", value: payment.room_fee },
@@ -97,7 +114,7 @@ const OfficialReceiptModal = ({
 
     return (
         <div
-            className="fixed inset-0 z-100 flex items-end justify-center bg-slate-950/60 p-0 backdrop-blur-sm duration-200 animate-in fade-in sm:items-center sm:p-4"
+            className="fixed inset-0 z-100 flex items-start justify-center overflow-y-auto bg-slate-950/60 px-4 py-8 backdrop-blur-sm duration-200 animate-in fade-in"
             onClick={onClose}
             role="dialog"
             aria-modal="true"
@@ -105,11 +122,11 @@ const OfficialReceiptModal = ({
         >
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl shadow-slate-900/20 ring-1 ring-black/5 duration-200 animate-in fade-in zoom-in-95 sm:rounded-3xl"
+                className="w-full max-w-md duration-200 animate-in fade-in zoom-in-95"
             >
                 {/* Action bar — not part of the printed receipt */}
-                <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-3.5">
-                    <div className="flex items-center gap-2 text-[12px] font-medium text-slate-500">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-[12px] font-medium text-slate-300">
                         <ReceiptText className="h-3.5 w-3.5" />
                         Official Receipt
                     </div>
@@ -126,7 +143,7 @@ const OfficialReceiptModal = ({
                             type="button"
                             onClick={onClose}
                             aria-label="Close"
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-900"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-900"
                         >
                             <X className="h-4 w-4" />
                         </button>
@@ -134,165 +151,142 @@ const OfficialReceiptModal = ({
                 </div>
 
                 {/* Printable receipt */}
-                <div className="min-h-0 flex-1 overflow-y-auto bg-slate-100/60 p-4 sm:p-5">
-                    <div
-                        ref={printRef}
-                        className="mx-auto w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200"
-                    >
-                        {/* Top accent */}
-                        <div className={`h-1.5 w-full bg-linear-to-r ${accent.bar}`} />
+                <div
+                    ref={printRef}
+                    className="mx-auto w-full max-w-md bg-white px-4 py-8"
+                    style={{ fontFamily: RECEIPT_MONO }}
+                >
+                    <div className="relative mx-auto max-w-105">
+                        <TornEdge position="top" />
 
-                        <div className="px-6 py-6">
+                        <div className="bg-white px-6 pb-6 pt-5">
                             {/* Letterhead */}
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900">
-                                        <Home className="h-4.5 w-4.5 text-white" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[13.5px] font-semibold leading-tight tracking-tight text-slate-900">
-                                            {orgName}
-                                        </p>
-                                        <p className="text-[10px] leading-tight text-slate-400">{orgTagline}</p>
-                                    </div>
-                                </div>
-
-                                <span
-                                    className={`shrink-0 rounded-full px-2.5 py-1 text-[9.5px] font-bold tracking-wide ring-1 ring-inset ${accent.badge}`}
-                                >
-                                    {accent.label}
-                                </span>
-                            </div>
-
-                            <div className="my-5 border-t border-dashed border-slate-200" />
-
-                            {/* Receipt identity */}
-                            <div className="flex items-end justify-between gap-3">
-                                <div>
-                                    <p className="text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
-                                        Receipt No.
-                                    </p>
-                                    <p className="mt-0.5 font-mono text-[15px] font-bold tracking-wide text-slate-900">
-                                        {payment.receipt_no}
-                                    </p>
-                                </div>
-                                <p className="shrink-0 text-[11px] text-slate-400">{formatDateTime(payment.received_at)}</p>
-                            </div>
-
-                            <div className="my-5 border-t border-dashed border-slate-200" />
-
-                            {/* Parties */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="mb-1.5 flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
-                                        <UserRound className="h-3 w-3" />
-                                        Received From
-                                    </p>
-                                    <p className="truncate text-[13px] font-semibold text-slate-900">
-                                        {payment.boarder_first_name} {payment.boarder_last_name}
-                                    </p>
-                                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500">
-                                        <BedDouble className="h-3 w-3 text-slate-400" />
-                                        Room {payment.room_number || "—"}
-                                        {payment.bed_number ? ` · Bed ${payment.bed_number}` : ""}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="mb-1.5 flex items-center gap-1 text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
-                                        <ShieldCheck className="h-3 w-3" />
-                                        Received By
-                                    </p>
-                                    <p className="truncate text-[13px] font-semibold text-slate-900">
-                                        {payment.first_name} {payment.last_name}
-                                    </p>
-                                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-slate-500">
-                                        <CalendarDays className="h-3 w-3 text-slate-400" />
-                                        {formatDate(payment.received_at)}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="my-5 border-t border-dashed border-slate-200" />
-
-                            {/* Billing meta */}
-                            <div className="grid grid-cols-3 gap-3 rounded-xl bg-slate-50/80 p-3.5">
-                                <InfoRow label="Billing No." value={payment.billing_no} />
-                                <InfoRow label="Type" value={payment.billing_type} />
-                                <InfoRow label="Due Date" value={formatDate(payment.due_date)} />
-                            </div>
-
-                            <div className="my-5 border-t border-dashed border-slate-200" />
-
-                            {/* Breakdown */}
-                            <p className="mb-2 text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
-                                Charges
-                            </p>
-                            <div className="space-y-1.5">
-                                {breakdown.map((row) => (
-                                    <div key={row.label} className="flex items-center justify-between text-[13px]">
-                                        <span className="text-slate-600">{row.label}</span>
-                                        <span className="font-medium tabular-nums text-slate-900">{peso(row.value)}</span>
-                                    </div>
-                                ))}
-                                {Number(payment.late_fee) > 0 && (
-                                    <div className="flex items-center justify-between text-[13px]">
-                                        <span className="text-slate-600">Late fee</span>
-                                        <span className="font-medium tabular-nums text-rose-600">
-                                            +{peso(payment.late_fee)}
-                                        </span>
-                                    </div>
-                                )}
-                                {Number(payment.discount) > 0 && (
-                                    <div className="flex items-center justify-between text-[13px]">
-                                        <span className="text-slate-600">Discount</span>
-                                        <span className="font-medium tabular-nums text-emerald-600">
-                                            -{peso(payment.discount)}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="my-3 border-t border-slate-200" />
-
-                            {/* Amount paid — the headline figure of a receipt */}
-                            <div className="rounded-xl bg-slate-900 px-4 py-3.5">
-                                <p className="text-[9.5px] font-semibold uppercase tracking-wider text-slate-400">
-                                    Amount Received
+                            <div className="flex flex-col items-center text-center">
+                                <p className="text-[15px] font-bold uppercase tracking-[0.08em] text-slate-900">
+                                    {orgName}
                                 </p>
-                                <p className="mt-0.5 font-mono text-[22px] font-bold tabular-nums text-white">
+                                <p className="max-w-xs text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                                    {orgTagline}
+                                </p>
+                            </div>
+
+                            <div className="mt-4 flex items-center justify-between text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                                <span>Receipt {payment.receipt_no}</span>
+                                <span>{formatDateTime(payment.received_at)}</span>
+                            </div>
+
+                            <div className="my-4 border-t border-dashed border-slate-300" />
+
+                            {/* Status stamp + headline amount */}
+                            <div className="relative">
+                                <div className="absolute -right-1 -top-1 -rotate-[9deg] border-[3px] border-slate-900 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.15em] text-slate-900">
+                                    {label}
+                                </div>
+
+                                <p className="text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                                    Amount received
+                                </p>
+                                <p className="mt-1 text-3xl font-bold tabular-nums text-slate-900">
                                     {peso(payment.amount)}
                                 </p>
                             </div>
 
-                            <div className="mt-3 flex items-center justify-between text-[12px]">
-                                <span className="text-slate-500">Total bill amount</span>
-                                <span className="font-medium tabular-nums text-slate-900">
-                                    {peso(payment.total_amount)}
-                                </span>
+                            <div className="my-4 border-t border-dashed border-slate-300" />
+
+                            {/* Parties */}
+                            <p className="mb-1.5 flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                                <UserRound size={11} />
+                                Received from
+                            </p>
+                            <p className="truncate text-[13px] font-bold text-slate-900">
+                                {payment.boarder_first_name} {payment.boarder_last_name}
+                            </p>
+
+                            <div className="mt-2 space-y-0.5">
+                                <DotRow
+                                    label="Room"
+                                    icon={<BedDouble size={11} />}
+                                    value={
+                                        <>
+                                            {payment.room_number || "Unassigned"}
+                                            {payment.bed_number ? ` · Bed ${payment.bed_number}` : ""}
+                                        </>
+                                    }
+                                />
+                                <DotRow
+                                    label="Received by"
+                                    icon={<ShieldCheck size={11} />}
+                                    value={`${payment.first_name} ${payment.last_name}`}
+                                />
+                                <DotRow
+                                    label="Date"
+                                    icon={<CalendarDays size={11} />}
+                                    value={formatDate(payment.received_at)}
+                                />
                             </div>
-                            <div className="mt-1 flex items-center justify-between text-[12px]">
-                                <span className="text-slate-500">Amount paid to date</span>
-                                <span className="font-medium tabular-nums text-slate-900">
-                                    {peso(payment.paid_amount)}
+
+                            <div className="my-4 border-t border-dashed border-slate-300" />
+
+                            {/* Billing meta */}
+                            <p className="mb-1.5 text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                                Billing detail
+                            </p>
+                            <DotRow label="Billing no." value={payment.billing_no} />
+                            <DotRow label="Type" value={payment.billing_type} />
+                            <DotRow label="Due date" value={formatDate(payment.due_date)} />
+
+                            <div className="my-4 border-t border-dashed border-slate-300" />
+
+                            {/* Charges */}
+                            <p className="mb-1.5 text-[10px] uppercase tracking-[0.15em] text-slate-400">
+                                Charges
+                            </p>
+                            {breakdown.map((row) => (
+                                <DotRow key={row.label} label={row.label} value={peso(row.value)} />
+                            ))}
+                            {Number(payment.late_fee) > 0 && (
+                                <DotRow label="Late fee" value={`+ ${peso(payment.late_fee)}`} />
+                            )}
+                            {Number(payment.discount) > 0 && (
+                                <DotRow label="Discount" value={`- ${peso(payment.discount)}`} />
+                            )}
+
+                            <div className="my-4 border-t-2 border-dashed border-slate-900" />
+
+                            {/* Totals */}
+                            <DotRow label="Total bill" value={peso(payment.total_amount)} />
+                            <DotRow label="Paid to date" value={peso(payment.paid_amount)} />
+
+                            <div className="mt-3 flex items-baseline justify-between bg-slate-900 px-4 py-3">
+                                <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-white">
+                                    Remaining balance
                                 </span>
-                            </div>
-                            <div className="mt-1 flex items-center justify-between text-[12px]">
-                                <span className="font-medium text-slate-700">Remaining balance</span>
-                                <span
-                                    className={`font-semibold tabular-nums ${Number(payment.balance) > 0 ? "text-rose-600" : "text-emerald-600"
-                                        }`}
-                                >
+                                <span className="text-xl font-bold tabular-nums text-white">
                                     {peso(payment.balance)}
                                 </span>
                             </div>
 
-                            <div className="my-5 border-t border-dashed border-slate-200" />
+                            <div className="my-5 border-t border-dashed border-slate-300" />
 
-                            <p className="text-center text-[10px] leading-relaxed text-slate-400">
-                                This receipt is proof of payment for the transaction above. Please keep it for
-                                your records. Generated by {orgName} Management System.
+                            {/* Footer */}
+                            <p className="text-center text-[11px] leading-relaxed text-slate-500">
+                                This receipt is proof of payment for the transaction above. Please keep it
+                                for your records.
+                            </p>
+
+                            <div className="mt-4 flex flex-col items-center gap-1">
+                                <Barcode seed={payment.receipt_no} />
+                                <p className="text-[10px] tracking-[0.2em] text-slate-400">
+                                    {payment.receipt_no}
+                                </p>
+                            </div>
+
+                            <p className="mt-3 text-center text-[9px] uppercase tracking-[0.15em] text-slate-300">
+                                {orgName} · thank you
                             </p>
                         </div>
+
+                        <TornEdge position="bottom" />
                     </div>
                 </div>
             </div>

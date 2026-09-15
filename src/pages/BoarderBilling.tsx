@@ -439,6 +439,7 @@ export default function BillingStatement() {
         rootId="statement-print-root"
         printLabel="Print Statement"
         maxWidthClassName="max-w-xl"
+        receiptWidthMm={80}
       >
         <StatementReceipt bill={bill} />
       </PrintModal>

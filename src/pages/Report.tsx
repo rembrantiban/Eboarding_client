@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import {
     DollarSign,
     Users,
@@ -10,74 +11,96 @@ import {
     ChevronDown,
     ArrowRight,
     TrendingUp,
+    TrendingDown,
     type LucideIcon,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { useNavigate } from "react-router-dom"
-
+import { useNavigate } from "react-router-dom";
+import { getReportHistory, recordReportGenerated } from "@/lib/reportHistory";
 
 type ReportType = {
-  title: string;
-  desc: string;
-  icon: LucideIcon;
-  bg: string;
-  fg: string;
-  path?: string;
+    title: string;
+    type: string;
+    desc: string;
+    icon: LucideIcon;
+    bg: string;
+    fg: string;
+    badge: string;
+    color: string;
+    path: string;
 };
 
-
-const reportTypes : ReportType[] = [
+const reportTypes: ReportType[] = [
     {
         title: "Financial Report",
+        type: "Financial",
         desc: "Income, expenses & summary",
         icon: DollarSign,
         bg: "bg-blue-50",
         fg: "text-blue-600",
+        badge: "bg-blue-50 text-blue-600",
+        color: "#2563eb",
         path: "/financial-report",
     },
     {
         title: "Occupancy Report",
+        type: "Occupancy",
         desc: "Room occupancy & boarder stats",
         icon: Users,
         bg: "bg-emerald-50",
         fg: "text-emerald-600",
+        badge: "bg-emerald-50 text-emerald-600",
+        color: "#059669",
         path: "/occupancy-report",
     },
     {
         title: "Penalty Report",
+        type: "Penalty",
         desc: "Penalties & late payments",
         icon: AlertTriangle,
         bg: "bg-amber-50",
         fg: "text-amber-600",
+        badge: "bg-amber-50 text-amber-600",
+        color: "#d97706",
         path: "/penalty-report",
     },
     {
         title: "Payment Collection",
+        type: "Collection",
         desc: "Collections & transactions",
         icon: CreditCard,
         bg: "bg-violet-50",
         fg: "text-violet-600",
+        badge: "bg-violet-50 text-violet-600",
+        color: "#7c3aed",
         path: "/payment-collection-report",
     },
     {
         title: "Room Availability",
+        type: "Availability",
         desc: "Availability & room status",
         icon: BedDouble,
         bg: "bg-sky-50",
         fg: "text-sky-600",
+        badge: "bg-sky-50 text-sky-600",
+        color: "#0284c7",
         path: "/room-availability-report",
     },
     {
         title: "Boarder Report",
+        type: "Boarder",
         desc: "Boarder details & information",
         icon: UserRound,
         bg: "bg-rose-50",
         fg: "text-rose-600",
+        badge: "bg-rose-50 text-rose-600",
+        color: "#e11d48",
         path: "/boarder-report",
     },
 ];
 
-/** Formats a timestamp the same way the report list has always displayed dates, e.g. "May 31, 10:30 AM". */
+const reportByType = new Map(reportTypes.map((r) => [r.type, r]));
+
 function formatReportTimestamp(date: Date) {
     return `${date.toLocaleDateString("en-PH", {
         month: "long",
@@ -88,87 +111,83 @@ function formatReportTimestamp(date: Date) {
     })}`;
 }
 
-const reportGenerationNow = new Date();
-const currentMonthName = reportGenerationNow.toLocaleDateString("en-PH", { month: "long" });
+const now = new Date();
 
-/** Minutes-ago offsets replicate the original mock's staggered generation times, anchored to today. */
-const recentReports = [
-    {
-        name: `${currentMonthName} Financial Report`,
-        type: "Financial",
-        badge: "bg-blue-50 text-blue-600",
-        date: formatReportTimestamp(new Date(reportGenerationNow.getTime() - 0)),
-        by: "Administrator",
-        path: "/financial-report",
-    },
-    {
-        name: `${currentMonthName} Occupancy Report`,
-        type: "Occupancy",
-        badge: "bg-emerald-50 text-emerald-600",
-        date: formatReportTimestamp(new Date(reportGenerationNow.getTime() - 75 * 60_000)),
-        by: "Administrator",
-        path: "/occupancy-report",
-    },
-    {
-        name: `${currentMonthName} Penalty Report`,
-        type: "Penalty",
-        badge: "bg-amber-50 text-amber-600",
-        date: formatReportTimestamp(new Date(reportGenerationNow.getTime() - 105 * 60_000)),
-        by: "Administrator",
-        path: "/penalty-report",
-    },
-    {
-        name: `${currentMonthName} Collection Report`,
-        type: "Collection",
-        badge: "bg-violet-50 text-violet-600",
-        date: formatReportTimestamp(new Date(reportGenerationNow.getTime() - 120 * 60_000)),
-        by: "Administrator",
-        path: "/payment-collection-report",
-    },
-    {
-        name: "Room Availability Report",
-        type: "Availability",
-        badge: "bg-sky-50 text-sky-600",
-        date: formatReportTimestamp(new Date(reportGenerationNow.getTime() - 18 * 60 * 60_000)),
-        by: "Administrator",
-        path: "/room-availability-report",
-    },
-];
+const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-const summaryData = [
-    { name: "Financial", value: 6, color: "#2563eb" },
-    { name: "Occupancy", value: 5, color: "#059669" },
-    { name: "Penalty", value: 4, color: "#d97706" },
-    { name: "Collection", value: 5, color: "#7c3aed" },
-    { name: "Availability", value: 2, color: "#0284c7" },
-    { name: "Boarder", value: 2, color: "#e11d48" },
-];
+const dateRange = `${firstDay.toLocaleDateString("en-PH", {
+    month: "short",
+    day: "2-digit",
+})} – ${lastDay.toLocaleDateString("en-PH", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+})}`;
 
-const totalReports = summaryData.reduce((sum, d) => sum + d.value, 0);
-
-
- const now = new Date();
-
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    const lastDay = new Date(
-        now.getFullYear(),
-        now.getMonth() + 1,
-        0
-    );
-
-    const dateRange = `${firstDay.toLocaleDateString("en-PH", {
-        month: "short",
-        day: "2-digit",
-    })} – ${lastDay.toLocaleDateString("en-PH", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-    })}`;
-
+const RECENT_LIMIT = 5;
 
 export default function ReportManagement() {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+
+    const [history, setHistory] = useState(getReportHistory);
+
+    // Pick up history recorded in another tab/window.
+    useEffect(() => {
+        const onFocus = () => setHistory(getReportHistory());
+        window.addEventListener("focus", onFocus);
+        return () => window.removeEventListener("focus", onFocus);
+    }, []);
+
+    const handleGenerate = (report: ReportType) => {
+        const next = recordReportGenerated({
+            title: report.title,
+            type: report.type,
+            path: report.path,
+        });
+        setHistory(next);
+        navigate(report.path);
+    };
+
+    const recentReports = useMemo(() => history.slice(0, RECENT_LIMIT), [history]);
+
+    const thisMonthHistory = useMemo(
+        () =>
+            history.filter((h) => {
+                const d = new Date(h.date);
+                return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+            }),
+        [history]
+    );
+
+    const lastMonthCount = useMemo(() => {
+        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        return history.filter((h) => {
+            const d = new Date(h.date);
+            return d.getFullYear() === lastMonth.getFullYear() && d.getMonth() === lastMonth.getMonth();
+        }).length;
+    }, [history]);
+
+    const summaryData = useMemo(() => {
+        const counts = new Map<string, number>();
+        thisMonthHistory.forEach((h) => counts.set(h.type, (counts.get(h.type) ?? 0) + 1));
+        return Array.from(counts.entries())
+            .map(([type, value]) => ({
+                name: type,
+                value,
+                color: reportByType.get(type)?.color ?? "#64748b",
+            }))
+            .sort((a, b) => b.value - a.value);
+    }, [thisMonthHistory]);
+
+    const totalThisMonth = thisMonthHistory.length;
+
+    const growth =
+        lastMonthCount > 0
+            ? ((totalThisMonth - lastMonthCount) / lastMonthCount) * 100
+            : totalThisMonth > 0
+                ? null // "New" — nothing to compare against
+                : 0;
 
     return (
         <div className="h-screen overflow-hidden">
@@ -207,7 +226,8 @@ export default function ReportManagement() {
 
                             return (
                                 <button
-                                    onClick={() => r.path && navigate(r.path)}
+                                    key={r.title}
+                                    onClick={() => handleGenerate(r)}
                                     className="group flex flex-col items-start gap-2 rounded-lg border border-slate-200 p-2.5 text-left transition-all duration-200 hover:-translate-y-1 hover:border-slate-300 hover:shadow-md"
                                 >
                                     <div className="flex w-full items-start justify-between">
@@ -253,37 +273,48 @@ export default function ReportManagement() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {recentReports.map((rep) => (
-                                    <tr
-                                        key={rep.name}
-                                        className="border-b border-slate-50 text-xs text-slate-700 last:border-0 hover:bg-slate-50"
-                                    >
-                                        <td className="py-2.5 font-medium text-slate-800">
-                                            {rep.name}
-                                        </td>
-                                        <td className="py-2.5">
-                                            <span
-                                                className={`rounded-full px-2 py-0.5 text-xs font-medium ${rep.badge}`}
-                                            >
-                                                {rep.type}
-                                            </span>
-                                        </td>
-                                        <td className="py-2.5 text-slate-400 hidden sm:table-cell">
-                                            {rep.date}
-                                        </td>
-                                        <td className="py-2.5">
-                                            <div className="flex items-center justify-end gap-1">
-                                                <button
-                                                    title="View report"
-                                                    onClick={() => navigate(rep.path)}
-                                                    className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                                {recentReports.map((rep, i) => {
+                                    const meta = reportByType.get(rep.type);
+                                    return (
+                                        <tr
+                                            key={`${rep.path}-${rep.date}-${i}`}
+                                            className="border-b border-slate-50 text-xs text-slate-700 last:border-0 hover:bg-slate-50"
+                                        >
+                                            <td className="py-2.5 font-medium text-slate-800">
+                                                {rep.title}
+                                            </td>
+                                            <td className="py-2.5">
+                                                <span
+                                                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${meta?.badge ?? "bg-slate-100 text-slate-600"}`}
                                                 >
-                                                    <Eye className="h-3.5 w-3.5" />
-                                                </button>
-                                            </div>
+                                                    {rep.type}
+                                                </span>
+                                            </td>
+                                            <td className="py-2.5 text-slate-400 hidden sm:table-cell">
+                                                {formatReportTimestamp(new Date(rep.date))}
+                                            </td>
+                                            <td className="py-2.5">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <button
+                                                        title="View report"
+                                                        onClick={() => navigate(rep.path)}
+                                                        className="flex h-6 w-6 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                                                    >
+                                                        <Eye className="h-3.5 w-3.5" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+
+                                {recentReports.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="py-10 text-center text-xs text-slate-400">
+                                            No reports generated yet. Select a report type above to get started.
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>
@@ -294,57 +325,65 @@ export default function ReportManagement() {
                             <h2 className="text-sm font-semibold text-slate-900">
                                 Report Summary
                             </h2>
-                            <button className="flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-500">
+                            <span className="flex items-center gap-1 rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-500">
                                 This Month
                                 <ChevronDown className="h-3 w-3" />
-                            </button>
+                            </span>
                         </div>
 
-                        <div className="relative mx-auto h-32 w-32">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={summaryData}
-                                        dataKey="value"
-                                        innerRadius={38}
-                                        outerRadius={56}
-                                        startAngle={90}
-                                        endAngle={-270}
-                                        stroke="none"
-                                    >
-                                        {summaryData.map((d) => (
-                                            <Cell key={d.name} fill={d.color} />
-                                        ))}
-                                    </Pie>
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-xs text-slate-400">Total</span>
-                                <span className="text-lg font-bold text-slate-900">
-                                    {totalReports}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="mt-3 space-y-1.5">
-                            {summaryData.map((d) => (
-                                <div
-                                    key={d.name}
-                                    className="flex items-center justify-between text-xs"
-                                >
-                                    <div className="flex items-center gap-1.5">
-                                        <span
-                                            className="h-2 w-2 rounded-full"
-                                            style={{ backgroundColor: d.color }}
-                                        />
-                                        <span className="text-slate-500">{d.name}</span>
+                        {summaryData.length === 0 ? (
+                            <p className="py-10 text-center text-xs text-slate-400">
+                                No reports generated this month yet.
+                            </p>
+                        ) : (
+                            <>
+                                <div className="relative mx-auto h-32 w-32">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart>
+                                            <Pie
+                                                data={summaryData}
+                                                dataKey="value"
+                                                innerRadius={38}
+                                                outerRadius={56}
+                                                startAngle={90}
+                                                endAngle={-270}
+                                                stroke="none"
+                                            >
+                                                {summaryData.map((d) => (
+                                                    <Cell key={d.name} fill={d.color} />
+                                                ))}
+                                            </Pie>
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                                        <span className="text-xs text-slate-400">Total</span>
+                                        <span className="text-lg font-bold text-slate-900">
+                                            {totalThisMonth}
+                                        </span>
                                     </div>
-                                    <span className="font-medium text-slate-700">
-                                        {d.value} ({Math.round((d.value / totalReports) * 100)}%)
-                                    </span>
                                 </div>
-                            ))}
-                        </div>
+
+                                <div className="mt-3 space-y-1.5">
+                                    {summaryData.map((d) => (
+                                        <div
+                                            key={d.name}
+                                            className="flex items-center justify-between text-xs"
+                                        >
+                                            <div className="flex items-center gap-1.5">
+                                                <span
+                                                    className="h-2 w-2 rounded-full"
+                                                    style={{ backgroundColor: d.color }}
+                                                />
+                                                <span className="text-slate-500">{d.name}</span>
+                                            </div>
+                                            <span className="font-medium text-slate-700">
+                                                {d.value} ({Math.round((d.value / totalThisMonth) * 100)}%)
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
 
                         <div className="mt-3 flex items-center justify-between rounded-lg bg-slate-50 p-2.5">
                             <div className="flex items-center gap-2">
@@ -354,13 +393,28 @@ export default function ReportManagement() {
                                 <div>
                                     <p className="text-xs text-slate-400">Reports Generated</p>
                                     <p className="text-sm font-bold text-slate-900">
-                                        {totalReports}
+                                        {totalThisMonth}
                                     </p>
                                 </div>
                             </div>
-                            <span className="text-xs font-semibold text-emerald-600">
-                                +14.3%
-                            </span>
+                            {growth === null ? (
+                                <span className="text-xs font-semibold text-emerald-600">New</span>
+                            ) : growth === 0 ? (
+                                <span className="text-xs font-semibold text-slate-400">—</span>
+                            ) : (
+                                <span
+                                    className={`flex items-center gap-0.5 text-xs font-semibold ${growth >= 0 ? "text-emerald-600" : "text-rose-600"
+                                        }`}
+                                >
+                                    {growth >= 0 ? (
+                                        <TrendingUp className="h-3 w-3" />
+                                    ) : (
+                                        <TrendingDown className="h-3 w-3" />
+                                    )}
+                                    {growth >= 0 ? "+" : ""}
+                                    {growth.toFixed(1)}%
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

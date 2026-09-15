@@ -277,9 +277,13 @@ const ViewUserPage = () => {
                                 {/* Quick contact */}
                                 <div className="w-full space-y-2.5 pt-2 text-left">
                                     <InfoLine icon={Mail} value={user.email} />
-                                    <InfoLine icon={Phone} value={formatPhone(user.country_code, user.contact_number)} />
-                                    <InfoLine icon={Globe} value={user.nationality || "Nationality not set"} />
-                                    {user.address && <InfoLine icon={MapPin} value={user.address} />}
+                                    {!isStaff && (
+                                        <InfoLine icon={Phone} value={formatPhone(user.country_code, user.contact_number)} />
+                                    )}
+                                    {!isStaff && (
+                                        <InfoLine icon={Globe} value={user.nationality || "Nationality not set"} />
+                                    )}
+                                    {!isStaff && user.address && <InfoLine icon={MapPin} value={user.address} />}
                                 </div>
                             </div>
                         </div>
@@ -290,22 +294,32 @@ const ViewUserPage = () => {
 
                         <SectionCard title="Personal information" icon={UserRound}>
                             <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-                                <Stat icon={UserRound} label="Gender" value={user.gender || "Not specified"} />
-                                <Stat
-                                    icon={Cake}
-                                    label="Age"
-                                    value={user.age ? `${user.age} years old` : "Not specified"}
-                                />
-                                <Stat icon={Globe} label="Nationality" value={user.nationality || "Not specified"} />
-                                <Stat
-                                    icon={Phone}
-                                    label="Contact number"
-                                    value={formatPhone(user.country_code, user.contact_number)}
-                                />
-                              
+                                {!isStaff && (
+                                    <Stat icon={UserRound} label="Gender" value={user.gender || "Not specified"} />
+                                )}
+                                {!isStaff && (
+                                    <Stat
+                                        icon={Cake}
+                                        label="Age"
+                                        value={user.age ? `${user.age} years old` : "Not specified"}
+                                    />
+                                )}
+                                {!isStaff && (
+                                    <Stat icon={Globe} label="Nationality" value={user.nationality || "Not specified"} />
+                                )}
+                                {!isStaff && (
+                                    <Stat
+                                        icon={Phone}
+                                        label="Contact number"
+                                        value={formatPhone(user.country_code, user.contact_number)}
+                                    />
+                                )}
+
                                 <Stat icon={Mail} label="Email" value={user.email} />
-                          
-                                <Stat icon={MapPin} label="Address" value={user.address || "Not specified"} />
+
+                                {!isStaff && (
+                                    <Stat icon={MapPin} label="Address" value={user.address || "Not specified"} />
+                                )}
                             </div>
                         </SectionCard>
 

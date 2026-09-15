@@ -76,10 +76,10 @@ export default function Sidebar() {
                         <img
                             src={user.avatar_url}
                             alt={`${user.first_name} ${user.last_name}`}
-                            className="h-12 w-12 rounded-full object-cover"
+                            className="h-12 w-14 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="h-12 w-12 rounded-full bg-slate-900 text-lg font-bold text-emerald-100 flex items-center justify-center">
+                        <div className="h-12 w-14 rounded-full bg-slate-900 text-lg font-bold text-emerald-100 flex items-center justify-center">
                             {user?.first_name?.charAt(0).toUpperCase()}{user?.last_name?.charAt(0).toUpperCase()}
                         </div>
                     )}

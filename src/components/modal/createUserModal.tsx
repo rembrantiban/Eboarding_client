@@ -292,9 +292,9 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
         if (!form.last_name) newErrors.last_name = "Required";
         else if (!nameRegex.test(form.last_name)) newErrors.last_name = "Letters only";
 
-        if (!form.nationality) newErrors.nationality = "Required";
-
         if (isBoarder) {
+            if (!form.nationality) newErrors.nationality = "Required";
+
             if (!form.gender) newErrors.gender = "Required";
 
             if (!form.age) newErrors.age = "Required";
@@ -310,13 +310,15 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
         if (!form.email) newErrors.email = "Required";
         else if (!emailRegex.test(form.email)) newErrors.email = "Invalid email";
 
-        if (!form.country_code) newErrors.country_code = "Required";
+        if (isBoarder) {
+            if (!form.country_code) newErrors.country_code = "Required";
 
-        if (!form.contact_number) newErrors.contact_number = "Required";
-        else if (!validatePhone(form.contact_number))
-            newErrors.contact_number = phoneHint;
+            if (!form.contact_number) newErrors.contact_number = "Required";
+            else if (!validatePhone(form.contact_number))
+                newErrors.contact_number = phoneHint;
 
-        if (!form.address) newErrors.address = "Required";
+            if (!form.address) newErrors.address = "Required";
+        }
 
         if (!form.password) newErrors.password = "Required";
         else if (!passwordRegex.test(form.password)) newErrors.password = "Min. 6 characters";
@@ -358,11 +360,7 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
                     first_name: form.first_name,
                     last_name: form.last_name,
                     username: form.username,
-                    country_code: form.country_code,
-                    contact_number: form.contact_number,
-                    nationality: form.nationality,
                     email: form.email,
-                    address: form.address,
                     password: form.password,
                     user_type: form.user_type,
                     avatar: form.avatar,
@@ -567,34 +565,38 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
                                 </div>
                             )}
 
-                            <Select
-                                label="Nationality"
-                                name="nationality"
-                                value={form.nationality}
-                                onChange={handleChange}
-                                options={NATIONALITIES}
-                                error={errors.nationality}
-                            />
+                            {isBoarder && (
+                                <Select
+                                    label="Nationality"
+                                    name="nationality"
+                                    value={form.nationality}
+                                    onChange={handleChange}
+                                    options={NATIONALITIES}
+                                    error={errors.nationality}
+                                />
+                            )}
                         </div>
 
                         {/* Account details */}
                         <div className="space-y-3">
                             <SectionLabel label="Account details" />
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className={isBoarder ? "grid grid-cols-2 gap-3" : ""}>
                                 <Field label="Username" name="username" placeholder="john_doe" value={form.username} onChange={handleChange} onBlur={handleBlur} error={errors.username} />
 
-                                <PhoneField
-                                    label="Contact number"
-                                    name="contact_number"
-                                    dial={form.country_code}
-                                    onDialChange={handleDialChange}
-                                    value={form.contact_number}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    placeholder={phonePlaceholder}
-                                    error={errors.contact_number || errors.country_code}
-                                />
+                                {isBoarder && (
+                                    <PhoneField
+                                        label="Contact number"
+                                        name="contact_number"
+                                        dial={form.country_code}
+                                        onDialChange={handleDialChange}
+                                        value={form.contact_number}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        placeholder={phonePlaceholder}
+                                        error={errors.contact_number || errors.country_code}
+                                    />
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
@@ -602,43 +604,45 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
                                 <Field label="Password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} type="password" error={errors.password} />
                             </div>
 
-                            {/* Address with location */}
-                            <div className="space-y-1.5">
-                                <div className="flex items-center justify-between gap-2">
-                                    <label className="block text-[12px] font-medium text-slate-600">
-                                        Address
-                                    </label>
-                                    {selectedCountry && (
-                                        <span className="text-[11px] text-slate-400">
-                                            {flagOf(selectedCountry.iso)} {selectedCountry.name}
-                                        </span>
-                                    )}
-                                </div>
+                            {/* Address with location — boarder only */}
+                            {isBoarder && (
+                                <div className="space-y-1.5">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <label className="block text-[12px] font-medium text-slate-600">
+                                            Address
+                                        </label>
+                                        {selectedCountry && (
+                                            <span className="text-[11px] text-slate-400">
+                                                {flagOf(selectedCountry.iso)} {selectedCountry.name}
+                                            </span>
+                                        )}
+                                    </div>
 
-                                <div className="relative">
-                                    <MapPin className="pointer-events-none absolute left-3 top-3 h-3.5 w-3.5 text-slate-400" />
-                                    <input
-                                        name="address"
-                                        type="text"
-                                        placeholder={
-                                            loadingLocation
-                                                ? "Getting your current location..."
-                                                : "Street, Barangay, City, Province"
-                                        }
-                                        value={form.address}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        className={`w-full resize-none rounded-lg border bg-white py-2 pl-8 pr-3 text-[13px] leading-relaxed text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20 ${errors.address
-                                            ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
-                                            : "border-slate-200 hover:border-slate-300"
-                                            }`}
-                                    />
-                                </div>
+                                    <div className="relative">
+                                        <MapPin className="pointer-events-none absolute left-3 top-3 h-3.5 w-3.5 text-slate-400" />
+                                        <input
+                                            name="address"
+                                            type="text"
+                                            placeholder={
+                                                loadingLocation
+                                                    ? "Getting your current location..."
+                                                    : "Street, Barangay, City, Province"
+                                            }
+                                            value={form.address}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            className={`w-full resize-none rounded-lg border bg-white py-2 pl-8 pr-3 text-[13px] leading-relaxed text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20 ${errors.address
+                                                ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
+                                                : "border-slate-200 hover:border-slate-300"
+                                                }`}
+                                        />
+                                    </div>
 
-                                {errors.address ? (
-                                    <ErrorText text={errors.address} />
-                                ) : null}
-                            </div>
+                                    {errors.address ? (
+                                        <ErrorText text={errors.address} />
+                                    ) : null}
+                                </div>
+                            )}
                         </div>
 
                         {/* Emergency contact — boarder only */}

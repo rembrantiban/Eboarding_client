@@ -36,7 +36,7 @@ const DocumentViewModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100%-1.5rem)] max-w-6xl gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl sm:max-w-5xl">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100%-1.5rem)] max-w-6xl flex-col gap-0 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-0 shadow-2xl sm:max-w-5xl">
         <DialogHeader className="border-b border-slate-100 bg-slate-50/80 px-6 py-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start pr-15 sm:justify-between">
             <div className="flex items-center gap-3">
@@ -55,12 +55,12 @@ const DocumentViewModal = ({
         </DialogHeader>
 
         <div className="grid gap-6 px-6 py-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="group relative flex min-h-80 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100">
+          <div className="group relative flex h-80 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:h-96">
             {document.valid_id_image ? (
               <img
                 src={document.valid_id_image}
                 alt={document.valid_id_type ?? "Document preview"}
-                className="h-full w-full rounded-2xl object-contain"
+                className="h-full w-full object-contain"
                 loading="lazy"
               />
             ) : (

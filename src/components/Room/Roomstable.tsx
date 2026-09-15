@@ -3,13 +3,14 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import RoomRow from "./RoomRow";
-import { Search, Plus, RotateCcw, DoorOpen, PackageOpen } from "lucide-react";
+import { Search, Plus, RotateCcw, DoorOpen, PackageOpen, Trash2 } from "lucide-react";
 import AddRoomModal from "../modal/AddRoomModal";
 import { useRoom } from "@/hooks/useRoom";
 import ViewRoomModal from "../modal/ViewRoomModal";
 import type { Room } from "@/store/useRoomStore";
 import UpdateRoomModal from "../modal/UpdateRoomModal";
 import DeleteRoomModal from "../modal/DeleteRoomModal";
+import DeletedRoomsModal from "../modal/DeletedRoomsModal";
 import UpdateRoomStatusModal, {
   type RoomStatus,
 } from "./UpdateRoomStatusModal";
@@ -26,6 +27,7 @@ const RoomsTable = () => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [addRoomOpen, setAddRoomOpen] = useState(false);
+  const [trashOpen, setTrashOpen] = useState(false);
   const { deleteRoom, updateRoomStatus } = useRoom();
 
   const { rooms, getRooms, loading } = useRoom();
@@ -150,6 +152,15 @@ const RoomsTable = () => {
 
             <button
               type="button"
+              onClick={() => setTrashOpen(true)}
+              title="Deleted rooms"
+              className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+
+            <button
+              type="button"
               onClick={() => setAddRoomOpen(true)}
               className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-[12.5px] font-medium text-white transition-colors hover:bg-slate-800 sm:flex-none"
             >
@@ -262,6 +273,7 @@ const RoomsTable = () => {
 
       {/* ✅ MODAL */}
       <AddRoomModal open={addRoomOpen} onClose={() => setAddRoomOpen(false)} />
+      <DeletedRoomsModal open={trashOpen} onClose={() => setTrashOpen(false)} />
       <ViewRoomModal
         open={viewOpen}
         onClose={() => setViewOpen(false)}

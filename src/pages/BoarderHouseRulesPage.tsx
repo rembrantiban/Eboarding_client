@@ -10,6 +10,7 @@ import {
   Check,
   Info,
   RefreshCcw,
+  ShieldCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -40,6 +41,17 @@ const formatDate = (date?: string) =>
     })
     : "—"
 
+const formatDateTime = (date?: string | null) =>
+  date
+    ? new Date(date).toLocaleString("en-PH", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    })
+    : "—"
+
 const authorName = (rule: Rule) => {
   const name = [rule.first_name, rule.last_name].filter(Boolean).join(" ").trim()
   return name || "House management"
@@ -62,14 +74,30 @@ const BoarderHouseRulesPage = ({
   const [search, setSearch] = useState("")
   const [activeId, setActiveId] = useState<number | null>(null)
   const [downloading, setDownloading] = useState(false)
-  const { getPublishedRules, PublishedRule = [] } = useRules()
+  const [agreed, setAgreed] = useState(false)
+  const {
+    getPublishedRules,
+    PublishedRule = [],
+    acknowledgment,
+    acknowledging,
+    getAcknowledgmentStatus,
+    acknowledgeRules,
+  } = useRules()
 
 
   const rules = PublishedRule;
 
   useEffect(() => {
     getPublishedRules()
-  }, [getPublishedRules])
+    getAcknowledgmentStatus()
+  }, [getPublishedRules, getAcknowledgmentStatus])
+
+  const needsAcknowledgment = acknowledgment?.needsAcknowledgment ?? false
+
+  const handleAcknowledge = async () => {
+    await acknowledgeRules()
+    setAgreed(false)
+  }
 
   const published = useMemo(
     () => rules,
@@ -338,6 +366,48 @@ const BoarderHouseRulesPage = ({
               </p>
             </div>
           </div>
+        )}
+
+        {/* ------------------------- Acknowledgment -------------------------- */}
+        {!loading && published.length > 0 && (
+          needsAcknowledgment ? (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm print:hidden">
+              <label className="flex items-start gap-2.5 text-[12px] leading-relaxed text-amber-900">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded border-amber-300 text-slate-900 focus:ring-slate-900"
+                />
+                <span>
+                  I have read and agree to abide by all of the house rules listed above.
+                </span>
+              </label>
+
+              <Button
+                type="button"
+                onClick={handleAcknowledge}
+                disabled={!agreed || acknowledging}
+                className="mt-3 h-9 rounded-lg bg-slate-900 px-4 text-[12.5px] font-medium text-white transition hover:bg-slate-800 disabled:opacity-40"
+              >
+                <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                {acknowledging ? "Submitting..." : "Acknowledge rules"}
+              </Button>
+            </div>
+          ) : (
+            acknowledgment?.acknowledgedAt && (
+              <div className="flex items-center gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-[12px] text-emerald-800 shadow-sm print:hidden">
+                <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" />
+                <p>
+                  You acknowledged these rules on{" "}
+                  <span className="font-medium">
+                    {formatDateTime(acknowledgment.acknowledgedAt)}
+                  </span>
+                  .
+                </p>
+              </div>
+            )
+          )
         )}
       </div>
 

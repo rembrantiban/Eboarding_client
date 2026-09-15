@@ -3,13 +3,44 @@ import { useEffect, type ReactNode } from "react";
 import { X, Download } from "lucide-react";
 
 
-function usePrintIsolation(rootId: string) {
+function usePrintIsolation(rootId: string, open: boolean, receiptWidthMm?: number) {
     useEffect(() => {
         const styleId = `${rootId}-styles`;
-        if (document.getElementById(styleId)) return;
+        const existing = document.getElementById(styleId);
+        if (existing) existing.remove();
+
+        // Only isolate the page for print while this modal is actually open —
+        // otherwise the "hide everything but #rootId" rule stays in <head>
+        // and blanks out any *other* print/react-to-print output on this page.
+        if (!open) return;
+
         const style = document.createElement("style");
         style.id = styleId;
-        style.innerHTML = `
+
+        style.innerHTML = receiptWidthMm
+            ? `
+            @media print {
+                body * { visibility: hidden; }
+                #${rootId}, #${rootId} * { visibility: visible; }
+                #${rootId} {
+                    position: fixed;
+                    inset: 0;
+                    width: ${receiptWidthMm}mm;
+                    max-width: ${receiptWidthMm}mm;
+                    margin: 0 auto;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                #${rootId} .max-w-md,
+                #${rootId} .max-w-105 {
+                    max-width: 100% !important;
+                }
+                @page { size: ${receiptWidthMm}mm 250mm; margin: 0; }
+            }
+        `
+            : `
             @media print {
                 body * { visibility: hidden; }
                 #${rootId}, #${rootId} * { visibility: visible; }
@@ -23,8 +54,13 @@ function usePrintIsolation(rootId: string) {
                 @page { margin: 0; }
             }
         `;
+
         document.head.appendChild(style);
-    }, [rootId]);
+
+        return () => {
+            style.remove();
+        };
+    }, [rootId, open, receiptWidthMm]);
 }
 
 interface PrintModalProps {
@@ -33,6 +69,8 @@ interface PrintModalProps {
     rootId: string;
     printLabel?: string;
     maxWidthClassName?: string;
+    /** Prints at this physical width (mm), like a real receipt roll, instead of a full page. */
+    receiptWidthMm?: number;
     children: ReactNode;
 }
 
@@ -41,9 +79,10 @@ export default function PrintModal({
     onClose,
     rootId,
     maxWidthClassName = "max-w-md",
+    receiptWidthMm,
     children,
 }: PrintModalProps) {
-    usePrintIsolation(rootId);
+    usePrintIsolation(rootId, open, receiptWidthMm);
 
     useEffect(() => {
         if (!open) return;

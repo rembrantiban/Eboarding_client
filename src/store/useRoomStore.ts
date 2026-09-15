@@ -14,7 +14,21 @@ export interface Room {
   images?: string[];
 
   occupied_beds?: number;
+  available_beds?: number;
   total_beds?: number;
+}
+
+export interface DeletedRoom {
+  id: number;
+  room_number: string;
+  capacity: number;
+  price_per_month: number;
+  status: "Available" | "Occupied" | "Under Maintenance";
+  total_beds: number;
+
+  deleted_at: string;
+  deleted_by_name?: string;
+  deleted_by_avatar?: string;
 }
 
 export interface Bed {
@@ -194,11 +208,15 @@ interface RoomState {
 
   loading: boolean;
   error: string | null;
+  deletedRooms: DeletedRoom[];
+  deletedRoomsLoading: boolean;
   getDashboardStats: () => Promise<void>;
   getRooms: () => Promise<void>;
   createRoom: (data: CreateRoomPayload) => Promise<void>;
   updateRoom: (data: UpdateRoomPayload) => Promise<void>;
   deleteRoom: (id: number) => Promise<void>;
+  getDeletedRooms: () => Promise<void>;
+  restoreRoom: (id: number) => Promise<void>;
   getRoomById: (id: number) => Promise<void>;
   getAvailableRooms: () => Promise<void>;
   getOccupancyTrend: () => Promise<void>
@@ -219,11 +237,13 @@ interface RoomState {
 }
 
 
-export const useRoomStore = create<RoomState>((set) => ({
+export const useRoomStore = create<RoomState>((set, get) => ({
   rooms: [],
   selectedRoomBeds: [],
   loading: false,
   error: null,
+  deletedRooms: [],
+  deletedRoomsLoading: false,
   availableRooms: [],
   occupancyTrend: [],
   dashboard: null,
@@ -697,7 +717,7 @@ export const useRoomStore = create<RoomState>((set) => ({
     const { showLoading, showError, showSuccess } = useStatusStore.getState();
     try {
       set({ loading: true, error: null });
-      showLoading("Deleting Room", "Please wait...");
+      showLoading("Moving to Trash", "Please wait...");
 
       await axiosInstance.delete(`/rooms/delete/${id}`);
 
@@ -705,7 +725,7 @@ export const useRoomStore = create<RoomState>((set) => ({
         rooms: state.rooms.filter((room) => room.id !== id),
         loading: false,
       }));
-      showSuccess("Room Deleted", "Room deleted successfully");
+      showSuccess("Room Moved to Trash", "You can restore it anytime from Deleted Rooms");
 
     } catch (error: unknown) {
       let message = "Failed to delete room";
@@ -718,6 +738,52 @@ export const useRoomStore = create<RoomState>((set) => ({
       showError("Failed to delete room", message);
       set({ loading: false, error: message });
       throw new Error(message); // 🔥 IMPORTANT for toast
+    }
+  },
+
+  getDeletedRooms: async () => {
+    try {
+      set({ deletedRoomsLoading: true });
+
+      const res = await axiosInstance.get("/rooms/deleted");
+
+      set({
+        deletedRooms: res.data,
+        deletedRoomsLoading: false,
+      });
+
+    } catch (error) {
+      console.error("Get deleted rooms error:", error);
+
+      set({ deletedRoomsLoading: false });
+    }
+  },
+
+  restoreRoom: async (id: number) => {
+    const { showError, showSuccess } = useStatusStore.getState();
+
+    try {
+      await axiosInstance.put(`/rooms/restore/${id}`);
+
+      set((state) => ({
+        deletedRooms: state.deletedRooms.filter((room) => room.id !== id),
+      }));
+
+      showSuccess("Room Restored", "The room is active again");
+
+      await get().getRooms();
+
+    } catch (error: unknown) {
+      let message = "Failed to restore room";
+
+      if (axios.isAxiosError(error)) {
+        message = error.response?.data?.message || message;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      showError("Failed to restore room", message);
+      throw new Error(message);
     }
   },
 

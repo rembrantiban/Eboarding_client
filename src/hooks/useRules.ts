@@ -11,10 +11,14 @@ export const useRules = () => {
   const unpublishRule = useRulesStore((state) => state.unpublishRule);
   const getPublishedRules = useRulesStore((state) => state.getPublishedRules);
   const PublishedRule = useRulesStore((state) => state.PublishedRule);
+  const acknowledgment = useRulesStore((state) => state.acknowledgment);
+  const acknowledging = useRulesStore((state) => state.acknowledging);
+  const getAcknowledgmentStatus = useRulesStore((state) => state.getAcknowledgmentStatus);
+  const acknowledgeRules = useRulesStore((state) => state.acknowledgeRules);
 
   return {
     rules,
-    loading,    
+    loading,
     getRules,
     createRule,
     updateRule,
@@ -23,6 +27,10 @@ export const useRules = () => {
     unpublishRule,
     getPublishedRules,
     PublishedRule,
+    acknowledgment,
+    acknowledging,
+    getAcknowledgmentStatus,
+    acknowledgeRules,
 
   };
 };

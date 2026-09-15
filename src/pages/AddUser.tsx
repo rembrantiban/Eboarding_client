@@ -4,13 +4,16 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/useAuth"
+import { DEFAULT_DIAL, DEFAULT_NATIONALITY } from "@/constants/countries"
 
 type FormType = {
   first_name: string
   last_name: string
   username: string
   email: string
+  country_code: string
   contact_number: string
+  nationality: string
   address: string
   password: string
   user_type: "Admin" | "Staff" | "Boarder"
@@ -24,7 +27,9 @@ const AddUser = () => {
     last_name: "",
     username: "",
     email: "",
+    country_code: DEFAULT_DIAL,
     contact_number: "",
+    nationality: DEFAULT_NATIONALITY,
     address: "",
     password: "",
     user_type: "Boarder",
@@ -107,7 +112,9 @@ const AddUser = () => {
         last_name: "",
         username: "",
         email: "",
+        country_code: DEFAULT_DIAL,
         contact_number: "",
+        nationality: DEFAULT_NATIONALITY,
         address: "",
         password: "",
         user_type: "Boarder",

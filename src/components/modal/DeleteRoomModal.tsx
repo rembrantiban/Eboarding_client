@@ -47,8 +47,9 @@ const DeleteRoomModal = ({
             </p>
           )}
 
-          <p className="text-xs text-red-500">
-            ⚠ This action cannot be undone. All beds and images will be deleted.
+          <p className="text-xs text-slate-500">
+            This room will be moved to Deleted Rooms. Its beds and images are
+            kept and you can restore it at any time.
           </p>
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 import { Mail, Phone, BedDouble, DoorOpen, LogIn, LogOut } from "lucide-react";
+import { RECEIPT_MONO, TornEdge, DotRow, Barcode } from "@/components/receipt/ReceiptPrimitives";
 
 export interface StatementBill {
     billing_no: string;
@@ -36,17 +37,15 @@ interface StatementReceiptProps {
     tagline?: string;
 }
 
-const MONO = "'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace";
-
 const accentByStatus: Record<
     StatementBill["status"],
     { text: string; border: string; dot: string }
 > = {
-    Upcoming: { text: "text-indigo-700", border: "border-indigo-500", dot: "bg-indigo-600" },
-    Pending: { text: "text-amber-700", border: "border-amber-500", dot: "bg-amber-600" },
-    Partial: { text: "text-sky-700", border: "border-sky-500", dot: "bg-sky-600" },
-    Paid: { text: "text-emerald-700", border: "border-emerald-500", dot: "bg-emerald-600" },
-    Overdue: { text: "text-red-700", border: "border-red-500", dot: "bg-red-600" },
+    Upcoming: { text: "text-slate-900", border: "border-slate-900", dot: "bg-slate-900" },
+    Pending: { text: "text-slate-900", border: "border-slate-900", dot: "bg-slate-900" },
+    Partial: { text: "text-slate-900", border: "border-slate-900", dot: "bg-slate-900" },
+    Paid: { text: "text-slate-900", border: "border-slate-900", dot: "bg-slate-900" },
+    Overdue: { text: "text-slate-900", border: "border-slate-900", dot: "bg-slate-900" },
     Cancelled: { text: "text-slate-500", border: "border-slate-400", dot: "bg-slate-400" },
 };
 
@@ -61,72 +60,6 @@ function formatDate(iso: string | null | undefined) {
 
 function initials(first: string, last: string) {
     return `${first?.[0] ?? ""}${last?.[0] ?? ""}`.toUpperCase() || "—";
-}
-
-/** Jagged torn-paper edge, drawn as a repeating triangle-wave polygon. */
-function TornEdge({ position }: { position: "top" | "bottom" }) {
-    const top = "0,10 4,0 8,10 12,0 16,10 20,0 24,10 28,0 32,10 36,0 40,10 40,10 0,10";
-    const bottom = "0,0 4,10 8,0 12,10 16,0 20,10 24,0 28,10 32,0 36,10 40,0 40,0 0,0";
-    return (
-        <svg
-            className="block w-full"
-            style={{ height: 9 }}
-            viewBox="0 0 40 10"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-        >
-            <polygon points={position === "top" ? top : bottom} className="fill-white" />
-        </svg>
-    );
-}
-
-/** A label ........ value line, like a printed receipt or restaurant check. */
-function DotRow({
-    label,
-    value,
-    icon,
-    tone = "default",
-}: {
-    label: React.ReactNode;
-    value: React.ReactNode;
-    icon?: React.ReactNode;
-    tone?: "default" | "good" | "bad" | "muted";
-}) {
-    const valueColor =
-        tone === "good" ? "text-emerald-700" : tone === "bad" ? "text-red-600" : tone === "muted" ? "text-slate-400" : "text-slate-900";
-    return (
-        <div className="flex items-baseline gap-2 py-0.75 text-[13px]">
-            <span className="flex shrink-0 items-center gap-1.5 text-slate-500">
-                {icon}
-                {label}
-            </span>
-            <span className="relative top-0.75 flex-1 border-b border-dotted border-slate-300" />
-            <span className={`shrink-0 font-semibold tabular-nums ${valueColor}`}>{value}</span>
-        </div>
-    );
-}
-
-/** Deterministic barcode generated from the billing number, so it's always the "same" code for that bill. */
-function Barcode({ seed }: { seed: string }) {
-    const chars = seed.length ? seed.split("") : ["0"];
-    const bars = chars.map((ch, i) => {
-        const code = ch.charCodeAt(0);
-        return {
-            w: 1 + (code % 3),
-            tall: (code + i) % 5 !== 0,
-        };
-    });
-    return (
-        <div className="flex h-9 items-end gap-0.5" aria-hidden="true">
-            {bars.map((b, i) => (
-                <div
-                    key={i}
-                    className="bg-slate-900"
-                    style={{ width: `${b.w}px`, height: b.tall ? "100%" : "62%" }}
-                />
-            ))}
-        </div>
-    );
 }
 
 const sampleBill: StatementBill = {
@@ -164,7 +97,7 @@ export default function StatementReceipt({
     const headlineValue = bill.balance > 0 ? bill.balance : bill.total_amount;
 
     return (
-        <div className="mx-auto w-full max-w-md bg-white px-4 py-8" style={{ fontFamily: MONO }}>
+        <div className="mx-auto w-full max-w-md bg-white px-4 py-8" style={{ fontFamily: RECEIPT_MONO }}>
             <div className="relative mx-auto max-w-105 ">
                 <TornEdge position="top" />
 

@@ -11,6 +11,10 @@ export const useRoom = () => {
   const getRooms = useRoomStore((state) => state.getRooms);
   const getAvailableRooms = useRoomStore((state) => state.getAvailableRooms);
   const deleteRoom = useRoomStore((state) => state.deleteRoom);
+  const deletedRooms = useRoomStore((state) => state.deletedRooms);
+  const deletedRoomsLoading = useRoomStore((state) => state.deletedRoomsLoading);
+  const getDeletedRooms = useRoomStore((state) => state.getDeletedRooms);
+  const restoreRoom = useRoomStore((state) => state.restoreRoom);
   const dashboardStats = useRoomStore((state) => state.dashboardStats);
   const getDashboardStats = useRoomStore((state) => state.getDashboardStats);
   const occupancyTrend = useRoomStore((state) => state.occupancyTrend);
@@ -50,6 +54,10 @@ export const useRoom = () => {
     getRooms,
     getAvailableRooms,
     deleteRoom,
+    deletedRooms,
+    deletedRoomsLoading,
+    getDeletedRooms,
+    restoreRoom,
     dashboardStats,
     getDashboardStats,
     occupancyTrend,

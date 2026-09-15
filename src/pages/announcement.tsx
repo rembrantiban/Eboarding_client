@@ -203,7 +203,7 @@ export default function AdminAnnouncementsPage() {
             <div className="h-full overflow-y-auto border-l-2 border-t-2 rounded-tl-2xl bg-background">
                 {/* ===== Sticky header ===== */}
                 <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
-                    <div className="mx-auto max-w-3xl px-4 pt-5 pb-3 space-y-4.5">
+                    <div className="mx-auto max-w-5xl px-4 pt-5 pb-3 space-y-4.5">
                         {/* Title row */}
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
@@ -327,7 +327,7 @@ export default function AdminAnnouncementsPage() {
                 </header>
 
                 {/* ===== Feed ===== */}
-                <div className="mx-auto max-w-3xl px-4 py-5">
+                <div className="mx-auto max-w-5xl px-4 py-5">
                     <section className="space-y-3">
                         {filtered.length === 0 ? (
                             <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-14 text-center">

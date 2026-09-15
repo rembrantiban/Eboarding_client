@@ -30,10 +30,18 @@ interface UpdateRulePayload {
   status: "Published" | "Unpublished";
 }
 
+interface AcknowledgmentStatus {
+  acknowledgedAt: string | null;
+  latestRuleUpdate: string | null;
+  needsAcknowledgment: boolean;
+}
+
 interface RulesState {
   rules: Rule[];
   loading: boolean;
   PublishedRule: Rule[];
+  acknowledgment: AcknowledgmentStatus | null;
+  acknowledging: boolean;
 
   getRules: () => Promise<void>;
 
@@ -60,6 +68,10 @@ interface RulesState {
 
   getPublishedRules:() => Promise<Rule | undefined>
 
+  getAcknowledgmentStatus: () => Promise<void>;
+
+  acknowledgeRules: () => Promise<void>;
+
 }
 
 
@@ -67,6 +79,8 @@ export const useRulesStore = create<RulesState>((set, get) => ({
   rules: [],
   loading: false,
   PublishedRule: [],
+  acknowledgment: null,
+  acknowledging: false,
 
 
 
@@ -228,6 +242,47 @@ unpublishRule: async (id) => {
     );
 
     showError("Error", "Failed to unpublish rule.");
+  }
+},
+
+getAcknowledgmentStatus: async () => {
+  try {
+    const res = await axiosInstance.get(
+      "/rules/acknowledgment/status"
+    );
+
+    set({ acknowledgment: res.data });
+
+  } catch (error) {
+    console.error("Get acknowledgment status error:", error);
+  }
+},
+
+acknowledgeRules: async () => {
+  const { showError } = useStatusStore.getState();
+
+  try {
+    set({ acknowledging: true });
+
+    const res = await axiosInstance.post(
+      "/rules/acknowledge"
+    );
+
+    set({
+      acknowledgment: {
+        acknowledgedAt: res.data.acknowledgedAt,
+        latestRuleUpdate: get().acknowledgment?.latestRuleUpdate ?? null,
+        needsAcknowledgment: false,
+      },
+      acknowledging: false,
+    });
+
+  } catch (error) {
+    console.error("Acknowledge rules error:", error);
+
+    set({ acknowledging: false });
+
+    showError("Error", "Failed to acknowledge rules.");
   }
 },
 
