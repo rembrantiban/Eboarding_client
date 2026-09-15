@@ -38,6 +38,7 @@ import MaintenanceRequestPage from './pages/MaintenanceRequestPage'
 import AdminMaintenanceRequestPage from './pages/AdminMaintenance'
 import AdminMaintenanceHistoryPage from './pages/AdminMaintenanceHistory'
 import BoarderMaintenancePage from './pages/BoarderMaintenancePage'
+import BoarderMaintenanceHistoryPage from './pages/BoarderMaintenanceHistoryPage'
 import BoarderHouseRulesPage from './pages/BoarderHouseRulesPage'
 import ReportBoarder from './pages/ReportBoarder'
 import BoarderPenalties from './pages/BoarderPenalties'
@@ -111,6 +112,7 @@ function App() {
             <Route path="/payment-history" element={<PaymentHistoryPage />} />
             <Route path="/boarder-billing" element={<BoarderBilling />} />
             <Route path='/boarder-maintenance' element={<BoarderMaintenancePage />} />
+            <Route path='/boarder-maintenance/history' element={<BoarderMaintenanceHistoryPage />} />
             <Route path='/house-rules' element={<BoarderHouseRulesPage />} />
             <Route path='/report/boarder' element={<ReportBoarder />} />
             <Route path='/boarder/penalties' element={<BoarderPenalties />} />

@@ -72,6 +72,7 @@ interface MaintenanceStore {
     boarderRequest: MaintenanceRequest[];
     assignedMaintenanceList: MaintenanceRequest[];
     maintenanceHistory: MaintenanceRequest[];
+    boarderMaintenanceHistory: MaintenanceRequest[];
 
     createMaintenanceRequest: (data: FormData) => Promise<boolean>;
 
@@ -89,6 +90,7 @@ interface MaintenanceStore {
     getMySubmittedRequest: () => Promise<boolean>;
 
     getBoarderRequestMaintenance: () => Promise<boolean>;
+    getBoarderMaintenanceHistory: () => Promise<boolean>;
 
     getAllAssignedMaintenance: () => Promise<boolean>;
     updateAssignedMaintenanceRequest: (id: number, status: MaintenanceStatus, remarks?: string) => Promise<boolean>;
@@ -108,6 +110,7 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
     boarderRequest: [],
     assignedMaintenanceList: [],
     maintenanceHistory: [],
+    boarderMaintenanceHistory: [],
 
 
     updateAssignedMaintenanceRequest: async (
@@ -297,6 +300,29 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
 
             set({
                 boarderRequest: res.data,
+            });
+
+            return true;
+
+        } catch {
+            return false;
+        } finally {
+
+            set({ loading: false });
+
+        }
+
+    },
+
+    getBoarderMaintenanceHistory: async () => {
+
+        try {
+            set({ loading: true });
+
+            const res = await axiosInstance.get("/maintenance/boarder/history");
+
+            set({
+                boarderMaintenanceHistory: res.data,
             });
 
             return true;

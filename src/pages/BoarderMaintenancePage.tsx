@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   Wrench,
   Plus,
@@ -55,7 +56,7 @@ const STATUS_META: Record<
   },
 }
 
-const TABS = ["All", "Pending", "In Progress", "Resolved", "Closed"] as const
+const TABS = ["All", "Pending", "In Progress", "Resolved"] as const
 type Tab = (typeof TABS)[number]
 
 
@@ -282,12 +283,21 @@ const RequestDetailsModal = ({
 
 
 const BoarderMaintenancePage = () => {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>("All")
   const [search, setSearch] = useState("")
   const [open, setOpen] = useState(false)
   const [detailsRequest, setDetailsRequest] = useState<MaintenanceRequest | null>(null)
   const [imageRequest, setImageRequest] = useState<MaintenanceRequest | null>(null)
-  const { createMaintenanceRequest, getMySubmittedRequest, loading, getBoarderRequestMaintenance, boarderRequest } = useMaintenance()
+  const {
+    createMaintenanceRequest,
+    getMySubmittedRequest,
+    loading,
+    getBoarderRequestMaintenance,
+    boarderRequest,
+    getBoarderMaintenanceHistory,
+    boarderMaintenanceHistory,
+  } = useMaintenance()
   const { getBoarderAssignedRoom, boarderAssignedRoom } = useRoomAssignment()
   const { user } = useAuth()
 
@@ -295,6 +305,7 @@ const BoarderMaintenancePage = () => {
   useEffect(() => {
     getMySubmittedRequest();
     getBoarderRequestMaintenance()
+    getBoarderMaintenanceHistory()
     //eslint-disable-next-line
   }, []);
 
@@ -356,14 +367,33 @@ const BoarderMaintenancePage = () => {
             </div>
           </div>
 
-          <Button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="h-9 rounded-lg bg-slate-900 px-4 text-[12.5px] font-medium text-white transition hover:bg-slate-800"
-          >
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            New request
-          </Button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate("/boarder-maintenance/history")}
+              title="Maintenance request history"
+              className="relative flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[12.5px] font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+            >
+              <Archive className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">History</span>
+              {boarderMaintenanceHistory.length > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-slate-900 px-1 text-[9.5px] font-semibold tabular-nums text-white ring-2 ring-white">
+                  {boarderMaintenanceHistory.length > 99
+                    ? "99+"
+                    : boarderMaintenanceHistory.length}
+                </span>
+              )}
+            </button>
+
+            <Button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="h-9 rounded-lg bg-slate-900 px-4 text-[12.5px] font-medium text-white transition hover:bg-slate-800"
+            >
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              New request
+            </Button>
+          </div>
         </div>
 
         {/* ------------------------------- Stats ----------------------------- */}
