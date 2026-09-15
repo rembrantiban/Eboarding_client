@@ -16,7 +16,6 @@ import {
   FolderOpen,
   NotepadText,
   Wrench ,
-  ArchiveRestore,
   TriangleAlertIcon,
 } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react"
@@ -235,24 +234,6 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
                   }}
                 />
               </div>
-
-              {/* Admin Tools */}
-              {user?.user_type === "Admin" && (
-                <>
-                  <div className="border-t border-slate-100" />
-
-                  <div className="py-1">
-                    <DropdownButton
-                      icon={<ArchiveRestore size={14} />}
-                      label="Deleted Accounts"
-                      onClick={() => {
-                        navigate("/deleted-accounts");
-                        setDropdownOpen(false);
-                      }}
-                    />
-                  </div>
-                </>
-              )}
 
               {/* Logout */}
               <div className="border-t border-slate-100 py-1">

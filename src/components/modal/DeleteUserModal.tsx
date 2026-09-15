@@ -23,7 +23,7 @@ type Props = {
 type Status = "idle" | "loading" | "success" | "error";
 
 const DeleteUserModal = ({ open, onClose, userId, onSuccess }: Props) => {
-  const { deleteUser } = useAuth();
+  const { deleteUser, getAllDeletedUsers } = useAuth();
   const { showLoading, showSuccess, showError } = useStatus();
 
   const [status, setStatus] = useState<Status>("idle");
@@ -46,6 +46,7 @@ const handleDelete = async () => {
     );
 
     await deleteUser(userId);
+    await getAllDeletedUsers();
 
     showSuccess(
       "User Deleted",

@@ -257,14 +257,19 @@ export default function EditProfile() {
               Contact & security
             </h2>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field
-                label="Email address"
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                icon={Mail}
-              />
+              <div>
+                <Field
+                  label="Email address"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  icon={Mail}
+                  disabled
+                />
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Your email address can&apos;t be changed.
+                </p>
+              </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-500">
                   Password

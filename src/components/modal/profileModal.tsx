@@ -232,8 +232,11 @@ const ProfileModal = ({ open, onClose }: Props) => {
                                 name="email"
                                 type="email"
                                 value={form.email}
-                                onChange={handleChange}
+                                disabled
                             />
+                            <p className="text-[10.5px] text-gray-400">
+                                Your email address can&apos;t be changed.
+                            </p>
                             {/* Password with show/hide */}
                             <div className="space-y-1">
                                 <label className="text-[11px] font-medium text-gray-500">

@@ -1,9 +1,10 @@
-import { Search, ChevronDown, Plus } from "lucide-react"
+import { Search, ChevronDown, Plus, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/useAuth"
 import AddUserModal from "@/components/modal/createUserModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import StaffCreateUser from "@/components/modal/StaffCreateUser";
+import DeletedUsersModal from "@/components/modal/DeletedUsersModal";
 
 type Props = {
   search: string
@@ -13,10 +14,16 @@ type Props = {
 }
 
 const UserTableHeader = ({ search, setSearch, filter, setFilter }: Props) => {
-  const { user } = useAuth();
+  const { user, deletedUsers, getAllDeletedUsers } = useAuth();
+  const isAdmin = user?.user_type === "Admin";
 
   const [open, setOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
+  const [trashOpen, setTrashOpen] = useState(false);
+
+  useEffect(() => {
+    if (isAdmin) getAllDeletedUsers();
+  }, [isAdmin, getAllDeletedUsers]);
 
   return (
     <>
@@ -63,6 +70,23 @@ const UserTableHeader = ({ search, setSearch, filter, setFilter }: Props) => {
             <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
           </div>
 
+          {/* Deleted accounts — admin only */}
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setTrashOpen(true)}
+              title="Deleted accounts"
+              className="relative flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {deletedUsers.length > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-slate-900 px-1 text-[9.5px] font-semibold tabular-nums text-white ring-2 ring-white">
+                  {deletedUsers.length > 99 ? "99+" : deletedUsers.length}
+                </span>
+              )}
+            </button>
+          )}
+
           {/* Add */}
           <button
             type="button"
@@ -86,6 +110,13 @@ const UserTableHeader = ({ search, setSearch, filter, setFilter }: Props) => {
         open={staffOpen}
         onClose={() => setStaffOpen(false)}
       />
+
+      {isAdmin && (
+        <DeletedUsersModal
+          open={trashOpen}
+          onClose={() => setTrashOpen(false)}
+        />
+      )}
     </>
   )
 }

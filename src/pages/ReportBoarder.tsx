@@ -1,6 +1,7 @@
 "use client";
 
 import { useBilling } from "@/hooks/useBilling";
+import { usePenalty } from "@/hooks/usePenalty";
 import {
     ClipboardList,
     Wallet,
@@ -8,37 +9,18 @@ import {
     TriangleAlert,
     FileText,
     CircleCheck,
+    Receipt,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AllPaymentsModal from "@/components/BoarderReport/AllPaymentsModal";
-
-
-
-type Penalty = {
-    id: number;
-    date: string;
-    description: string;
-    amount: number;
-    status: "Settled" | "Outstanding";
-};
-
-const SUMMARY = {
-    total_payments: 36000,
-    last_payment_date: "2026-05-05",
-    total_penalties: 0,
-    outstanding_penalties: 0,
-};
-
-
-const PENALTIES: Penalty[] = [];
- 
+import AllPenaltiesModal from "@/components/BoarderReport/AllPenaltiesModal";
 
 const peso = (value: number) =>
     new Intl.NumberFormat("en-PH", {
         style: "currency",
         currency: "PHP",
         minimumFractionDigits: 2,
-    }).format(value);
+    }).format(Number.isFinite(value) ? value : 0);
 
 const formatDate = (value?: string | null) => {
     if (!value) return "—";
@@ -51,10 +33,16 @@ const formatDate = (value?: string | null) => {
     }).format(d);
 };
 
+const num = (v: unknown) => {
+    const x = Number(v);
+    return Number.isFinite(x) ? x : 0;
+};
+
 const STATUS_STYLE: Record<string, string> = {
     Paid: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     Partial: "bg-amber-50 text-amber-700 ring-amber-100",
-    Settled: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    "Partially Paid": "bg-blue-50 text-blue-700 ring-blue-100",
+    Waived: "bg-slate-100 text-slate-600 ring-slate-200",
     Pending: "bg-amber-50 text-amber-700 ring-amber-100",
     Outstanding: "bg-rose-50 text-rose-700 ring-rose-100",
     Overdue: "bg-rose-50 text-rose-700 ring-rose-100",
@@ -65,14 +53,40 @@ const STATUS_STYLE: Record<string, string> = {
 const BoarderReport = () => {
 
     const { boarderPaymentSummary, getBoarderPaymentSummary, getMyRecentPayments, recentPayments } = useBilling();
+    const { myPenaltyRecords, myPenaltyRecordsLoading, getMyPenaltyRecords } = usePenalty();
     const [allPaymentsOpen, setAllPaymentsOpen] = useState(false);
+    const [allPenaltiesOpen, setAllPenaltiesOpen] = useState(false);
 
 
     useEffect(() => {
         getBoarderPaymentSummary();
         getMyRecentPayments();
+        getMyPenaltyRecords();
         //eslint-disable-next-line
     }, []);
+
+    const penaltySummary = useMemo(() => {
+        const totalPenalties = myPenaltyRecords
+            .filter((p) => p.status !== "Pending")
+            .reduce((sum, p) => sum + num(p.amount), 0);
+
+        const outstandingPenalties = myPenaltyRecords
+            .filter((p) => p.status === "Partially Paid")
+            .reduce((sum, p) => sum + Math.max(num(p.amount) - num(p.amount_paid), 0), 0);
+
+        return { totalPenalties, outstandingPenalties };
+    }, [myPenaltyRecords]);
+
+    const recentPenalties = useMemo(
+        () =>
+            [...myPenaltyRecords]
+                .sort(
+                    (a, b) =>
+                        new Date(b.penalty_date).getTime() - new Date(a.penalty_date).getTime()
+                )
+                .slice(0, 5),
+        [myPenaltyRecords]
+    );
 
 
     return (
@@ -129,8 +143,8 @@ const BoarderReport = () => {
                         title="Penalty Records"
                         subtitle="View your penalty history and status"
                         stats={[
-                            { label: "Total Penalties", value: peso(SUMMARY.total_penalties), highlight: true },
-                            { label: "Outstanding Penalties", value: peso(SUMMARY.outstanding_penalties) },
+                            { label: "Total Penalties", value: peso(penaltySummary.totalPenalties), highlight: true },
+                            { label: "Outstanding Penalties", value: peso(penaltySummary.outstandingPenalties) },
                         ]}
                     />
                 </div>
@@ -158,39 +172,35 @@ const BoarderReport = () => {
                                 text="You have no payment records."
                             />
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead>
-                                        <tr className="border-y border-slate-100">
-                                            <Th>Date</Th>
-                                            <Th>Description</Th>
-                                            <Th className="text-right">Amount</Th>
-                                            <Th>Status</Th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {recentPayments.map((p) => (
-                                            <tr
-                                                key={p.id}
-                                                className="border-b border-slate-50 transition-colors last:border-0 hover:bg-slate-50/60"
-                                            >
-                                                <Td className="whitespace-nowrap text-slate-500">
-                                                    {formatDate(p.date)}
-                                                </Td>
-                                                <Td className="font-medium text-slate-800">
+                            <ul className="divide-y divide-slate-100 border-t border-slate-100 px-4">
+                                {recentPayments.map((p) => (
+                                    <li
+                                        key={p.id}
+                                        className="flex items-center justify-between gap-3 py-3"
+                                    >
+                                        <div className="flex min-w-0 items-center gap-3">
+                                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 ring-1 ring-blue-100">
+                                                <Receipt size={14} className="text-blue-500" />
+                                            </span>
+                                            <div className="min-w-0">
+                                                <p className="truncate text-[12.5px] font-medium text-slate-900">
                                                     {p.description}
-                                                </Td>
-                                                <Td className="whitespace-nowrap text-right font-medium tabular-nums text-slate-800">
-                                                    {peso(p.amount)}
-                                                </Td>
-                                                <Td>
-                                                    <StatusBadge status={p.status} />
-                                                </Td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                </p>
+                                                <p className="mt-0.5 truncate text-[11px] text-slate-400">
+                                                    {formatDate(p.date)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex shrink-0 flex-col items-end gap-1">
+                                            <span className="text-[12.5px] font-semibold tabular-nums text-slate-900">
+                                                {peso(p.amount)}
+                                            </span>
+                                            <StatusBadge status={p.status} />
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
                     </Panel>
 
@@ -201,52 +211,73 @@ const BoarderReport = () => {
                         iconTone="rose"
                         title="Recent Penalties"
                         action="View All Penalties"
-                        onAction={() => { }}
+                        onAction={() => setAllPenaltiesOpen(true)}
                         footer={
-                            PENALTIES.length > 0
-                                ? `Showing 1 to ${PENALTIES.length} of ${PENALTIES.length} penalties`
+                            recentPenalties.length > 0
+                                ? `Showing 1 to ${recentPenalties.length} of ${myPenaltyRecords.length} penalties`
                                 : undefined
                         }
                     >
-                        {PENALTIES.length === 0 ? (
+                        {myPenaltyRecordsLoading && myPenaltyRecords.length === 0 ? (
+                            <div className="space-y-2 px-4 py-3">
+                                {[...Array(3)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="h-12 w-full animate-pulse rounded-xl bg-slate-100"
+                                    />
+                                ))}
+                            </div>
+                        ) : recentPenalties.length === 0 ? (
                             <EmptyState
                                 title="No Penalties Found"
                                 text="You have no penalty records."
                             />
                         ) : (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead>
-                                        <tr className="border-y border-slate-100">
-                                            <Th>Date</Th>
-                                            <Th>Description</Th>
-                                            <Th className="text-right">Amount</Th>
-                                            <Th>Status</Th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {PENALTIES.map((p) => (
-                                            <tr
-                                                key={p.id}
-                                                className="border-b border-slate-50 transition-colors last:border-0 hover:bg-slate-50/60"
-                                            >
-                                                <Td className="whitespace-nowrap text-slate-500">
-                                                    {formatDate(p.date)}
-                                                </Td>
-                                                <Td className="font-medium text-slate-800">
-                                                    {p.description}
-                                                </Td>
-                                                <Td className="whitespace-nowrap text-right font-medium tabular-nums text-slate-800">
-                                                    {peso(p.amount)}
-                                                </Td>
-                                                <Td>
-                                                    <StatusBadge status={p.status} />
-                                                </Td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <ul className="divide-y divide-slate-100 border-t border-slate-100 px-4">
+                                {recentPenalties.map((p) => {
+                                    const amount = num(p.amount);
+                                    const outstanding = Math.max(amount - num(p.amount_paid), 0);
+                                    const active =
+                                        p.status === "Pending" || p.status === "Partially Paid";
+
+                                    return (
+                                        <li
+                                            key={p.penalty_id}
+                                            className="flex items-center justify-between gap-3 py-3"
+                                        >
+                                            <div className="flex min-w-0 items-center gap-3">
+                                                <span
+                                                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-1 ${active
+                                                        ? "bg-amber-50 ring-amber-100"
+                                                        : "bg-emerald-50 ring-emerald-100"
+                                                        }`}
+                                                >
+                                                    {active ? (
+                                                        <TriangleAlert size={14} className="text-amber-500" />
+                                                    ) : (
+                                                        <CircleCheck size={14} className="text-emerald-500" />
+                                                    )}
+                                                </span>
+                                                <div className="min-w-0">
+                                                    <p className="truncate text-[12.5px] font-medium text-slate-900">
+                                                        {p.penalty_name ?? "Custom penalty"}
+                                                    </p>
+                                                    <p className="mt-0.5 truncate text-[11px] text-slate-400">
+                                                        {formatDate(p.penalty_date)}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex shrink-0 flex-col items-end gap-1">
+                                                <span className="text-[12.5px] font-semibold tabular-nums text-slate-900">
+                                                    {peso(active ? outstanding : amount)}
+                                                </span>
+                                                <StatusBadge status={p.status} />
+                                            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
                         )}
                     </Panel>
                 </div>
@@ -255,6 +286,11 @@ const BoarderReport = () => {
             <AllPaymentsModal
                 open={allPaymentsOpen}
                 onClose={() => setAllPaymentsOpen(false)}
+            />
+
+            <AllPenaltiesModal
+                open={allPenaltiesOpen}
+                onClose={() => setAllPenaltiesOpen(false)}
             />
         </div>
     );
@@ -397,32 +433,6 @@ function Panel({
             )}
         </section>
     );
-}
-
-function Th({
-    children,
-    className = "",
-}: {
-    children: React.ReactNode;
-    className?: string;
-}) {
-    return (
-        <th
-            className={`bg-slate-50/70 px-4 py-2 text-[11px] font-medium uppercase tracking-wide text-slate-400 ${className}`}
-        >
-            {children}
-        </th>
-    );
-}
-
-function Td({
-    children,
-    className = "",
-}: {
-    children: React.ReactNode;
-    className?: string;
-}) {
-    return <td className={`px-4 py-2.5 text-[12.5px] ${className}`}>{children}</td>;
 }
 
 function StatusBadge({ status }: { status: string }) {

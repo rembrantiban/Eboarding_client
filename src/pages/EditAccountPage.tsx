@@ -211,15 +211,21 @@ useEffect(() => {
                             />
                         </Field>
 
-                        <Field label="Email address" icon={Mail}>
-                            <input
-                                type="email"
-                                value={form.email}
-                                onChange={handleChange("email")}
-                                className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                                placeholder="you@example.com"
-                            />
-                        </Field>
+                        <div>
+                            <Field label="Email address" icon={Mail}>
+                                <input
+                                    type="email"
+                                    value={form.email}
+                                    readOnly
+                                    disabled
+                                    className="w-full cursor-not-allowed bg-transparent text-sm text-slate-500 outline-none"
+                                />
+                                <Lock size={14} className="shrink-0 text-slate-300" />
+                            </Field>
+                            <p className="mt-1 text-[11px] text-slate-400">
+                                Your email address can&apos;t be changed.
+                            </p>
+                        </div>
 
                         <Field label="Phone number" icon={Phone}>
                             <input

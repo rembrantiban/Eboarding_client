@@ -30,7 +30,7 @@ const RoomsTable = () => {
   const [trashOpen, setTrashOpen] = useState(false);
   const { deleteRoom, updateRoomStatus } = useRoom();
 
-  const { rooms, getRooms, loading } = useRoom();
+  const { rooms, getRooms, loading, deletedRooms, getDeletedRooms } = useRoom();
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -44,7 +44,8 @@ const RoomsTable = () => {
 
   useEffect(() => {
     getRooms();
-  }, [getRooms]);
+    getDeletedRooms();
+  }, [getRooms, getDeletedRooms]);
 
   // ✅ FILTER LOGIC
   const filteredRooms = rooms.filter((room) => {
@@ -154,9 +155,14 @@ const RoomsTable = () => {
               type="button"
               onClick={() => setTrashOpen(true)}
               title="Deleted rooms"
-              className="flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+              className="relative flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
             >
               <Trash2 className="h-3.5 w-3.5" />
+              {deletedRooms.length > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-slate-900 px-1 text-[9.5px] font-semibold tabular-nums text-white ring-2 ring-white">
+                  {deletedRooms.length > 99 ? "99+" : deletedRooms.length}
+                </span>
+              )}
             </button>
 
             <button
@@ -309,6 +315,7 @@ const RoomsTable = () => {
             setIsDeleting(true);
 
             await deleteRoom(roomToDelete.id);
+            await getDeletedRooms();
 
             toast.success("Room deleted 🗑️", { id: toastId });
 
