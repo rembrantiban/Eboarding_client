@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,9 @@ import { Trash2, RotateCcw, User as UserIcon, Inbox, CalendarClock } from "lucid
 import { useAuth } from "@/hooks/useAuth";
 import type { UserType } from "@/store/useAuthStore";
 import { toast } from "sonner";
+import Pagination from "@/components/Document/Pagination";
+
+const PAGE_SIZE = 5;
 
 type Props = {
   open: boolean;
@@ -35,9 +38,25 @@ const formatDate = (iso?: string | null) =>
 const DeletedUsersModal = ({ open, onClose }: Props) => {
   const { deletedUsers, getAllDeletedUsers, recoverDeletedUsers } = useAuth();
 
+  const [page, setPage] = useState(1);
+  const [wasOpen, setWasOpen] = useState(open);
+
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setPage(1);
+  }
+
   useEffect(() => {
     if (open) getAllDeletedUsers();
   }, [open, getAllDeletedUsers]);
+
+  const pageCount = Math.max(1, Math.ceil(deletedUsers.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+
+  const paginatedUsers = useMemo(() => {
+    const startIdx = (safePage - 1) * PAGE_SIZE;
+    return deletedUsers.slice(startIdx, startIdx + PAGE_SIZE);
+  }, [deletedUsers, safePage]);
 
   const handleRestore = async (id: number, name: string) => {
     try {
@@ -102,7 +121,7 @@ const DeletedUsersModal = ({ open, onClose }: Props) => {
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
-                  {deletedUsers.map((u) => (
+                  {paginatedUsers.map((u) => (
                     <tr key={u.id} className="transition-colors hover:bg-slate-50/70">
                       <td className="px-6 py-3">
                         <div className="flex min-w-0 items-center gap-2.5">
@@ -177,6 +196,14 @@ const DeletedUsersModal = ({ open, onClose }: Props) => {
                   ))}
                 </tbody>
               </table>
+
+              <Pagination
+                page={safePage}
+                pageCount={pageCount}
+                pageSize={PAGE_SIZE}
+                totalItems={deletedUsers.length}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </div>

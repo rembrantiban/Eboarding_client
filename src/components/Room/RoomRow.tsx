@@ -83,7 +83,9 @@ const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
       <td className="px-4 py-2.5">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
           <BedDouble size={12} className="text-slate-400" />
-          <span className="tabular-nums">{room.total_beds ?? 0}</span>
+          <span className="tabular-nums">
+            {room.occupied_beds ?? 0}/{room.total_beds ?? 0}
+          </span>
         </span>
       </td>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,9 @@ import {
 import { Trash2, RotateCcw, BedDouble, Inbox, Users, CalendarClock } from "lucide-react";
 import { useRoom } from "@/hooks/useRoom";
 import { toast } from "sonner";
+import Pagination from "@/components/Document/Pagination";
+
+const PAGE_SIZE = 5;
 
 type Props = {
   open: boolean;
@@ -38,9 +41,25 @@ const DeletedRoomsModal = ({ open, onClose }: Props) => {
   const { deletedRooms, deletedRoomsLoading, getDeletedRooms, restoreRoom } =
     useRoom();
 
+  const [page, setPage] = useState(1);
+  const [wasOpen, setWasOpen] = useState(open);
+
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setPage(1);
+  }
+
   useEffect(() => {
     if (open) getDeletedRooms();
   }, [open, getDeletedRooms]);
+
+  const pageCount = Math.max(1, Math.ceil(deletedRooms.length / PAGE_SIZE));
+  const safePage = Math.min(page, pageCount);
+
+  const paginatedRooms = useMemo(() => {
+    const startIdx = (safePage - 1) * PAGE_SIZE;
+    return deletedRooms.slice(startIdx, startIdx + PAGE_SIZE);
+  }, [deletedRooms, safePage]);
 
   const handleRestore = async (id: number, roomNumber: string) => {
     const toastId = toast.loading(`Restoring ${roomNumber}...`);
@@ -117,7 +136,7 @@ const DeletedRoomsModal = ({ open, onClose }: Props) => {
                 </thead>
 
                 <tbody className="divide-y divide-slate-100">
-                  {deletedRooms.map((room) => {
+                  {paginatedRooms.map((room) => {
                     const statusClass =
                       STATUS_STYLES[room.status] ??
                       "bg-rose-50 text-rose-700 ring-1 ring-rose-100";
@@ -193,6 +212,14 @@ const DeletedRoomsModal = ({ open, onClose }: Props) => {
                   })}
                 </tbody>
               </table>
+
+              <Pagination
+                page={safePage}
+                pageCount={pageCount}
+                pageSize={PAGE_SIZE}
+                totalItems={deletedRooms.length}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </div>

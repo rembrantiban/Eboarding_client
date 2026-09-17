@@ -71,7 +71,7 @@ export default function GlobalStatusModal() {
               onClick={close}
               className="mt-7 w-full h-10 rounded-lg text-[13px] font-medium bg-slate-900 hover:bg-slate-800 text-white shadow-none"
             >
-              Close
+              Okay
             </Button>
           )}
 
