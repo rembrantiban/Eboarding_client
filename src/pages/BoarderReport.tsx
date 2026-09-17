@@ -332,7 +332,6 @@ export default function BoarderReport() {
                         <button className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
                             <Calendar className="h-3 w-3 text-slate-400" />
                             {dateRange}
-                            <ChevronDown className="h-3 w-3 text-slate-400" />
                         </button>
                         <button className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[10.5px] font-medium text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50">
                             <FileDown className="h-3 w-3 text-rose-500" />

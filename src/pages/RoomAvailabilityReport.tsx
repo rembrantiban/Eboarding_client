@@ -7,7 +7,6 @@ import {
   Wrench,
   BedDouble,
   Calendar,
-  ChevronDown,
   FileSpreadsheet,
   Printer,
   Search,
@@ -236,7 +235,6 @@ export default function RoomAvailabilityReport() {
             <button className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-slate-300">
               <Calendar className="h-3.5 w-3.5 text-slate-400" />
               {dateRange}
-              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
             </button>
             <button
               onClick={handleExcel}
