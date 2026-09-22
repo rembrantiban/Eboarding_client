@@ -92,7 +92,7 @@ export default function PaymentsOverviewChart() {
         : "text-red-600 bg-red-50";
 
   return (
-    <div className="w-full  rounded border border-slate-300 bg-white p-6 ">
+    <div className="w-full rounded-md border border-gray-200 bg-white p-6">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>

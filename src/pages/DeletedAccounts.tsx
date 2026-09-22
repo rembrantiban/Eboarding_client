@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Trash2,
     User as UserIcon,
@@ -10,6 +11,7 @@ import {
     ChevronLeft,
     ChevronRight,
     ListFilter,
+    ArrowLeft,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import RestoreConfirmModal from "@/components/modal/ResoreAccountModal";
@@ -518,6 +520,7 @@ function Pagination({ page, totalPages, totalItems, pageSize, setPage }: Paginat
 
 
 export default function DeletedAccountsPage() {
+    const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [userType, setUserType] = useState("all");
     const [deletedBy, setDeletedBy] = useState("all");
@@ -526,7 +529,6 @@ export default function DeletedAccountsPage() {
     const { deletedUsers, getAllDeletedUsers, recoverDeletedUsers } = useAuth();
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [showRestoreModal, setShowRestoreModal] = useState(false);
-    const [isRestoring, setIsRestoring] = useState(false);
 
 
     useEffect(() => {
@@ -580,29 +582,36 @@ export default function DeletedAccountsPage() {
     const handleRestore = async () => {
         if (!selectedUser) return;
 
+        // Close the confirm modal first so the loading/success status modal is the only one visible.
+        setShowRestoreModal(false);
+
         try {
-            setIsRestoring(true);
-
             await recoverDeletedUsers(selectedUser.id);
-
-            setShowRestoreModal(false);
-            setSelectedUser(null);
-
             getAllDeletedUsers();
-
         } finally {
-            setIsRestoring(false);
+            setSelectedUser(null);
         }
     };
     return (
         <div className="h-screen overflow-hidden">
             <div className="h-full overflow-y-auto space-y-2 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-gray-50">
                 {/* Header */}
-                <div>
-                    <h1 className="text-xl font-semibold text-slate-900">Deleted Accounts</h1>
-                    <p className="text-sm text-slate-500 mt-0.5">
-                        These user accounts have been deleted or archived. You can restore them if needed.
-                    </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-xl font-semibold text-slate-900">Deleted Accounts</h1>
+                        <p className="text-sm text-slate-500 mt-0.5">
+                            These user accounts have been deleted or archived. You can restore them if needed.
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={() => navigate("/user")}
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 text-[12.5px] font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+                    >
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                        Back to Users
+                    </button>
                 </div>
 
                 {/* Stats — separated component */}
@@ -654,10 +663,7 @@ export default function DeletedAccountsPage() {
                 {showRestoreModal && selectedUser && (
                     <RestoreConfirmModal
                         user={selectedUser}
-                        isSubmitting={isRestoring}
                         onCancel={() => {
-                            if (isRestoring) return;
-
                             setShowRestoreModal(false);
                             setSelectedUser(null);
                         }}

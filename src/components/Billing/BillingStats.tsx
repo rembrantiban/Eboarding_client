@@ -1,5 +1,5 @@
 "use client";
-import { Wallet, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { Wallet, Clock, AlertTriangle } from "lucide-react";
 
 export interface BillingStatsData {
     total_billings: number;
@@ -31,7 +31,7 @@ interface StatCardProps {
     accent: string;
     label: string;
     value: string;
-    caption: string;
+    caption?: string;
 }
 
 function StatCard({
@@ -61,7 +61,7 @@ function StatCard({
             <p className="mt-1.5 truncate text-[17px] font-semibold leading-tight tracking-tight text-slate-200">
                 {value}
             </p>
-            <p className="mt-1 text-[11px] text-slate-400">{caption}</p>
+            {caption && <p className="mt-1 text-[11px] text-slate-400">{caption}</p>}
         </div>
     );
 }
@@ -91,7 +91,7 @@ export default function BillingStats({ data, loading }: BillingStatsProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
             <StatCard
                 icon={<Wallet size={14} />}
                 iconBg="bg-slate-100"
@@ -102,22 +102,12 @@ export default function BillingStats({ data, loading }: BillingStatsProps) {
                 caption={data.total_billings_period_label ?? "This Month"}
             />
             <StatCard
-                icon={<CheckCircle2 size={14} />}
-                iconBg="bg-emerald-50"
-                iconColor="text-emerald-600"
-                accent="bg-emerald-500"
-                label="Paid"
-                value={formatCurrency(data.paid_amount)}
-                caption={`${data.paid_percentage.toFixed(2)}% of total`}
-            />
-            <StatCard
                 icon={<Clock size={14} />}
                 iconBg="bg-amber-50"
                 iconColor="text-amber-600"
                 accent="bg-amber-500"
                 label="Partial Payments"
                 value={formatCurrency(data.partial_amount)}
-                caption={`${data.partial_percentage.toFixed(2)}% of total`}
             />
             <StatCard
                 icon={<AlertTriangle size={14} />}
@@ -126,7 +116,6 @@ export default function BillingStats({ data, loading }: BillingStatsProps) {
                 accent="bg-rose-500"
                 label="Overdue"
                 value={formatCurrency(data.overdue_amount)}
-                caption={`${data.overdue_percentage.toFixed(2)}% of total`}
             />
         </div>
     );

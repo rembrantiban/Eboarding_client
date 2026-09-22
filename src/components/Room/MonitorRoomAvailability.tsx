@@ -126,9 +126,9 @@ const MonitorRoomAvailability = () => {
   );
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 py-10">
       {/* Header */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-5 text-white shadow-lg shadow-slate-900/10 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-linear-to-br from-slate-900 via-slate-900 to-slate-800 p-5 text-white shadow-lg shadow-slate-900/10 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15">
             <Activity className="h-5 w-5 text-white" />
@@ -164,10 +164,10 @@ const MonitorRoomAvailability = () => {
               className="group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
             >
               <div
-                className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${s.gradient} opacity-10 transition-transform group-hover:scale-110`}
+                className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-linear-to-br ${s.gradient} opacity-10 transition-transform group-hover:scale-110`}
               />
               <div
-                className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${s.gradient} shadow-sm`}
+                className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br ${s.gradient} shadow-sm`}
               >
                 <Icon className="h-4 w-4 text-white" />
               </div>

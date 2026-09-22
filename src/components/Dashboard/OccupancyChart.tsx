@@ -70,7 +70,7 @@ export default function RoomOccupancyChart() {
   );
 
   return (
-    <div className="w-full max-w-3xl ite rounded border border-slate-200 bg-white p-6">
+    <div className="w-full max-w-3xl rounded-md border border-gray-200 bg-white p-6">
       <h3 className="mb-4 text-[15px] font-semibold text-slate-900">
         Occupancy Status{" "}
         <span className="font-normal text-slate-400">(Today)</span>

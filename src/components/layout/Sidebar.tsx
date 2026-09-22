@@ -8,7 +8,6 @@ import {
   LogOut,
   Shield,
   Bell,
-  MoreHorizontal,
   Menu,
   X,
   Wallet,
@@ -17,6 +16,7 @@ import {
   NotepadText,
   Wrench ,
   TriangleAlertIcon,
+  EllipsisVertical,
 } from "lucide-react"
 import { useEffect, useState, type ReactNode } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
@@ -203,9 +203,9 @@ const Sidebar = ({ mobileOpen = false, onMobileClose }: SidebarProps) => {
               </p>
             </div>
 
-            <MoreHorizontal
-              size={16}
-              className="text-slate-400 shrink-0"
+            <EllipsisVertical 
+              size={18}
+              className="text-slate-500 shrink-0"
             />
           </button>
 

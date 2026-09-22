@@ -50,6 +50,13 @@ const formatTime = (date: string) =>
         minute: "2-digit",
     })
 
+const MAX_DESCRIPTION_PREVIEW = 20
+
+const truncateDescription = (text?: string) =>
+    text && text.length > MAX_DESCRIPTION_PREVIEW
+        ? `${text.slice(0, MAX_DESCRIPTION_PREVIEW).trimEnd()}...`
+        : text
+
 const MaintenanceRow = ({
     request,
     onView,
@@ -108,7 +115,7 @@ const MaintenanceRow = ({
                             title={request.description}
                             className="truncate text-[12px] font-medium text-slate-800"
                         >
-                            {request.description || "—"}
+                            {truncateDescription(request.description) || "—"}
                         </p>
                     </div>
                 </div>

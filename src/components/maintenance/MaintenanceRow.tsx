@@ -49,6 +49,13 @@ const formatTime = (date: string) =>
     minute: "2-digit",
   })
 
+const MAX_DESCRIPTION_PREVIEW = 20
+
+const truncateDescription = (text?: string) =>
+  text && text.length > MAX_DESCRIPTION_PREVIEW
+    ? `${text.slice(0, MAX_DESCRIPTION_PREVIEW).trimEnd()}...`
+    : text
+
 const MaintenanceRow = ({
   request,
   onView,
@@ -107,9 +114,18 @@ const MaintenanceRow = ({
               title={request.description}
               className="truncate text-[12px] font-medium text-slate-800"
             >
-              {request.description || "—"}
+              {truncateDescription(request.description) || "—"}
             </p>
           </div>
+        </div>
+      </td>
+
+      <td className="whitespace-nowrap px-4 py-2.5">
+        <div className="flex flex-col">
+          <span className="text-[12px] font-medium text-slate-900">
+            {request.requested_by || "—"}
+          </span>
+          <span className="text-[10.5px] text-slate-400">Requested by</span>
         </div>
       </td>
 

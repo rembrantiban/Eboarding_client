@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import RoomRow from "./RoomRow";
 import { Search, Plus, RotateCcw, DoorOpen, PackageOpen, Trash2 } from "lucide-react";
@@ -10,7 +11,6 @@ import ViewRoomModal from "../modal/ViewRoomModal";
 import type { Room } from "@/store/useRoomStore";
 import UpdateRoomModal from "../modal/UpdateRoomModal";
 import DeleteRoomModal from "../modal/DeleteRoomModal";
-import DeletedRoomsModal from "../modal/DeletedRoomsModal";
 import UpdateRoomStatusModal, {
   type RoomStatus,
 } from "./UpdateRoomStatusModal";
@@ -24,10 +24,10 @@ import {
 } from "@/components/ui/select";
 
 const RoomsTable = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [addRoomOpen, setAddRoomOpen] = useState(false);
-  const [trashOpen, setTrashOpen] = useState(false);
   const { deleteRoom, updateRoomStatus } = useRoom();
 
   const { rooms, getRooms, loading, deletedRooms, getDeletedRooms } = useRoom();
@@ -153,7 +153,7 @@ const RoomsTable = () => {
 
             <button
               type="button"
-              onClick={() => setTrashOpen(true)}
+              onClick={() => navigate("/deleted-rooms")}
               title="Deleted rooms"
               className="relative flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
             >
@@ -279,7 +279,6 @@ const RoomsTable = () => {
 
       {/* ✅ MODAL */}
       <AddRoomModal open={addRoomOpen} onClose={() => setAddRoomOpen(false)} />
-      <DeletedRoomsModal open={trashOpen} onClose={() => setTrashOpen(false)} />
       <ViewRoomModal
         open={viewOpen}
         onClose={() => setViewOpen(false)}

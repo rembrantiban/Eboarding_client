@@ -14,7 +14,7 @@ const DashboardLayout = () => {
         onMobileClose={() => setSidebarOpen(false)}
       />
       <MobileHeader onMenuOpen={() => setSidebarOpen(true)} />
-      <main className="flex-1">
+      <main className="min-w-0 flex-1">
         {/* 🔷 PAGE CONTENT */}
         <div className="pt-10 pl-2">
           <Outlet />

@@ -3,8 +3,8 @@ import { Input } from "@/components/ui/input"
 import { useAuth } from "@/hooks/useAuth"
 import AddUserModal from "@/components/modal/createUserModal";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StaffCreateUser from "@/components/modal/StaffCreateUser";
-import DeletedUsersModal from "@/components/modal/DeletedUsersModal";
 
 type Props = {
   search: string
@@ -16,10 +16,10 @@ type Props = {
 const UserTableHeader = ({ search, setSearch, filter, setFilter }: Props) => {
   const { user, deletedUsers, getAllDeletedUsers } = useAuth();
   const isAdmin = user?.user_type === "Admin";
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const [staffOpen, setStaffOpen] = useState(false);
-  const [trashOpen, setTrashOpen] = useState(false);
 
   useEffect(() => {
     if (isAdmin) getAllDeletedUsers();
@@ -74,7 +74,7 @@ const UserTableHeader = ({ search, setSearch, filter, setFilter }: Props) => {
           {isAdmin && (
             <button
               type="button"
-              onClick={() => setTrashOpen(true)}
+              onClick={() => navigate("/deleted-accounts")}
               title="Deleted accounts"
               className="relative flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 text-[12.5px] font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
             >
@@ -110,13 +110,6 @@ const UserTableHeader = ({ search, setSearch, filter, setFilter }: Props) => {
         open={staffOpen}
         onClose={() => setStaffOpen(false)}
       />
-
-      {isAdmin && (
-        <DeletedUsersModal
-          open={trashOpen}
-          onClose={() => setTrashOpen(false)}
-        />
-      )}
     </>
   )
 }

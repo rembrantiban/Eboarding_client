@@ -24,7 +24,7 @@ const StatCard = ({
 }: Props) => {
   return (
     <div
-      className="rounded-xl border p-4 transition-colors 
+      className="rounded-md border p-4 transition-colors
       border-slate-900 bg-slate-800"
     >
       <div className="flex items-center justify-between gap-2">

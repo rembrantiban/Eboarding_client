@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Wrench,
   SearchX,
 } from "lucide-react"
 import MaintenanceRow from "./MaintenanceRow"
@@ -24,7 +23,7 @@ type Props = {
 
 const STATUS_OPTIONS = ["Pending", "In Progress", "Resolved"]
 const ITEMS_PER_PAGE = 7
-const COLUMN_COUNT = 8
+const COLUMN_COUNT = 9
 
 const MaintenanceTable = ({
   request,
@@ -55,7 +54,8 @@ const MaintenanceTable = ({
         q === "" ||
         r.request_number?.toLowerCase().includes(q) ||
         r.room_number?.toLowerCase().includes(q) ||
-        r.description?.toLowerCase().includes(q)
+        r.description?.toLowerCase().includes(q) ||
+        r.requested_by?.toLowerCase().includes(q)
 
       // Compare lowercased — API casing ("in progress") won't match "In Progress"
       const matchesStatus = s === "" ? true : r.status?.toLowerCase() === s
@@ -111,21 +111,7 @@ const MaintenanceTable = ({
     <>
       <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
         {/* Header */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900">
-              <Wrench className="h-4 w-4 text-white" />
-            </div>
-            <div>
-              <h2 className="text-[14px] font-semibold leading-tight text-slate-900">
-                Recent Requests
-              </h2>
-              <p className="text-[11px] leading-tight text-slate-400">
-                {filtered.length} of {request.length} requests
-              </p>
-            </div>
-          </div>
-
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
@@ -181,6 +167,7 @@ const MaintenanceTable = ({
                 <tr className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500">
                   <th className="whitespace-nowrap px-4 py-2.5 text-left">Request ID</th>
                   <th className="whitespace-nowrap px-4 py-2.5 text-left">Request</th>
+                  <th className="whitespace-nowrap px-4 py-2.5 text-left">Requested By</th>
                   <th className="whitespace-nowrap px-4 py-2.5 text-left">Room / Bed</th>
                   <th className="whitespace-nowrap px-4 py-2.5 text-left">Category</th>
                   <th className="whitespace-nowrap px-4 py-2.5 text-left">Submitted</th>
@@ -205,6 +192,9 @@ const MaintenanceTable = ({
                             <div className="h-2.5 w-20 animate-pulse rounded bg-slate-100" />
                           </div>
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-3 w-20 animate-pulse rounded bg-slate-100" />
                       </td>
                       <td className="px-4 py-3">
                         <div className="h-3 w-16 animate-pulse rounded bg-slate-100" />

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useMaintenance } from "@/hooks/useMaintenace";
 import { useRoom } from "@/hooks/useRoom"
+import { useAuth } from "@/hooks/useAuth"
 
 type Props = {
     open: boolean;
@@ -25,6 +26,7 @@ type Props = {
 type FormState = {
     category: string;
     room_id: string;
+    boarder_id: string;
     description: string;
     image: File | null;
 };
@@ -48,7 +50,9 @@ const AddMaintenanceRequestModal = ({
     onClose,
     onCreated,
 }: Props) => {
-    const { createMaintenanceRequest } = useMaintenance();
+    const { createMaintenanceRequest, boardersForRequest, getBoardersForRequest } = useMaintenance();
+    const { user } = useAuth();
+    const isFilingForSomeoneElse = user?.user_type !== "Boarder";
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -57,11 +61,14 @@ const AddMaintenanceRequestModal = ({
 
     useEffect(() => {
         getRooms();
-    }, [getRooms]);
+        if (isFilingForSomeoneElse) getBoardersForRequest();
+        //eslint-disable-next-line
+    }, []);
 
     const [form, setForm] = useState<FormState>({
         category: "",
         room_id: "",
+        boarder_id: "",
         description: "",
         image: null,
     });
@@ -120,6 +127,9 @@ const AddMaintenanceRequestModal = ({
 
         if (!form.room_id) newErrors.room_id = "Required";
 
+        if (isFilingForSomeoneElse && !form.boarder_id)
+            newErrors.boarder_id = "Select the boarder this is for";
+
         if (!form.description.trim()) newErrors.description = "Required";
         else if (form.description.trim().length < 10)
             newErrors.description = "Please describe the issue in a bit more detail";
@@ -140,12 +150,14 @@ const AddMaintenanceRequestModal = ({
         setIsSubmitting(true);
 
         try {
-            await createMaintenanceRequest({
-                category: form.category,
-                room_id: form.room_id,
-                description: form.description.trim(),
-                image: form.image,
-            } as never);
+            const formData = new FormData();
+            formData.append("category", form.category);
+            formData.append("room_id", form.room_id);
+            formData.append("description", form.description.trim());
+            if (isFilingForSomeoneElse) formData.append("boarder_id", form.boarder_id);
+            if (form.image) formData.append("image", form.image);
+
+            await createMaintenanceRequest(formData);
 
             toast.success("Maintenance request submitted");
             onCreated?.();
@@ -197,6 +209,52 @@ const AddMaintenanceRequestModal = ({
 
                 <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
                     <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5">
+
+                        {/* Requesting for (staff filing on a boarder's behalf) */}
+                        {isFilingForSomeoneElse && (
+                            <section className="space-y-3">
+                                <SectionLabel label="Requesting for" />
+
+                                <div className="space-y-1.5">
+                                    <label className="block text-[12px] font-medium text-slate-600">
+                                        Boarder
+                                    </label>
+
+                                    <div className="relative">
+                                        <select
+                                            name="boarder_id"
+                                            value={form.boarder_id}
+                                            onChange={handleChange}
+                                            className={`h-9 w-full appearance-none rounded-lg border bg-white pl-3 pr-8 text-[13px] outline-none transition-all
+                                          ${form.boarder_id === ""
+                                                    ? "text-slate-400"
+                                                    : "text-slate-800"
+                                                }
+                                          ${errors.boarder_id
+                                                    ? "border-red-300 bg-red-50/30 focus:border-red-400 focus:ring-red-500/20"
+                                                    : "border-slate-200 hover:border-slate-300 focus:border-slate-400 focus:ring-2 focus:ring-slate-500/20"
+                                                }`}
+                                        >
+                                            <option value="">
+                                                Select a boarder...
+                                            </option>
+
+                                            {boardersForRequest.map((boarder) => (
+                                                <option key={boarder.id} value={boarder.id}>
+                                                    {boarder.name} — Room {boarder.room_number} / Bed {boarder.bed_number}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                                    </div>
+
+                                    {errors.boarder_id && (
+                                        <ErrorText text={errors.boarder_id} />
+                                    )}
+                                </div>
+                            </section>
+                        )}
 
                         {/* Category */}
                         <section className="space-y-3">

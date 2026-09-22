@@ -243,6 +243,9 @@ const ViewMaintenanceRequestModal = ({ request, onClose, onViewImage, onUpdateSt
               }
             />
             <InfoTile icon={UserRound} label="Requested by" value={requesterName} />
+            {request.created_by_name && request.created_by_name !== requesterName && (
+              <InfoTile icon={UserRoundCog} label="Filed by" value={request.created_by_name} />
+            )}
             <InfoTile
               icon={UserRoundCog}
               label="Assigned staff"

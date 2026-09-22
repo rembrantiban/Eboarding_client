@@ -38,6 +38,7 @@ export interface MaintenanceRequest {
 
     date?: string;
     requested_by: string,
+    created_by_name?: string;
 
     priority?: string;
     remarks?: string;
@@ -63,6 +64,13 @@ export interface MaintenanceRequest {
 
 
 
+export interface RequestableBoarder {
+    id: number;
+    name: string;
+    room_number: string;
+    bed_number: string;
+}
+
 interface MaintenanceStore {
     loading: boolean;
 
@@ -73,6 +81,10 @@ interface MaintenanceStore {
     assignedMaintenanceList: MaintenanceRequest[];
     maintenanceHistory: MaintenanceRequest[];
     boarderMaintenanceHistory: MaintenanceRequest[];
+
+    boardersForRequest: RequestableBoarder[];
+    boardersForRequestLoading: boolean;
+    getBoardersForRequest: () => Promise<boolean>;
 
     createMaintenanceRequest: (data: FormData) => Promise<boolean>;
 
@@ -112,6 +124,34 @@ export const useMaintenanceStore = create<MaintenanceStore>((set) => ({
     maintenanceHistory: [],
     boarderMaintenanceHistory: [],
 
+    boardersForRequest: [],
+    boardersForRequestLoading: false,
+
+    getBoardersForRequest: async () => {
+
+        try {
+
+            set({ boardersForRequestLoading: true });
+
+            const res = await axiosInstance.get("/maintenance/boarders");
+
+            set({
+                boardersForRequest: res.data,
+            });
+
+            return true;
+
+        } catch {
+
+            return false;
+
+        } finally {
+
+            set({ boardersForRequestLoading: false });
+
+        }
+
+    },
 
     updateAssignedMaintenanceRequest: async (
         id,

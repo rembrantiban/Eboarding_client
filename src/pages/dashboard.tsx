@@ -66,7 +66,7 @@ const Dashboard = () => {
                             Overview of your boarding house status
                         </p>
                     </div>
-                    <div className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
+                    <div className="flex items-center gap-2.5 rounded-md border border-gray-200 bg-white px-4 py-2.5">
                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-slate-900 to-slate-700">
                             <Calendar className="h-4 w-4 text-white" />
                         </div>
