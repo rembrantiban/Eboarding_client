@@ -213,8 +213,8 @@ export default function RoomAvailabilityReport() {
   };
 
   return (
-    <div className="h-screen overflow-hidden">
-      <div className="h-full overflow-y-auto space-y-2 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-gray-50">
+    <div className="h-full overflow-hidden">
+      <div className="h-full overflow-y-auto space-y-2 px-10 pb-15 pt-4 bg-gray-50">
         {/* Back link */}
         <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900">
           <ArrowLeft className="h-3.5 w-3.5" />

@@ -133,8 +133,8 @@ const AddUser = () => {
   }
 
   return (
-      <div className="h-screen overflow-hidden">
-    <div className="space-y-6 border-l-2 overflow-auto border-t-2 rounded-tl-2xl px-4 py-2 h-full ">
+      <div className="h-full overflow-hidden">
+    <div className="space-y-6 overflow-auto px-4 py-2 h-full ">
 
     <div className="p-6 max-w-3xl mx-auto space-y-6 ">
 

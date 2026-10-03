@@ -16,6 +16,7 @@ import {
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 import type { Announcement } from "@/store/useAnnouncementStore";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuickAction } from "@/hooks/useQuickAction";
 
 type Category = "Maintenance" | "Billing" | "General";
 type CategoryFilter = "All" | Category;
@@ -51,7 +52,8 @@ export default function AdminAnnouncementsPage() {
     } = useAnnouncement();
 
     const [editing, setEditing] = useState<Announcement | null>(null);
-    const [isCreating, setIsCreating] = useState(false);
+    const quickCreate = useQuickAction("create-announcement");
+    const [isCreating, setIsCreating] = useState(quickCreate);
     const [pendingArchive, setPendingArchive] = useState<Announcement | null>(null);
     const [pendingRestore, setPendingRestore] = useState<Announcement | null>(null);
     const [pendingDelete, setPendingDelete] = useState<Announcement | null>(null);
@@ -199,11 +201,11 @@ export default function AdminAnnouncementsPage() {
     const isFormOpen = isCreating || editing !== null;
 
     return (
-        <div className="h-screen overflow-hidden bg-slate-50/60">
-            <div className="h-full overflow-y-auto border-l-2 border-t-2 rounded-tl-2xl bg-background">
+        <div className="h-full overflow-hidden bg-slate-50/60">
+            <div className="h-full overflow-y-auto bg-background">
                 {/* ===== Sticky header ===== */}
                 <header className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl">
-                    <div className="mx-auto max-w-5xl px-4 pt-5 pb-3 space-y-4.5">
+                    <div className="mx-auto max-w-6xl px-10 pt-5 pb-3 space-y-4.5">
                         {/* Title row */}
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
@@ -234,7 +236,7 @@ export default function AdminAnnouncementsPage() {
                         {/* Segmented view switch + search */}
                         <div className="flex items-center gap-2">
                             <div className="flex shrink-0 items-center gap-0.5 rounded-lg bg-slate-100 p-0.5">
-                                {(["Active", "Archive"] as ViewMode[]).map((mode) => (
+                                {(["Active", "Archived"] satisfies ViewMode[]).map((mode) => (
                                     <button
                                         key={mode}
                                         onClick={() => setView(mode)}
@@ -314,7 +316,7 @@ export default function AdminAnnouncementsPage() {
                                         onClick={() => setActiveAudience(audience)}
                                         className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium ring-1 transition-colors ${
                                             activeAudience === audience
-                                                ? "bg-emerald-600 text-white ring-emerald-600"
+                                                ? "bg-gray-900 text-white ring-emerald-600"
                                                 : "bg-white text-slate-500 ring-slate-200 hover:text-slate-900 hover:ring-slate-300"
                                         }`}
                                     >

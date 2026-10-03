@@ -97,7 +97,7 @@ const AdminMaintenanceHistoryPage = () => {
     }
 
     return (
-        <div className="h-screen overflow-y-auto space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-5 py-6 bg-background">
+        <div className="h-full overflow-y-auto space-y-6 px-5 py-6 bg-background">
             {/* Header */}
             <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 px-6 py-6 shadow-sm">
                 <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

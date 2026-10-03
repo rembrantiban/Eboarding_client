@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { TrendingDown, TrendingUp } from "lucide-react"
 
 type Props = {
   title: string
@@ -6,8 +7,8 @@ type Props = {
   icon: ReactNode
   /** Optional short line under the value, e.g. "Updated today" */
   hint?: string
-  /** Fills the card with slate-900 — use for the primary metric only */
-  primary?: boolean
+  /** Tailwind classes for the icon chip, e.g. "bg-blue-50 text-blue-600" */
+  tone?: string
   /** Optional change indicator, e.g. "+12%" */
   trend?: string
   trendDirection?: "up" | "down"
@@ -18,62 +19,41 @@ const StatCard = ({
   value,
   icon,
   hint,
-  primary,
+  tone = "bg-slate-100 text-slate-700",
   trend,
   trendDirection = "up",
 }: Props) => {
-  return (
-    <div
-      className="rounded-md border p-4 transition-colors
-      border-slate-900 bg-slate-800"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <p
-          className="truncate text-[13px] font-medium text-slate-200"
-         
-        >
-          {title}
-        </p>
+  const TrendIcon = trendDirection === "up" ? TrendingUp : TrendingDown
 
-        <div
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100"
-        >
-          <span
-            className="flex items-center justify-center [&>svg]:h-4.5 [&>svg]:w-4.5 "
-          >
-            {icon}
-          </span>
+  return (
+    <div className="rounded-lg border border-gray-800 bg-gray-900 p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-xs font-medium text-slate-400">{title}</p>
+          <p className="mt-2 text-2xl font-semibold leading-none tracking-tight text-white tabular-nums">
+            {value}
+          </p>
+        </div>
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg [&>svg]:h-5 [&>svg]:w-5 ${tone}`}>
+          {icon}
         </div>
       </div>
 
-      <div className="mt-2.5 flex items-end gap-2">
-        <h2
-          className="text-[22px] font-semibold leading-none tabular-nums tracking-tight text-white"
-        >
-          {value}
-        </h2>
-
-        {trend && (
-          <span
-            className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-              trendDirection === "up"
-                ? "bg-emerald-50 text-emerald-700"
-                : "bg-rose-50 text-rose-700"
-            }`}
-          >
-            {trend}
-          </span>
-        )}
-      </div>
-
-      {hint && (
-        <p
-          className={`mt-1.5 truncate text-[10.5px] ${
-            primary ? "text-slate-500" : "text-slate-400"
-          }`}
-        >
-          {hint}
-        </p>
+      {(trend || hint) && (
+        <div className="mt-3 flex items-center gap-2 text-[11px]">
+          {trend && (
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 font-semibold ${trendDirection === "up"
+                ? "bg-emerald-500/15 text-emerald-400"
+                : "bg-rose-500/15 text-rose-400"
+                }`}
+            >
+              <TrendIcon size={11} />
+              {trend}
+            </span>
+          )}
+          {hint && <span className="truncate text-slate-500">{hint}</span>}
+        </div>
       )}
     </div>
   )

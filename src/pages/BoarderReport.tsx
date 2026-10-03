@@ -18,7 +18,6 @@ import {
     TrendingUp,
     TrendingDown,
     Loader2,
-    ArrowRight,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -303,8 +302,8 @@ export default function BoarderReport() {
     const changeUp = (boarderSummary?.percentageChange ?? 0) >= 0;
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full space-y-2.5 overflow-y-auto rounded-tl-2xl border-l border-t border-slate-200 bg-slate-50/70 px-3.5 pb-15 pt-3">
+        <div className="h-full overflow-hidden">
+            <div className="h-full space-y-2.5 overflow-y-auto bg-slate-50/70 px-10 pb-15 pt-3">
                 {/* Back link */}
                 <button
                     onClick={() => navigate(-1)}
@@ -583,10 +582,7 @@ export default function BoarderReport() {
                                     Latest additions to the register
                                 </p>
                             </div>
-                            <button className="flex shrink-0 items-center gap-1 text-[10.5px] font-medium text-indigo-600 transition-colors hover:text-indigo-700">
-                                View all
-                                <ArrowRight className="h-3 w-3" />
-                            </button>
+                           
                         </div>
 
                         <div className="overflow-x-auto">

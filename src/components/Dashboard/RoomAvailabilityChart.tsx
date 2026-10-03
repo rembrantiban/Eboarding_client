@@ -77,7 +77,7 @@ export default function RoomBarChart() {
 }));
 
   return (
-    <div className="w-full max-w-3xl rounded-md border border-gray-200 bg-white p-6">
+    <div className="h-full w-full rounded-lg border border-gray-200 bg-white p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-sm font-medium text-slate-600">Room  Availability</h3>

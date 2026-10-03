@@ -472,8 +472,8 @@ export default function DeletedRoomsPage() {
     };
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full overflow-y-auto space-y-4 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-6 pt-4 bg-gray-50">
+        <div className="h-full overflow-hidden">
+            <div className="h-full overflow-y-auto space-y-4 px-4 pb-6 pt-4 bg-gray-50">
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>

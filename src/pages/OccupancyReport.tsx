@@ -289,8 +289,8 @@ export default function OccupancyReport() {
     })}`;
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full space-y-4 overflow-y-auto rounded-tl-2xl border-l border-t border-slate-200 bg-slate-50/70 px-4 pb-15 pt-4">
+        <div className="h-full overflow-hidden">
+            <div className="h-full space-y-4 overflow-y-auto bg-slate-50/70 px-10 pb-15 pt-4">
                 {/* Back link */}
                 <button
                     onClick={() => navigate(-1)}

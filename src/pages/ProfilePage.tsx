@@ -138,8 +138,8 @@ export default function EditProfile() {
 
   return (
 
-    <div className="h-screen overflow-hidden">
-      <div className="h-full overflow-y-auto space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-background">
+    <div className="h-full overflow-hidden">
+      <div className="h-full overflow-y-auto space-y-6 px-4 pb-15 pt-4 bg-background">
 
 
         <div className="mx-auto max-w-3xl space-y-6">

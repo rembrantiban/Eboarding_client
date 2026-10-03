@@ -17,7 +17,7 @@ export default function Room() {
   const isAdmin = user?.user_type === "Admin";
 
   return (
-    <div className="h-screen overflow-auto rounded-tl-2xl border-l border-t bg-background px-6 py-5">
+    <div className="h-full overflow-auto bg-background px-10 py-5">
       <div className="mx-auto max-w-7xl space-y-6">
 
         {/* Header */}

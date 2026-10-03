@@ -113,13 +113,13 @@ html {
 
 /* Thumb */
 ::-webkit-scrollbar-thumb {
-  background-color: #f3f3f4; /* light gray */
+  background-color: #3a3838; /* light gray */
   border-radius: 9999px;
 }
 
 /* Hover effect */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #c5c6c9;
+  background-color: #777676;
 }
 
 .scrollbar-hidden::-webkit-scrollbar {

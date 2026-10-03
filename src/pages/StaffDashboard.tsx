@@ -33,6 +33,7 @@ import {
     RefreshCcw,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAnnouncement } from "@/hooks/useAnnouncement";
 import { useBilling } from "@/hooks/useBilling";
 import { useRoom } from "@/hooks/useRoom";
 import { BillingPageSkeleton, RoomPageSkeleton, SkeletonStyles } from "@/components/Skeleton/Skeleton";
@@ -96,7 +97,19 @@ export default function StaffDashboard() {
 
 
     const navigate = useNavigate();
-    const { dashboardStats, getStaffDashboardStats } = useAuth();
+    const { user, dashboardStats, getStaffDashboardStats } = useAuth();
+    const { unreadCount, getUnreadCount, markAllAsRead } = useAnnouncement();
+
+    useEffect(() => {
+        getUnreadCount();
+    }, [getUnreadCount]);
+
+    // Same behaviour as the sidebar link: opening announcements marks them as read
+    const openAnnouncements = async () => {
+        navigate("/staff-announcements");
+        await markAllAsRead();
+        await getUnreadCount();
+    };
     const { paymentsOverview, getPaymentsOverview, paymentsOverviewTrend, getPaymentsOverviewTrend, calendarEvents, getCalendarEvents, loading } = useBilling();
     const { roomOccupancyChart, getRoomOccupancyChart, roomAvailabilityChart, getRoomAvailabilityChart, loading: roomLoading } = useRoom();
     const { assignedMaintenanceList, getAllAssignedMaintenance, updateAssignedMaintenanceRequest } = useMaintenance();
@@ -243,8 +256,8 @@ export default function StaffDashboard() {
     if (roomLoading && (roomOccupancyChart.length === 0 || roomAvailabilityChart.length === 0)) return <RoomPageSkeleton view="grid" />;
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full overflow-y-auto space-y-2 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-gray-50">
+        <div className="h-full overflow-hidden">
+            <div className="h-full overflow-y-auto space-y-2 px-4 pb-15 pt-4 bg-gray-50">
                 {/* Header */}
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -252,20 +265,24 @@ export default function StaffDashboard() {
                             Dashboard
                         </h1>
                         <p className="mt-1 text-sm text-slate-500">
-                            Welcome back, Staff One. Here&apos;s what&apos;s happening today.
+                            Welcome back{user?.first_name ? `, ${user.first_name}` : ""}. Here&apos;s what&apos;s happening today.
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <button
                             type="button"
-                            aria-label="Notifications"
+                            onClick={openAnnouncements}
+                            aria-label={`Announcements${unreadCount ? `, ${unreadCount} unread` : ""}`}
+                            title="Announcements"
                             className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                         >
                             <Bell className="h-4 w-4" />
-                            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-semibold text-white ring-2 ring-white">
-                                2
-                            </span>
+                            {unreadCount > 0 && (
+                                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
                         </button>
                     </div>
                 </header>

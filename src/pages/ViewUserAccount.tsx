@@ -128,7 +128,7 @@ const ViewUserPage = () => {
 
     if (isLoading && !user) {
         return (
-            <div className="flex h-screen items-center justify-center bg-background">
+            <div className="flex h-full items-center justify-center bg-background">
                 <div className="flex items-center gap-2.5 text-sm text-slate-400">
                     <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-200 border-t-slate-500" />
                     Loading resident profile…
@@ -139,7 +139,7 @@ const ViewUserPage = () => {
 
     if (!user) {
         return (
-            <div className="flex h-screen flex-col items-center justify-center gap-3 bg-background">
+            <div className="flex h-full flex-col items-center justify-center gap-3 bg-background">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100">
                     <UserRound size={20} className="text-slate-400" />
                 </div>
@@ -167,8 +167,8 @@ const ViewUserPage = () => {
     const initials = `${user.first_name?.[0] ?? ""}${user.last_name?.[0] ?? ""}`.toUpperCase()
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full overflow-y-auto rounded-tl-2xl border-l-2 border-t-2 bg-background px-4 pb-16 pt-4 sm:px-6">
+        <div className="h-full overflow-hidden">
+            <div className="h-full overflow-y-auto bg-background px-4 pb-16 pt-4 sm:px-6">
 
               
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-3">

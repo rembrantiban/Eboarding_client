@@ -190,8 +190,8 @@ export default function ReportManagement() {
                 : 0;
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full overflow-y-auto space-y-2 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-gray-50">
+        <div className="h-full overflow-hidden">
+            <div className="h-full overflow-y-auto space-y-2 px-10 pb-15 pt-4 bg-gray-50">
                 {/* Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>

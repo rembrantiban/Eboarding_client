@@ -131,8 +131,8 @@ export default function StaffAnnouncementsPage() {
     const isFormOpen = isCreating || editing !== null;
 
     return (
-        <div className="h-screen overflow-hidden">
-            <div className="h-full overflow-y-auto space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-4 py-14 bg-background">
+        <div className="h-full overflow-hidden">
+            <div className="h-full overflow-y-auto space-y-6 px-4 py-14 bg-background">
                 <div className="mx-auto max-w-5xl space-y-6">
 
                     {/* Header */}

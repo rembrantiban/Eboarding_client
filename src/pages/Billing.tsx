@@ -95,7 +95,7 @@ const Billing = () => {
     return (
         <div className="h-full overflow-hidden">
 
-            <div className="h-screen space-y-4 overflow-auto rounded-tl-2xl border-l-2 border-t-2 px-4 pb-16 pt-3">
+            <div className="h-full space-y-4 overflow-auto px-10 pb-16 pt-3">
 
                 {/* Page header */}
                 <div className="flex items-start gap-3 border-b border-slate-100 pb-3">

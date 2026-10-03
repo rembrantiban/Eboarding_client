@@ -99,7 +99,7 @@ export default function ActivePenaltiesCard() {
   );
 
   return (
-    <div className="flex w-full flex-col rounded-md border border-gray-200 bg-white p-5">
+    <div className="flex flex-col h-full w-full rounded-lg border border-gray-200 bg-white p-5">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">

@@ -151,9 +151,9 @@ export default function PaymentHistoryList({
     const grouped = useMemo(() => groupByDate(filtered), [filtered]);
 
     return (
-        <div className="h-full overflow-y-auto rounded-tl-2xl border-l border-t border-slate-200 bg-slate-50/70 pb-15">
+        <div className="h-full overflow-y-auto bg-slate-50/70 pb-15">
             {/* Header */}
-            <div className="border-b border-slate-200/80 bg-white/80 px-5 py-4 backdrop-blur-sm">
+            <div className="border-b border-slate-200/80 bg-white/80 px-10 py-4 backdrop-blur-sm">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
@@ -187,7 +187,7 @@ export default function PaymentHistoryList({
             </div>
 
             {/* Toolbar */}
-            <div className="flex flex-col gap-2.5 border-b border-slate-200/80 bg-white px-5 py-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-2.5 border-b border-slate-200/80 bg-white px-10 py-3 sm:flex-row sm:items-center">
                 <div className="relative w-full sm:max-w-xs">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
                     <Input
@@ -229,7 +229,7 @@ export default function PaymentHistoryList({
                     Array.from({ length: 4 }).map((_, i) => (
                         <div
                             key={i}
-                            className="flex items-center gap-3.5 border-b border-slate-100 px-5 py-3.5"
+                            className="flex items-center gap-3.5 border-b border-slate-100 px-10 py-3.5"
                         >
                             <Skeleton className="h-9 w-9 rounded-xl" />
                             <div className="flex-1 space-y-2">
@@ -263,7 +263,7 @@ export default function PaymentHistoryList({
 
                         return (
                             <div key={dateLabel}>
-                                <div className="sticky top-0 z-10 flex items-center justify-between border-y border-slate-100 bg-slate-50/85 px-5 py-2 backdrop-blur">
+                                <div className="sticky top-0 z-10 flex items-center justify-between border-y border-slate-100 bg-slate-50/85 px-15 py-2 backdrop-blur">
                                     <span className="text-[10.5px] font-semibold uppercase tracking-wider text-slate-500">
                                         {dateLabel}
                                     </span>
@@ -277,7 +277,7 @@ export default function PaymentHistoryList({
                                     return (
                                         <div
                                             key={p.id}
-                                            className="group relative flex items-center gap-3.5 border-b border-slate-100 px-5 py-3.5 transition-colors last:border-b-0 hover:bg-slate-50/70"
+                                            className="group relative flex items-center gap-3.5 border-b border-slate-100 px-10 py-3.5 transition-colors last:border-b-0 hover:bg-slate-50/70"
                                         >
                                             <span className="absolute inset-y-0 left-0 w-0.5 scale-y-0 bg-slate-900 transition-transform duration-200 group-hover:scale-y-100" />
 

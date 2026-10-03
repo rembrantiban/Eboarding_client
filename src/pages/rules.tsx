@@ -18,6 +18,7 @@ import {
 import { useRules } from "@/hooks/useRules";
 import { useEffect, useMemo, useRef, useState } from "react";
 import CreateRuleModal from "@/components/modal/createRulesModal";
+import { useQuickAction } from "@/hooks/useQuickAction";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +46,8 @@ const formatDate = (value?: string | null) =>
 const Rules = () => {
   const { user } = useAuth();
   const { rules, loading, getRules, publishRule, unpublishRule } = useRules();
-  const [openCreate, setOpenCreate] = useState(false);
+  const quickCreate = useQuickAction("create-rule");
+  const [openCreate, setOpenCreate] = useState(quickCreate);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [openPublish, setOpenPublish] = useState(false);
@@ -133,7 +135,7 @@ const Rules = () => {
   return (
     <div
       ref={scrollRef}
-      className="h-screen overflow-y-auto rounded-tl-2xl border-l border-t border-slate-200 bg-slate-50 px-5 py-4"
+      className="h-full overflow-y-auto bg-slate-50 px-5 py-4"
     >
       <div className="mx-auto max-w-5xl space-y-3.5 pb-8">
         {/* HEADER */}

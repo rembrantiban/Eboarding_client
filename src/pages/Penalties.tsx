@@ -36,6 +36,7 @@ import AssignPenaltyModal from "@/components/penalty/AssignPenaltyModal";
 import EditPenaltyModal from "@/components/penalty/EditPenaltyModal";
 import ViewPenaltyModal from "@/components/penalty/ViewPenaltyModal";
 import ConfirmPenaltyModal from "@/components/penalty/ConfirmPenaltyModal";
+import { useQuickAction } from "@/hooks/useQuickAction";
 import SettlePenaltyModal from "@/components/penalty/SettlePenaltyModal";
 import PenaltyRulesModal from "@/components/penalty/PenaltyRulesModal";
 import { useAuth } from "@/hooks/useAuth";
@@ -113,7 +114,8 @@ export default function PenaltiesPage() {
     const [page, setPage] = useState(1);
 
     const [rulesOpen, setRulesOpen] = useState(false);
-    const [assignOpen, setAssignOpen] = useState(false);
+    const quickAssign = useQuickAction("assign-penalty");
+    const [assignOpen, setAssignOpen] = useState(quickAssign);
     const [modal, setModal] = useState<ModalKind>(null);
     const [active, setActive] = useState<Penalty | null>(null);
 
@@ -197,8 +199,8 @@ export default function PenaltiesPage() {
     };
 
     return (
-        <div className="h-screen overflow-y-hidden">
-            <div className="h-full overflow-y-auto space-y-2 border-l-2 border-t-2 rounded-tl-2xl px-4 pb-15 pt-4 bg-gray-50">
+        <div className="h-full overflow-y-hidden">
+            <div className="h-full overflow-y-auto space-y-2 px-10 pb-15 pt-4 bg-gray-50">
                 {/* ===== Page actions ===== */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>

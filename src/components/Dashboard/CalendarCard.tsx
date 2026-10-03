@@ -234,7 +234,7 @@ const upcomingPayments = calendarEvents
   const hiddenCount = upcomingPayments.length - visiblePayments.length;
 
   return (
-    <div className="w-full rounded-md border border-gray-200 bg-white p-5 sm:p-6">
+    <div className="h-full w-full rounded-lg border border-gray-200 bg-white p-5">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_280px]">
         {/* Calendar */}
         <div className="flex flex-col">

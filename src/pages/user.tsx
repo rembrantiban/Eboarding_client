@@ -5,7 +5,7 @@ const UserPage = () => {
 
 
   return (
-    <div className="h-screen overflow-y-auto space-y-6 border-l-2 border-t-2 rounded-tl-2xl px-5 py-6 bg-background ">
+    <div className="h-full overflow-y-auto space-y-6 px-10 py-6 bg-background ">
       {/* Page header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
