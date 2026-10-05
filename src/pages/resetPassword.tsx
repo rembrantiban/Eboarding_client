@@ -37,9 +37,11 @@ const ResetPassword = () => {
 
     } catch (err: unknown) {
       const message =
-        typeof err === "string"
-          ? err
-          : "Invalid code or error";
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "Invalid code or error";
 
       setError(message);
     }

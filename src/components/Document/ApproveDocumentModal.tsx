@@ -30,7 +30,7 @@ export default function ApproveDocumentModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md rounded-2xl">
+      <DialogContent className="sm:max-w-sm gap-0 rounded-2xl p-5">
 
         <DialogHeader>
           <DialogTitle className="sr-only">
@@ -40,15 +40,15 @@ export default function ApproveDocumentModal({
 
         <div className="flex flex-col items-center text-center">
 
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-green-100">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
           </div>
 
-          <h2 className="mt-5 text-xl font-semibold">
+          <h2 className="mt-3 text-base font-semibold text-slate-900">
             Approve Document
           </h2>
 
-          <p className="mt-2 text-sm text-slate-500 leading-6">
+          <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
             Are you sure you want to approve the uploaded
             <span className="font-semibold text-slate-900">
               {" "}
@@ -64,9 +64,10 @@ export default function ApproveDocumentModal({
 
         </div>
 
-        <div className="mt-8 flex justify-center gap-2">
+        <div className="mt-5 flex justify-center gap-2">
 
           <Button
+            size="sm"
             variant="outline"
             onClick={onClose}
           >
@@ -74,6 +75,7 @@ export default function ApproveDocumentModal({
           </Button>
 
           <Button
+            size="sm"
             className="bg-green-600 hover:bg-green-700"
             onClick={async () => {
               await onApprove(document.id);

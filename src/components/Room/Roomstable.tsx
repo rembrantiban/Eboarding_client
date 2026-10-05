@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import RoomRow from "./RoomRow";
+import RoomBedsModal from "./RoomBedsModal";
 import { Search, Plus, RotateCcw, DoorOpen, PackageOpen, Trash2 } from "lucide-react";
 import AddRoomModal from "../modal/AddRoomModal";
 import { useRoom } from "@/hooks/useRoom";
@@ -33,6 +34,7 @@ const RoomsTable = () => {
   const { rooms, getRooms, loading, deletedRooms, getDeletedRooms } = useRoom();
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const [bedsRoom, setBedsRoom] = useState<Room | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
@@ -257,6 +259,7 @@ const RoomsTable = () => {
                       setSelectedRoom(r);
                       setViewOpen(true);
                     }}
+                    onViewBeds={(r) => setBedsRoom(r)}
                     onEdit={(r) => {
                       setSelectedRoom(r);
                       setEditOpen(true);
@@ -299,6 +302,12 @@ const RoomsTable = () => {
         room={roomToUpdate}
         loading={isUpdatingStatus}
         onConfirm={handleStatusConfirm}
+      />
+
+      <RoomBedsModal
+        open={!!bedsRoom}
+        onClose={() => setBedsRoom(null)}
+        room={bedsRoom}
       />
 
       <DeleteRoomModal

@@ -191,7 +191,13 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
     ) => {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
-        setErrors((prev) => ({ ...prev, [name]: "" }));
+
+        // Password is checked live so the rule is visible while typing
+        const error =
+            name === "password" && value && !passwordRegex.test(value)
+                ? "Min. 6 characters, with letters and numbers"
+                : "";
+        setErrors((prev) => ({ ...prev, [name]: error }));
     };
 
     const handleBlur = (
@@ -269,7 +275,7 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
     const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phRegex = /^09\d{9}$/;
-    const passwordRegex = /^.{6,}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
 
     const isPH = form.country_code === "+63";
 
@@ -321,7 +327,7 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
         }
 
         if (!form.password) newErrors.password = "Required";
-        else if (!passwordRegex.test(form.password)) newErrors.password = "Min. 6 characters";
+        else if (!passwordRegex.test(form.password)) newErrors.password = "Min. 6 characters, with letters and numbers";
 
         // Boarder only
         if (isBoarder) {
@@ -601,7 +607,7 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
 
                             <div className="grid grid-cols-2 gap-3">
                                 <Field label="Email address" name="email" placeholder="john@example.com" value={form.email} onChange={handleChange} onBlur={handleBlur} type="email" error={errors.email} />
-                                <Field label="Password" name="password" placeholder="Min. 6 characters" value={form.password} onChange={handleChange} type="password" error={errors.password} />
+                                <Field label="Password" name="password" placeholder="Letters and numbers, min. 6" value={form.password} onChange={handleChange} type="password" error={errors.password} />
                             </div>
 
                             {/* Address with location — boarder only */}

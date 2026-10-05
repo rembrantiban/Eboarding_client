@@ -15,6 +15,7 @@ import DeactivateUserModal from "../modal/DeactivateUserModal"
 import ActivateUserModal from "../modal/ActivateUserModal"
 import StatusReviewModal from "../modal/StatusReviewModal"
 import ResetUserPasswordModal from "../modal/ResetUserPasswordModal"
+import { useAuth } from "@/hooks/useAuth"
 
 
 type Props = {
@@ -30,6 +31,8 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
   const [openStatusReview, setOpenStatusReview] = useState(false);
   const [openResetPassword, setOpenResetPassword] = useState(false);
   const navigate = useNavigate()
+  const { user: currentUser } = useAuth()
+  const isStaff = currentUser?.user_type === "Staff"
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-PH", {
@@ -156,12 +159,14 @@ const UserTableRow = ({ user, onUpdateSuccess }: Props) => {
                 <UserRoundPen size={14} /> Update
               </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={() => setOpenResetPassword(true)}
-                className="gap-2 rounded-lg text-slate-600 focus:text-slate-900"
-              >
-                <KeyRound size={14} /> Reset Password
-              </DropdownMenuItem>
+              {!isStaff && (
+                <DropdownMenuItem
+                  onClick={() => setOpenResetPassword(true)}
+                  className="gap-2 rounded-lg text-slate-600 focus:text-slate-900"
+                >
+                  <KeyRound size={14} /> Reset Password
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuSeparator />
 

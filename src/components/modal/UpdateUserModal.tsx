@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, Pencil, X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import type { User } from "@/store/useAuthStore";
@@ -94,7 +94,7 @@ const UpdateUserModal = ({ open, onClose, user, onSuccess }: Props) => {
             </span>
             <div>
               <h2 className="text-base font-semibold text-slate-900">Update User</h2>
-              <p className="text-xs text-slate-400">Edit user details and credentials</p>
+              <p className="text-xs text-slate-400">Edit user details</p>
             </div>
           </div>
           <button
@@ -118,33 +118,9 @@ const UpdateUserModal = ({ open, onClose, user, onSuccess }: Props) => {
               <Field label="First Name" name="first_name" value={form.first_name} onChange={handleChange} />
               <Field label="Last Name" name="last_name" value={form.last_name} onChange={handleChange} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Username" name="username" value={form.username} onChange={handleChange} />
-              <Field label="Contact Number" name="contact_number" value={form.contact_number} onChange={handleChange} />
-            </div>
+            <Field label="Contact Number" name="contact_number" value={form.contact_number} onChange={handleChange} />
 
-            <Field label="Email" name="email" value={form.email} onChange={handleChange} type="email" />
             <Field label="Address" name="address" value={form.address} onChange={handleChange} />
-          </div>
-
-          <div className="h-px bg-slate-100" />
-
-          {/* PASSWORD */}
-          <div className="space-y-3.5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-              Security
-            </p>
-
-            <PasswordField
-              label="New Password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-            />
-
-            <p className="text-xs text-slate-400">
-              Leave blank if you don&rsquo;t want to change the password
-            </p>
           </div>
 
           <div className="h-px bg-slate-100" />
@@ -211,34 +187,3 @@ const Field = ({ label, name, value, onChange, type = "text" }: FieldProps) => (
     />
   </div>
 );
-
-/* ================= PASSWORD FIELD ================= */
-
-const PasswordField = ({ label, name, value, onChange }: FieldProps) => {
-  const [show, setShow] = useState(false);
-
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-medium text-slate-600">{label}</label>
-
-      <div className="relative">
-        <input
-          name={name}
-          value={value}
-          onChange={onChange}
-          type={show ? "text" : "password"}
-          placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-          className="h-10 w-full rounded-xl border border-slate-200 px-3 pr-10 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-        />
-
-        <button
-          type="button"
-          onClick={() => setShow(!show)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-700"
-        >
-          {show ? <EyeOff size={16} /> : <Eye size={16} />}
-        </button>
-      </div>
-    </div>
-  );
-};

@@ -29,9 +29,11 @@ const ForgotPassword = () => {
 
     } catch (err: unknown) {
       const message =
-        typeof err === "string"
-          ? err
-          : "Failed to send reset code";
+        err instanceof Error
+          ? err.message
+          : typeof err === "string"
+            ? err
+            : "Failed to send reset code";
 
       setError(message);
     }

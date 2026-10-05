@@ -96,6 +96,8 @@ const Topbar = () => {
   const initial = user?.first_name?.charAt(0).toUpperCase() || "G"
   const roleLabel = role === "Admin" ? "Administrator" : role ?? ""
   const announcementsPath = role === "Staff" ? "/staff-announcements" : "/announcements"
+  // Admins only create announcements, so the bell is a shortcut without an unread badge
+  const badgeCount = role === "Staff" ? unreadCount : 0
   const dashboardPath = role === "Staff" ? "/staff-dashboard" : "/dashboard"
 
   // Dashboard is always the first crumb; the current page (and its parent) follow it
@@ -181,12 +183,12 @@ const Topbar = () => {
               }
             }}
             className="relative w-10 h-10 flex items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 transition-colors"
-            aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`}
+            aria-label={`Announcements${badgeCount ? `, ${badgeCount} unread` : ""}`}
           >
             <Bell size={20} />
-            {!!unreadCount && unreadCount > 0 && (
+            {badgeCount > 0 && (
               <span className="absolute top-1 right-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white ring-2 ring-white">
-                {unreadCount > 99 ? "99+" : unreadCount}
+                {badgeCount > 99 ? "99+" : badgeCount}
               </span>
             )}
           </button>

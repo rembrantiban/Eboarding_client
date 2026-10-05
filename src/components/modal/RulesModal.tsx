@@ -3,10 +3,11 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ShieldCheck } from "lucide-react";
+import { ScrollText } from "lucide-react";
 import { useRules } from "@/hooks/useRules";
 import { useEffect } from "react";
 
@@ -26,124 +27,93 @@ const RulesModal = ({ open, onClose }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-xl! p-0 overflow-hidden rounded-lg">
+      <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden rounded-2xl p-0 sm:max-w-lg">
 
-        {/* 🔷 HEADER */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b bg-white">
-          <div className="w-11 h-11 rounded-2xl bg-blue-50 flex items-center justify-center">
-            <ShieldCheck className="text-blue-600" size={22} />
-          </div>
+        {/* HEADER */}
+        <div className="flex shrink-0 items-center gap-3 border-b border-slate-100 px-5 py-4 pr-12">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+            <ScrollText size={16} />
+          </span>
 
-          <div>
-            <h2 className="text-lg font-semibold">
+          <div className="min-w-0">
+            <DialogTitle className="text-base font-semibold text-slate-900">
               Rules & Regulations
-            </h2>
-
-            <p className="text-sm text-muted-foreground">
+            </DialogTitle>
+            <DialogDescription className="text-xs text-slate-400">
               Please read and follow all boarding house policies.
-            </p>
+            </DialogDescription>
           </div>
         </div>
 
-        {/* 🔷 CONTENT */}
-        <ScrollArea className="h-125 px-6 py-5">
+        {/* CONTENT */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
 
           {loading ? (
-            <div className="space-y-4">
-
-              {[...Array(4)].map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl border p-4 animate-pulse"
-                >
-                  <div className="h-4 w-40 bg-muted rounded mb-3" />
-
-                  <div className="space-y-2">
-                    <div className="h-3 bg-muted rounded" />
-                    <div className="h-3 bg-muted rounded w-5/6" />
-                    <div className="h-3 bg-muted rounded w-4/6" />
-                  </div>
+            <div className="space-y-5">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="animate-pulse space-y-2">
+                  <div className="h-3.5 w-36 rounded bg-slate-100" />
+                  <div className="h-3 rounded bg-slate-100" />
+                  <div className="h-3 w-5/6 rounded bg-slate-100" />
                 </div>
               ))}
-
             </div>
           ) : rules.length === 0 ? (
 
-            <div className="h-full flex flex-col items-center justify-center text-center py-20">
-              <ShieldCheck
-                size={40}
-                className="text-muted-foreground"
-              />
-
-              <h3 className="mt-4 font-semibold text-lg">
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <ScrollText size={28} className="text-slate-300" />
+              <h3 className="mt-3 text-sm font-semibold text-slate-900">
                 No Rules Available
               </h3>
-
-              <p className="text-sm text-muted-foreground mt-1">
+              <p className="mt-1 text-xs text-slate-400">
                 No rules and regulations have been added yet.
               </p>
             </div>
 
           ) : (
 
-            <div className="space-y-5">
-
-              {rules.map((rule) => (
-                <div
-                  key={rule.id}
-                  className=""
-                >
+            <ol className="divide-y divide-slate-100">
+              {rules.map((rule, index) => (
+                <li key={rule.id} className="py-4 first:pt-0 last:pb-0">
 
                   {/* TITLE */}
-                  <div className="flex items-center gap-2 mb-4">
-
-                    <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
-                      <ShieldCheck
-                        size={18}
-                        className="text-blue-600"
-                      />
-                    </div>
-
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {rule.title}
-                      </h3>
-                    </div>
-                  </div>
+                  <h3 className="flex items-baseline gap-2 text-sm font-semibold text-slate-900">
+                    <span className="text-xs tabular-nums text-slate-400">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    {rule.title}
+                  </h3>
 
                   {/* DESCRIPTION */}
-                  <div className="space-y-2">
+                  <ul className="mt-2 space-y-1.5 pl-6">
                     {rule.description
                       ?.split("\n")
-                      .map((line, index) => (
-                        <div
-                          key={index}
-                          className="flex items-start gap-2 text-sm text-muted-foreground"
+                      .filter((line) => line.trim())
+                      .map((line, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-[13px] leading-relaxed text-slate-600"
                         >
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 shrink-0" />
-
-                          <span className="leading-relaxed">
-                            {line}
-                          </span>
-                        </div>
+                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-slate-400" />
+                          <span>{line}</span>
+                        </li>
                       ))}
-                  </div>
+                  </ul>
 
-                </div>
+                </li>
               ))}
-
-            </div>
+            </ol>
           )}
 
-        </ScrollArea>
+        </div>
 
-        {/* 🔷 FOOTER */}
-        <div className="flex justify-end px-6 py-4 border-t bg-white">
+        {/* FOOTER */}
+        <div className="flex shrink-0 justify-end border-t border-slate-100 px-5 py-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm rounded-xl border hover:bg-muted transition"
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
           >
-            Close
+            I Understand
           </button>
         </div>
 

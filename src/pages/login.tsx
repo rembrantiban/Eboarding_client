@@ -180,17 +180,9 @@ const Login = () => {
 
               {/* Password */}
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-medium text-slate-500">
-                    Password
-                  </label>
-                  <span
-                    onClick={() => navigate("/forgot-password")}
-                    className="text-xs text-slate-500 hover:text-slate-900 cursor-pointer transition-colors"
-                  >
-                    Forgot password?
-                  </span>
-                </div>
+                <label className="text-xs font-medium text-slate-500">
+                  Password
+                </label>
                 <div className={`
                   relative flex items-center rounded-lg
                   bg-white border transition-colors
@@ -219,11 +211,20 @@ const Login = () => {
                     )}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="text-xs text-red-500 flex items-center gap-1 pl-0.5">
-                    <span>⚠</span> {errors.password}
-                  </p>
-                )}
+                <div className="flex items-start justify-between gap-3">
+                  {errors.password && (
+                    <p className="text-xs text-red-500 flex items-center gap-1 pl-0.5">
+                      <span>⚠</span> {errors.password}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    className="ml-auto shrink-0 text-xs text-slate-500 hover:text-slate-900 cursor-pointer transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
               </div>
 
               {/* Submit */}

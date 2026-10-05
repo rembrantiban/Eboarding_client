@@ -28,6 +28,7 @@ import ViewOwnAccount from "@/pages/ViewOwnAccount"
 import PaymentHistoryPage from './pages/PaymentHistoryPage'
 import ViewUserPage from './pages/ViewUserAccount'
 import GlobalStatusModal from './components/StatusModal/GlobalStatusModal'
+import SessionExpiredModal from './components/modal/SessionExpiredModal'
 import Documents from './pages/Documents'
 import BoarderDocumentPage from './pages/BoarderDocumentPage'
 import History from './pages/History'
@@ -123,6 +124,7 @@ function App() {
       </Routes>
       
        <GlobalStatusModal />
+       <SessionExpiredModal />
     </>
   )
 }

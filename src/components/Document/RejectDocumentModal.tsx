@@ -57,7 +57,7 @@ export default function RejectDocumentModal({
         }
       }}
     >
-      <DialogContent className="sm:max-w-md rounded-2xl">
+      <DialogContent className="sm:max-w-sm gap-0 rounded-2xl p-5">
 
         <DialogHeader>
           <DialogTitle className="sr-only">
@@ -67,26 +67,27 @@ export default function RejectDocumentModal({
 
         <div className="flex flex-col items-center text-center">
 
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-            <XCircle className="h-8 w-8 text-red-600" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-red-100">
+            <XCircle className="h-5 w-5 text-red-600" />
           </div>
 
-          <h2 className="mt-5 text-xl font-semibold">
+          <h2 className="mt-3 text-base font-semibold text-slate-900">
             Reject Document
           </h2>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-1.5 text-sm text-slate-500">
             Please provide a reason for rejecting
             this document.
           </p>
 
         </div>
 
-        <div className="mt-5">
+        <div className="mt-4">
 
           <Textarea
             placeholder="Enter rejection reason..."
-            rows={5}
+            rows={3}
+            className="min-h-0 resize-none text-sm"
             value={reason}
             onChange={(e) =>
               setReason(e.target.value)
@@ -95,9 +96,10 @@ export default function RejectDocumentModal({
 
         </div>
 
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-4 flex justify-end gap-2">
 
           <Button
+            size="sm"
             variant="outline"
             onClick={onClose}
           >
@@ -105,6 +107,7 @@ export default function RejectDocumentModal({
           </Button>
 
           <Button
+            size="sm"
             variant="destructive"
             disabled={!reason.trim()}
             onClick={handleReject}

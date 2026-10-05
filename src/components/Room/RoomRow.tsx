@@ -25,6 +25,7 @@ type Props = {
     occupants?: number;
   };
   onView: (room: Room) => void;
+  onViewBeds: (room: Room) => void;
   onDelete?: (room: Room) => void;
   onEdit: (room: Room) => void;
   onChangeStatus?: (room: Room) => void;
@@ -36,7 +37,7 @@ const STATUS_STYLES: Record<string, string> = {
   "Under Maintenance": "bg-amber-50 text-amber-700 ring-1 ring-amber-100",
 };
 
-const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
+const RoomRow = ({ room, onView, onViewBeds, onDelete, onEdit, onChangeStatus }: Props) => {
   const { user } = useAuth();
 
   const statusClass =
@@ -81,12 +82,17 @@ const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
       </td>
 
       <td className="px-4 py-2.5">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
+        <button
+          type="button"
+          onClick={() => onViewBeds(room)}
+          title="View beds"
+          className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100 hover:ring-slate-300"
+        >
           <BedDouble size={12} className="text-slate-400" />
           <span className="tabular-nums">
             {room.occupied_beds ?? 0}/{room.total_beds ?? 0}
           </span>
-        </span>
+        </button>
       </td>
 
       <td className="whitespace-nowrap px-4 py-2.5 text-[12.5px] font-semibold tabular-nums text-slate-900">
@@ -133,6 +139,10 @@ const RoomRow = ({ room, onView, onDelete, onEdit, onChangeStatus }: Props) => {
             >
               <DropdownMenuItem onClick={() => onView(room)} className="gap-2 rounded-lg">
                 <Eye size={14} /> View
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => onViewBeds(room)} className="gap-2 rounded-lg">
+                <BedDouble size={14} /> View Beds
               </DropdownMenuItem>
 
               {onChangeStatus && (
