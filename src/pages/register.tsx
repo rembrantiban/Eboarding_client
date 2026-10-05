@@ -47,6 +47,8 @@ const PH_PHONE_REGEX = /^(09|\+639)\d{9}$/;
 const INTL_PHONE_REGEX = /^\d{6,15}$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RELATIONSHIP_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,30}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{6,}$/;
+const PASSWORD_HINT = "Min. 6 characters, with letters and numbers";
 
 const RELATIONSHIP_OPTIONS = [
   "Parent",
@@ -256,8 +258,8 @@ const Register = () => {
 
     if (!form.password) {
       newErrors.password = "Password is required";
-    } else if (form.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (!PASSWORD_REGEX.test(form.password)) {
+      newErrors.password = PASSWORD_HINT;
     }
 
     if (!form.confirmPassword) {
@@ -322,7 +324,12 @@ const Register = () => {
       [name]: sanitizedValue,
     }));
 
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+    // Password is checked live so the rule is visible while typing
+    const error =
+      name === "password" && sanitizedValue && !PASSWORD_REGEX.test(sanitizedValue)
+        ? PASSWORD_HINT
+        : "";
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   // Changing the dial code re-validates both phone fields against the new rule.
@@ -707,7 +714,7 @@ const Register = () => {
                 <Input
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder="Letters and numbers, min. 6"
                   value={form.password}
                   onChange={handleChange}
                   className={`${inputClass} pr-10`}

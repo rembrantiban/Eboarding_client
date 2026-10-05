@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, ShieldCheck, ShieldX } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { User } from "@/store/useAuthStore";
 
 type Props = {
@@ -54,109 +54,73 @@ const handleSubmit = async () => {
   }
 };
 
+  const options = [
+    {
+      value: "Approved" as const,
+      label: "Approve",
+      hint: "User can access the system.",
+      Icon: ShieldCheck,
+      active: "border-emerald-400 bg-emerald-50",
+      iconClass: "text-emerald-600",
+    },
+    {
+      value: "Rejected" as const,
+      label: "Reject",
+      hint: "User cannot access the system.",
+      Icon: ShieldX,
+      active: "border-red-400 bg-red-50",
+      iconClass: "text-red-500",
+    },
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
 
-      <DialogContent className="sm:max-w-md rounded-2xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-sm gap-0 rounded-2xl p-0 overflow-hidden">
 
-        <div className="border-b px-6 py-5">
-
-          <h2 className="text-lg font-semibold">
+        {/* Header */}
+        <div className="border-b border-slate-100 px-5 py-4 pr-12">
+          <DialogTitle className="text-base font-semibold text-slate-900">
             Review Registration
-          </h2>
-
-          <p className="text-sm text-slate-500 mt-1">
-            Choose the status for this boarder.
-          </p>
-
+          </DialogTitle>
+          <DialogDescription className="mt-0.5 truncate text-xs text-slate-400">
+            Set the account status for{" "}
+            <span className="font-medium text-slate-700">{userName}</span>
+          </DialogDescription>
         </div>
 
-        <div className="px-6 py-5">
-
-          <div className="mb-5">
-
-            <p className="font-medium text-slate-800">
-              {userName}
-            </p>
-
-            <p className="text-sm text-slate-400">
-              Select the account status below.
-            </p>
-
-          </div>
-
-          <div className="space-y-3">
-
-           
+        {/* Options */}
+        <div className="space-y-2 px-5 py-4">
+          {options.map(({ value, label, hint, Icon, active, iconClass }) => (
             <label
-              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition ${
-                status === "Approved"
-                  ? "border-emerald-400 bg-emerald-50"
-                  : "border-slate-200"
+              key={value}
+              className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
+                status === value ? active : "border-slate-200 hover:bg-slate-50"
               }`}
             >
               <input
                 type="radio"
-                checked={status === "Approved"}
-                onChange={() => setStatus("Approved")}
-                className="hidden"
+                name="registration-status"
+                checked={status === value}
+                onChange={() => setStatus(value)}
+                className="sr-only"
               />
 
-              <ShieldCheck className="text-emerald-600" />
+              <Icon size={18} className={`shrink-0 ${iconClass}`} />
 
-              <div>
-
-                <p className="font-medium">
-                  Approved
-                </p>
-
-                <p className="text-xs text-slate-500">
-                  User can access the system.
-                </p>
-
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-slate-900">{label}</p>
+                <p className="text-xs text-slate-500">{hint}</p>
               </div>
-
             </label>
-
-            <label
-              className={`flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition ${
-                status === "Rejected"
-                  ? "border-red-400 bg-red-50"
-                  : "border-slate-200"
-              }`}
-            >
-              <input
-                type="radio"
-                checked={status === "Rejected"}
-                onChange={() => setStatus("Rejected")}
-                className="hidden"
-              />
-
-              <ShieldX className="text-red-500" />
-
-              <div>
-
-                <p className="font-medium">
-                  Rejected
-                </p>
-
-                <p className="text-xs text-slate-500">
-                  User cannot access the system.
-                </p>
-
-              </div>
-
-            </label>
-
-          </div>
-
+          ))}
         </div>
 
-        <div className="border-t px-6 py-4 flex justify-end gap-3">
-
+        {/* Footer */}
+        <div className="flex justify-end gap-2 border-t border-slate-100 px-5 py-3">
           <button
             onClick={onClose}
-            className="rounded-lg border px-4 py-2 text-sm"
+            className="rounded-lg border border-slate-200 px-3.5 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -164,12 +128,11 @@ const handleSubmit = async () => {
           <button
             disabled={loading}
             onClick={handleSubmit}
-            className="rounded-lg bg-slate-900 px-5 py-2 text-sm font-medium text-white hover:bg-slate-800 flex items-center gap-2"
+            className="flex items-center gap-2 rounded-lg bg-slate-900 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
           >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Save Changes
           </button>
-
         </div>
 
       </DialogContent>
