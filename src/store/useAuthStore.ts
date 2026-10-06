@@ -68,6 +68,7 @@ export interface User {
 type LoginPayload = {
   identifier: string;
   password: string;
+  turnstileToken: string;
 };
 
 type RegisterPayload = {

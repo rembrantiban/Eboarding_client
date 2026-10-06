@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile"
 import RulesModal from "@/components/modal/RulesModal"
 import {
   Mail,
@@ -27,6 +28,9 @@ const Login = () => {
   });
 
   const [errors, setErrors] = useState<Partial<typeof form>>({});
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileError, setTurnstileError] = useState("");
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const [modal, setModal] = useState<{
     type: "loading" | "success" | "error" | null;
@@ -55,9 +59,13 @@ const Login = () => {
       setErrors(validationErrors);
       return;
     }
+    if (!turnstileToken) {
+      setTurnstileError("Please complete the security check");
+      return;
+    }
     try {
       setModal({ type: "loading" });
-      const loggedInUser = await login({ identifier: form.identifier, password: form.password });
+      const loggedInUser = await login({ identifier: form.identifier, password: form.password, turnstileToken });
       setModal({ type: "success", message: "Login successful 🎉" });
 
      console.log(loggedInUser);
@@ -93,6 +101,9 @@ const Login = () => {
       } else if (err instanceof Error) {
         message = err.message;
       }
+      // Turnstile tokens are single-use, so get a fresh one for the next attempt
+      setTurnstileToken("");
+      turnstileRef.current?.reset();
       setModal({ type: "error", message });
     }
   };
@@ -227,11 +238,34 @@ const Login = () => {
                 </div>
               </div>
 
+              {/* Cloudflare Turnstile */}
+              <div className="space-y-1.5">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={import.meta.env.TURNSTILE_SITE_KEY}
+                  options={{ size: "flexible", theme: "light" }}
+                  onSuccess={(token) => {
+                    setTurnstileToken(token);
+                    setTurnstileError("");
+                  }}
+                  onExpire={() => setTurnstileToken("")}
+                  onError={() => {
+                    setTurnstileToken("");
+                    setTurnstileError("Security check failed to load. Please refresh the page.");
+                  }}
+                />
+                {turnstileError && (
+                  <p className="text-xs text-red-500 flex items-center gap-1 pl-0.5">
+                    <span>⚠</span> {turnstileError}
+                  </p>
+                )}
+              </div>
+
               {/* Submit */}
               <div className="pt-1">
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || !turnstileToken}
                   className="
                     w-full py-2.5 rounded-lg text-sm font-semibold text-white
                     bg-slate-900
