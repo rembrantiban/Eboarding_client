@@ -118,26 +118,53 @@ const UpdateUserModal = ({ open, onClose, user, onSuccess }: Props) => {
               <Field label="First Name" name="first_name" value={form.first_name} onChange={handleChange} />
               <Field label="Last Name" name="last_name" value={form.last_name} onChange={handleChange} />
             </div>
-            <Field label="Contact Number" name="contact_number" value={form.contact_number} onChange={handleChange} />
+            {form.user_type !== "Staff" && (
+              <>
+                <Field label="Contact Number" name="contact_number" value={form.contact_number} onChange={handleChange} />
 
-            <Field label="Address" name="address" value={form.address} onChange={handleChange} />
+                <Field label="Address" name="address" value={form.address} onChange={handleChange} />
+              </>
+            )}
           </div>
 
-          <div className="h-px bg-slate-100" />
+          {user.user_type !== "Staff" && (
+            <>
+              <div className="h-px bg-slate-100" />
 
-          {/* ROLE */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-600">User Role</label>
-            <select
-              name="user_type"
-              value={form.user_type}
-              onChange={handleChange}
-              className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
-            >
-              <option value="Boarder">Boarder</option>
-              <option value="Staff">Staff</option>
-            </select>
-          </div>
+              {/* ROLE */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">User Role</label>
+                <select
+                  name="user_type"
+                  value={form.user_type}
+                  onChange={handleChange}
+                  className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                >
+                  <option value="Boarder">Boarder</option>
+                  <option value="Staff">Staff</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          {user.user_type === "Staff" && (
+            <>
+              <div className="h-px bg-slate-100" />
+
+              {/* DETAILS */}
+              <div className="space-y-3.5">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                  Details
+                </p>
+
+                <div className="space-y-2 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-sm">
+                  <InfoRow label="Role" value={user.user_type} />
+                  <InfoRow label="Email" value={user.email} />
+                  <InfoRow label="Username" value={user.username} />
+                </div>
+              </div>
+            </>
+          )}
 
         </div>
 
@@ -164,6 +191,15 @@ const UpdateUserModal = ({ open, onClose, user, onSuccess }: Props) => {
 };
 
 export default UpdateUserModal;
+
+/* ================= INFO ROW ================= */
+
+const InfoRow = ({ label, value }: { label: string; value?: string }) => (
+  <div className="flex items-center justify-between gap-4">
+    <span className="text-xs font-medium text-slate-500">{label}</span>
+    <span className="truncate text-slate-900">{value || "—"}</span>
+  </div>
+);
 
 /* ================= FIELD ================= */
 

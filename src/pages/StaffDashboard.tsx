@@ -275,7 +275,7 @@ export default function StaffDashboard() {
                             onClick={openAnnouncements}
                             aria-label={`Announcements${unreadCount ? `, ${unreadCount} unread` : ""}`}
                             title="Announcements"
-                            className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 shadow-sm transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+                            className="relative rounded-xl border border-gray-200 bg-white p-2.5 text-slate-600 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                         >
                             <Bell className="h-4 w-4" />
                             {unreadCount > 0 && (
@@ -295,7 +295,7 @@ export default function StaffDashboard() {
                         return (
                             <div
                                 key={stat.label}
-                                className="group relative overflow-hidden rounded-2xl bg-slate-900 p-5 shadow-sm ring-1 ring-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg"
+                                className="group relative overflow-hidden rounded-2xl bg-slate-900 p-5 border border-gray-200 transition hover:-translate-y-0.5"
                             >
                                 <div className="pointer-events-none absolute -right-8 -top-10 h-32 w-32 rounded-full bg-white/4 blur-2xl" />
                                 <div className="flex items-start gap-4">
@@ -333,7 +333,7 @@ export default function StaffDashboard() {
                 {/* Charts */}
                 <section className="grid grid-cols-1 gap-2 lg:grid-cols-3">
                     {/* Room occupancy */}
-                    <div className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5">
                         <h2 className="text-base font-semibold text-slate-900">Room Occupancy</h2>
                         <p className="mt-0.5 text-xs text-slate-500">Overview of room occupancy</p>
 
@@ -397,7 +397,7 @@ export default function StaffDashboard() {
                     </div>
 
                     {/* Room availability */}
-                    <div className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5">
                         <div className="flex items-start justify-between gap-3">
                             <div>
                                 <h2 className="text-base font-semibold text-slate-900">Room Availability</h2>
@@ -451,7 +451,7 @@ export default function StaffDashboard() {
                     </div>
 
                     {/* Payments overview */}
-                    <div className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5">
                         <div className="flex items-baseline justify-between gap-2">
                             <h2 className="text-base font-semibold text-slate-900">Payments Overview</h2>
                             <span className="text-xs text-slate-500">This month</span>
@@ -527,7 +527,7 @@ export default function StaffDashboard() {
 
                 {/* Maintenance + Billings */}
                 <section className="grid grid-cols-1 gap-2 lg:grid-cols-3">
-                    <div className="rounded-2xl border border-slate-200/70 bg-white shadow-sm lg:col-span-2">
+                    <div className="rounded-2xl border border-gray-200 bg-white lg:col-span-2">
                         {/* Header */}
                         <div className="flex items-start justify-between gap-3 border-b border-slate-100 px-5 py-4">
                             <div className="flex items-center gap-3">
@@ -614,7 +614,7 @@ export default function StaffDashboard() {
                                             <button
                                                 onClick={() => setSelectedRequest(req)}
                                                 type="button"
-                                                className="shrink-0 flex rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
+                                                className="shrink-0 flex rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
                                             > 
                                                 <RefreshCcw className="h-4 w-7"/>
                                                 Update Status
@@ -641,7 +641,7 @@ export default function StaffDashboard() {
                     </div>
 
                     {/* Billings */}
-                    <div className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5">
                         <div className="flex items-start justify-between gap-3">
                             <div>
                                 <h2 className="text-base font-semibold text-slate-900">Billing Schedule</h2>
