@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Bell,
   User,
@@ -20,17 +20,9 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { HashLink } from "react-router-hash-link";
 import { IoHomeSharp } from "react-icons/io5";
 import { useAnnouncement } from "@/hooks/useAnnouncement";
 import { useEffect } from "react";
-
-const NAV_LINKS = [
-  { label: "Home", to: "/" },
-  { label: "Features", to: "/#features", hash: true },
-  { label: "About", to: "/#about", hash: true },
-  { label: "Location", to: "/#location", hash: true },
-];
 
 const categoryIcons = {
   General: Home,
@@ -80,40 +72,17 @@ const Header = () => {
           </h1>
         </div>
 
-        {/* NAV */}
-        <nav className="hidden items-center gap-1 text-sm font-medium text-slate-600 md:flex">
-          <nav className="hidden items-center gap-1 md:flex">
-            {NAV_LINKS.map((item) =>
-              item.hash ? (
-                <HashLink
-                  key={item.label}
-                  smooth
-                  to={item.to}
-                  className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
-                >
-                  {item.label}
-                </HashLink>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-
-            {user && (
-              <Link
-                to="/viewroom"
-                className="rounded-md px-3 py-2 transition-colors hover:bg-slate-100 hover:text-slate-900"
-              >
-                Rooms
-              </Link>
-            )}
-          </nav>
-        </nav>
+        {/* WELCOME */}
+        <div className="hidden flex-1 justify-center md:flex">
+          <div className="flex flex-col items-center leading-tight">
+            <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-slate-400">
+              {user?.first_name ? `Welcome, ${user.first_name}` : "Welcome to"}
+            </span>
+            <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 bg-clip-text text-base font-semibold tracking-tight text-transparent lg:text-lg">
+              {user?.first_name && "to "}Ermings Boarding House
+            </span>
+          </div>
+        </div>
 
         {/* ACTIONS */}
         {user ? (
