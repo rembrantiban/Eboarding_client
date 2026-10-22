@@ -20,9 +20,9 @@ const AddRoomModal = ({ open, onClose, onSuccess }: Props) => {
   const [dragOver, setDragOver] = useState(false);
   const [form, setForm] = useState({
     room_number: "",
-    capacity: "",
-    price_per_month: "",
-    bed_count: "",
+    capacity: "0",
+    price_per_month: "0",
+    bed_count: "0",
     description: "",
     status: "Available" as const,
   });
@@ -33,7 +33,9 @@ const AddRoomModal = ({ open, onClose, onSuccess }: Props) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const isNumeric = ["capacity", "bed_count", "price_per_month"].includes(name);
+    const safeValue = isNumeric && Number(value) < 0 ? "0" : value;
+    setForm((prev) => ({ ...prev, [name]: safeValue }));
   };
 
   const handleFiles = (files: FileList | null) => {
@@ -73,7 +75,7 @@ const AddRoomModal = ({ open, onClose, onSuccess }: Props) => {
       });
 
       toast.success("Room created successfully!");
-      setForm({ room_number: "", capacity: "", bed_count: "", price_per_month: "", description: "", status: "Available" });
+      setForm({ room_number: "", capacity: "0", bed_count: "0", price_per_month: "0", description: "", status: "Available" });
       setImages([]);
       onSuccess?.();
       onClose();
@@ -236,6 +238,7 @@ const Field = ({ label, name, placeholder, value, onChange, type = "text", prefi
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        min={type === "number" ? 0 : undefined}
         className={`rounded-xl border-slate-200 text-sm h-9 focus-visible:ring-slate-500/30 focus-visible:border-slate-400 ${prefix ? "pl-7" : ""}`}
       />
     </div>

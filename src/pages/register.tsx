@@ -252,8 +252,6 @@ const Register = () => {
 
     if (!form.contact_number) {
       newErrors.contact_number = "Contact number is required";
-    } else if (!validatePhone(form.contact_number)) {
-      newErrors.contact_number = phoneHint;
     }
 
     if (!form.password) {

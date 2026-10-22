@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react"
 import {
   ScrollText,
-  Download,
   Search,
   SearchX,
   FileText,
@@ -11,6 +10,7 @@ import {
   Info,
   RefreshCcw,
   ShieldCheck,
+  Printer,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -201,8 +201,8 @@ const BoarderHouseRulesPage = ({
               disabled={loading || published.length === 0 || downloading}
               className="h-9 rounded-lg bg-slate-900 px-4 text-[12.5px] font-medium text-white transition hover:bg-slate-800 disabled:opacity-40"
             >
-              <Download className="mr-1.5 h-3.5 w-3.5" />
-              Download PDF
+              <Printer className="mr-1.5 h-3.5 w-3.5" />
+              Print PDF
             </Button>
           </div>
         </div>

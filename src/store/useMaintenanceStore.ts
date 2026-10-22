@@ -45,6 +45,7 @@ export interface MaintenanceRequest {
     resolved_at?: string | null;
     boarder_confirmed?: boolean;
     closed_by?: string;
+    resolved_by?: string | null;
 }
 
 export interface MaintenanceRequest {

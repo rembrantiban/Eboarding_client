@@ -17,6 +17,7 @@ import {
   UserRound,
   MapPin,
   CalendarDays,
+  MessageSquareText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -225,6 +226,35 @@ const RequestDetailsModal = ({
               {request.description}
             </p>
           </div>
+
+          {request.status === "Resolved" && (
+            <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/50 p-4">
+              <div className="flex items-center justify-between gap-2">
+                <p className="flex items-center gap-1.5 text-[10.5px] font-medium uppercase tracking-wider text-emerald-700">
+                  <CheckCheck className="h-3.5 w-3.5" />
+                  Staff remarks
+                </p>
+                {request.resolved_at && (
+                  <p className="text-[10.5px] tabular-nums text-emerald-700/70">
+                    {formatDateTime(request.resolved_at)}
+                  </p>
+                )}
+              </div>
+              <p
+                className={cn(
+                  "mt-1.5 whitespace-pre-wrap wrap-break-words text-[12.5px] leading-relaxed",
+                  request.remarks ? "text-slate-700" : "italic text-slate-400"
+                )}
+              >
+                {request.remarks || "No remarks were left for this request."}
+              </p>
+              {request.resolved_by?.trim() && (
+                <p className="mt-2 text-[11px] text-slate-500">
+                  Resolved by <span className="font-medium text-slate-700">{request.resolved_by}</span>
+                </p>
+              )}
+            </div>
+          )}
 
           {request.image_url && (
             <button
@@ -576,6 +606,16 @@ const BoarderMaintenancePage = () => {
                     {relativeTime(request.created_at)}
                   </span>
                 </div>
+
+                {request.status === "Resolved" && request.remarks && (
+                  <div className="mt-3 flex gap-2 rounded-lg bg-emerald-50/70 px-3 py-2 ring-1 ring-emerald-100">
+                    <MessageSquareText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                    <p className="line-clamp-2 text-[11.5px] leading-relaxed text-slate-700">
+                      <span className="font-medium text-emerald-700">Remarks: </span>
+                      {request.remarks}
+                    </p>
+                  </div>
+                )}
 
                 <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
                   <p className="flex min-w-0 items-center gap-1.5 text-[11px] text-slate-500">

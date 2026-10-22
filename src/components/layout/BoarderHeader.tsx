@@ -78,7 +78,7 @@ const Header = () => {
             <span className="text-[11px] font-medium uppercase tracking-[0.25em] text-slate-400">
               {user?.first_name ? `Welcome, ${user.first_name}` : "Welcome to"}
             </span>
-            <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 bg-clip-text text-base font-semibold tracking-tight text-transparent lg:text-lg">
+            <span className="bg-linear-to-r from-slate-900 via-slate-700 to-slate-500 bg-clip-text text-base font-semibold tracking-tight text-transparent lg:text-lg">
               {user?.first_name && "to "}Ermings Boarding House
             </span>
           </div>

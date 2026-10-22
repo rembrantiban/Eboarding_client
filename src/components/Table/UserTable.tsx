@@ -12,7 +12,6 @@ import { useAuthStore } from "@/store/useAuthStore";
 const UserTable = () => {
   const { users, isLoading, getUsers } = useAuth()
 
-  const [search, setSearch] = useState("")
   const [filter, setFilter] = useState("")
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -23,27 +22,10 @@ const UserTable = () => {
   }, [getUsers]);
 
   const filteredUsers = useMemo(() => {
-  return users.filter((user: User) => {
-    const searchLower = search.toLowerCase();
-
-    const fullName =
-      `${user.first_name} ${user.last_name}`.toLowerCase();
-
-    // 🔷 Search match
-    const matchesSearch =
-      fullName.includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower) ||
-      user.username.toLowerCase().includes(searchLower);
-
-    // 🔷 Filter match
-    const matchesFilter =
-      filter === ""
-        ? true
-        : user.user_type === filter;
-
-    return matchesSearch && matchesFilter;
-  });
-}, [users, search, filter]);
+  return users.filter((user: User) =>
+    filter === "" ? true : user.user_type === filter
+  );
+}, [users, filter]);
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
 
@@ -55,7 +37,7 @@ const UserTable = () => {
   useEffect(() => {
       // eslint-disable-next-line react-hooks/set-state-in-effect
   setCurrentPage((prev) => (prev !== 1 ? 1 : prev));
-}, [search, filter]);
+}, [filter]);
 
 const handleUpdateSuccess = (updatedUser: User) => {
   useAuthStore.setState((state) => ({
@@ -74,8 +56,6 @@ const handleUpdateSuccess = (updatedUser: User) => {
 
       <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
         <UserTableHeader
-          search={search}
-          setSearch={setSearch}
           filter={filter}
           setFilter={setFilter}
         />
@@ -145,7 +125,7 @@ const handleUpdateSuccess = (updatedUser: User) => {
                             : "No users found"}
                         </p>
                         <p className="mt-1 text-[11.5px] text-slate-400">
-                          Try adjusting your search or filter.
+                          Try adjusting your filter.
                         </p>
                       </div>
                     </td>

@@ -24,9 +24,9 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
 
   const [form, setForm] = useState({
     room_number: "",
-    capacity: "",
-    bed_count: "",
-    price_per_month: "",
+    capacity: "0",
+    bed_count: "0",
+    price_per_month: "0",
     description: "",
   });
 
@@ -34,9 +34,9 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
     if (room) {
       setForm({
         room_number: room.room_number || "",
-        capacity: room.capacity?.toString() || "",
-        bed_count: room.total_beds?.toString() || "",
-        price_per_month: room.price_per_month?.toString() || "",
+        capacity: room.capacity?.toString() || "0",
+        bed_count: room.total_beds?.toString() || "0",
+        price_per_month: room.price_per_month?.toString() || "0",
         description: room.description || "",
       });
       setExistingImages(room.images ?? []);
@@ -50,7 +50,9 @@ const UpdateRoomModal = ({ open, onClose, room }: Props) => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const isNumeric = ["capacity", "bed_count", "price_per_month"].includes(name);
+    const safeValue = isNumeric && Number(value) < 0 ? "0" : value;
+    setForm((prev) => ({ ...prev, [name]: safeValue }));
   };
 
   const handleFiles = (files: FileList | null) => {
@@ -282,6 +284,7 @@ const Field = ({ label, name, value, onChange, type = "text", prefix }: FieldPro
         value={value}
         onChange={onChange}
         type={type}
+        min={type === "number" ? 0 : undefined}
         className={`rounded-xl border-slate-200 text-sm h-9 focus-visible:ring-slate-500/30 focus-visible:border-slate-400 ${prefix ? "pl-7" : ""}`}
       />
     </div>

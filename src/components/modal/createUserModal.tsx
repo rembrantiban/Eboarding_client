@@ -320,8 +320,6 @@ const AddUserModal = ({ open: _open, onClose }: Props) => {
             if (!form.country_code) newErrors.country_code = "Required";
 
             if (!form.contact_number) newErrors.contact_number = "Required";
-            else if (!validatePhone(form.contact_number))
-                newErrors.contact_number = phoneHint;
 
             if (!form.address) newErrors.address = "Required";
         }
