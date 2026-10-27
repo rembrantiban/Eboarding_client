@@ -220,7 +220,7 @@ export default function PenaltiesPage() {
                                 className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[12px] font-medium text-slate-700 transition-colors hover:bg-slate-50"
                             >
                                 <ScrollText size={13.5} />
-                                Penalty Rules
+                                Penalty
                             </button>
                         )}
                         <button

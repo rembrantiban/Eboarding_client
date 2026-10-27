@@ -66,6 +66,7 @@ const PenaltyRulesModal = ({ open, onClose }: Props) => {
         if (open) {
             getAllPenaltyRules();
         } else {
+            //eslint-disable-next-line
             setTab("list");
             setQuery("");
             setDraft(emptyDraft);
@@ -196,7 +197,7 @@ const PenaltyRulesModal = ({ open, onClose }: Props) => {
         <ModalShell
             open={open}
             onClose={onClose}
-            title="Penalty Rules"
+            title="Penalty"
             subtitle="Define reusable penalty types and amounts"
             icon={ScrollText}
             footer={footer}
