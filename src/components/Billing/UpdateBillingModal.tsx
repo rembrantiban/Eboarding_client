@@ -254,7 +254,10 @@ export default function UpdateBillingModal({
                                     label: "Room Fee",
                                     value: roomFee,
                                     set: setRoomFee,
-                                    hint: "Base monthly charge",
+                                    hint: isAdmin
+                                        ? "Base monthly charge (not editable)"
+                                        : "Base monthly charge",
+                                    readOnly: isAdmin,
                                 },
                                 ...(isAdmin
                                     ? [
@@ -263,12 +266,14 @@ export default function UpdateBillingModal({
                                             value: discountInput,
                                             set: setDiscountInput,
                                             hint: "Deducted from total",
+                                            readOnly: false,
                                         },
                                         {
                                             label: "Late Fee",
                                             value: lateFeeInput,
                                             set: setLateFeeInput,
                                             hint: "Added to total",
+                                            readOnly: false,
                                         },
                                     ]
                                     : []),
@@ -287,9 +292,9 @@ export default function UpdateBillingModal({
                                             step="0.01"
                                             value={field.value}
                                             onChange={(e) => field.set(e.target.value)}
-                                            disabled={locked}
+                                            disabled={locked || field.readOnly}
                                             placeholder="0.00"
-                                            className="h-11 rounded-xl pl-8 text-sm font-medium"
+                                            className="h-11 rounded-xl pl-8 text-sm font-medium disabled:bg-slate-50 disabled:text-slate-600"
                                         />
                                     </div>
                                     <span className="mt-1 block text-[10px] text-slate-400">

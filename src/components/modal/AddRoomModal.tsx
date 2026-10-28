@@ -29,6 +29,11 @@ const AddRoomModal = ({ open, onClose, onSuccess }: Props) => {
 
   if (!open) return null;
 
+  const capacityMismatch =
+    form.capacity !== "" &&
+    form.bed_count !== "" &&
+    Number(form.capacity) !== Number(form.bed_count);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -59,6 +64,14 @@ const AddRoomModal = ({ open, onClose, onSuccess }: Props) => {
 
     if (!form.room_number || !form.capacity || !form.price_per_month || !form.bed_count) {
       toast.error("Please fill in all required fields");
+      return;
+    }
+    if (Number(form.capacity) <= 0 || Number(form.bed_count) <= 0) {
+      toast.error("Capacity and beds must be greater than 0");
+      return;
+    }
+    if (Number(form.capacity) !== Number(form.bed_count)) {
+      toast.error("Capacity must be equal to the number of beds");
       return;
     }
 
@@ -113,6 +126,11 @@ const AddRoomModal = ({ open, onClose, onSuccess }: Props) => {
               <Field label="Number of Beds" name="bed_count"      placeholder="e.g. 4"      value={form.bed_count}      onChange={handleChange} type="number" />
               <Field label="Price / Month"  name="price_per_month" placeholder="0.00"       value={form.price_per_month} onChange={handleChange} type="number" prefix="₱" />
             </div>
+            {capacityMismatch && (
+              <p className="mt-2 text-xs font-medium text-rose-600">
+                Capacity must be equal to the number of beds.
+              </p>
+            )}
           </div>
 
           <div>
