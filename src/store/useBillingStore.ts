@@ -20,6 +20,10 @@ export interface Billing {
     discount: number;
     late_fee: number;
 
+    overdue_weeks_charged?: number;
+    overdue_penalty?: number;
+    penalty_message?: string | null;
+
     total_amount: number;
     paid_amount: number;
     balance: number;
@@ -299,6 +303,21 @@ export interface RecentPayment {
     receipt_no: string;
 }
 
+export interface OverdueBillingPenalty {
+    id: number;
+    billing_no: string;
+    billing_type: string;
+    billing_month: string | null;
+    due_date: string;
+    status: Billing["status"];
+    overdue_weeks_charged: number;
+    total_amount: number;
+    balance: number;
+    updated_at: string;
+    penalty_amount: number;
+    penalty_message: string | null;
+}
+
 interface BillingStore {
 
     loading: boolean;
@@ -306,6 +325,7 @@ interface BillingStore {
     paymentHistory: PaymentHistory[];
     outstandingBalance: OutstandingBalance | null;
     myPendingBilling: Billing[];
+    myOverduePenalties: OverdueBillingPenalty[];
 
     myPaymentSummary: MyPaymentSummary | null;
     myPaymentHistory: PaymentHistory[];
@@ -341,6 +361,7 @@ interface BillingStore {
     getOutstandingBalance: () => Promise<boolean>;
 
     getMyPendingBilling: () => Promise<boolean>;
+    getMyOverduePenalties: () => Promise<boolean>;
     getMyPaymentHistory: () => Promise<boolean>;
 
     getPaymentsOverview: () => Promise<boolean>;
@@ -377,6 +398,7 @@ export const useBillingStore = create<BillingStore>((set) => ({
 
     outstandingBalance: null,
     myPendingBilling: [],
+    myOverduePenalties: [],
     myPaymentSummary: null,
     myPaymentHistory: [],
     paymentsOverview: [],
@@ -987,6 +1009,33 @@ export const useBillingStore = create<BillingStore>((set) => ({
             set({
                 loading: false,
             });
+
+        }
+    },
+
+    getMyOverduePenalties: async () => {
+        try {
+
+            const res = await axiosInstance.get(
+                "/billings/my-overdue-penalties"
+            );
+
+            set({
+                myOverduePenalties: Array.isArray(res.data.penalties)
+                    ? res.data.penalties
+                    : [],
+            });
+
+            return true;
+
+        } catch (error) {
+
+            console.error(
+                "Get My Overdue Penalties:",
+                error
+            );
+
+            return false;
 
         }
     },

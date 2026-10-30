@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ReceiptText,
   PhilippinePeso,
+  TriangleAlert,
 } from "lucide-react";
 import { useBilling } from "@/hooks/useBilling";
 import PrintModal from "@/components/BillingStatement/PrintModal";
@@ -178,11 +179,20 @@ export default function BillingStatement() {
         },
       ]
       : []),
-    ...(bill.late_fee > 0
+    ...((bill.overdue_penalty ?? 0) > 0
+      ? [
+        {
+          label: `Overdue penalty (${bill.overdue_weeks_charged} wk × ₱100)`,
+          value: bill.overdue_penalty ?? 0,
+          tone: "bad",
+        },
+      ]
+      : []),
+    ...(bill.late_fee - (bill.overdue_penalty ?? 0) > 0
       ? [
         {
           label: "Late fee",
-          value: bill.late_fee,
+          value: bill.late_fee - (bill.overdue_penalty ?? 0),
           tone: "bad",
         },
       ]
@@ -269,6 +279,20 @@ export default function BillingStatement() {
               {bill.status}
             </span>
           </div>
+
+          {bill.penalty_message && (
+            <div className="mx-6 md:mx-8 mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-3">
+              <TriangleAlert size={18} className="mt-0.5 shrink-0 text-red-500" />
+              <div>
+                <p className="text-sm font-semibold text-red-700">
+                  Overdue penalty applied
+                </p>
+                <p className="text-sm text-red-600 mt-0.5">
+                  {bill.penalty_message}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Billed to / statement details */}
           <div className="px-6 py-6 md:px-8 grid gap-8 sm:grid-cols-2">

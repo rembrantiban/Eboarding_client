@@ -14,8 +14,11 @@ import {
     Inbox,
     LoaderCircle,
     Eye,
+    ReceiptText,
 } from "lucide-react";
 import { usePenalty } from "@/hooks/usePenalty";
+import { useBilling } from "@/hooks/useBilling";
+import type { OverdueBillingPenalty } from "@/store/useBillingStore";
 import type { Penalty, PenaltyStatus } from "@/store/usePenaltyStore";
 import BoarderPenaltyDetailModal from "@/components/penalty/BoarderPenaltyDetailModal";
 
@@ -78,6 +81,7 @@ export default function BoarderPenalties() {
         myPenaltyRecordsLoading,
         getMyPenaltyRecords,
     } = usePenalty();
+    const { myOverduePenalties, getMyOverduePenalties } = useBilling();
 
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<"All Status" | PenaltyStatus>("All Status");
@@ -85,7 +89,8 @@ export default function BoarderPenalties() {
 
     useEffect(() => {
         getMyPenaltyRecords();
-    }, [getMyPenaltyRecords]);
+        getMyOverduePenalties();
+    }, [getMyPenaltyRecords, getMyOverduePenalties]);
 
     /* ---------- summary (5.14 at a glance) ---------- */
     const summary = useMemo(() => {
@@ -185,6 +190,14 @@ export default function BoarderPenalties() {
                         meta="Needs payment"
                     />
                 </section>
+
+                {/* ===== Overdue billing penalties (only when there are any) ===== */}
+                {myOverduePenalties.length > 0 && (
+                    <OverdueBillingPenalties
+                        penalties={myOverduePenalties}
+                        onViewBilling={() => navigate("/boarder-billing")}
+                    />
+                )}
 
                 {/* ===== Toolbar ===== */}
                 <section className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -310,6 +323,107 @@ function SummaryTile({
             </p>
             <p className="mt-0.5 truncate text-[11px] text-slate-500">{meta}</p>
         </div>
+    );
+}
+
+function OverdueBillingPenalties({
+    penalties,
+    onViewBilling,
+}: {
+    penalties: OverdueBillingPenalty[];
+    onViewBilling: () => void;
+}) {
+    const unpaid = penalties.filter((p) => p.status === "Overdue");
+    const unpaidTotal = unpaid.reduce((t, p) => t + num(p.penalty_amount), 0);
+
+    return (
+        <section className="rounded-2xl border border-rose-200 bg-rose-50/40 p-4 sm:p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-100 ring-1 ring-inset ring-rose-200">
+                        <ReceiptText size={17} className="text-rose-600" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[13.5px] font-semibold tracking-tight text-slate-900">
+                            Overdue billing penalties
+                        </p>
+                        <p className="mt-0.5 text-[11.5px] text-slate-500">
+                            ₱100 is added to a billing for every week it stays overdue
+                        </p>
+                    </div>
+                </div>
+
+                {unpaidTotal > 0 && (
+                    <div className="text-right">
+                        <p className="text-[10.5px] uppercase tracking-wide text-slate-400">
+                            Unpaid penalties
+                        </p>
+                        <p className="text-[17px] font-bold tabular-nums tracking-tight text-rose-600">
+                            {peso(unpaidTotal)}
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            <div className="mt-4 space-y-2">
+                {penalties.map((p) => {
+                    const overdue = p.status === "Overdue";
+
+                    return (
+                        <div
+                            key={p.id}
+                            className="rounded-xl border border-slate-200 bg-white px-4 py-3"
+                        >
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="min-w-0">
+                                    <p className="truncate text-[13px] font-semibold tabular-nums text-slate-900">
+                                        Billing #{p.billing_no}
+                                    </p>
+                                    <p className="mt-0.5 text-[11.5px] text-slate-400">
+                                        {p.billing_type} · due {fmtDate(p.due_date)} · {p.overdue_weeks_charged} wk × ₱100
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                    <span
+                                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10.5px] font-medium ring-1 ring-inset ${
+                                            overdue
+                                                ? "bg-rose-50 text-rose-700 ring-rose-100"
+                                                : "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                                        }`}
+                                    >
+                                        {overdue ? "Unpaid" : "Paid with billing"}
+                                    </span>
+                                    <span
+                                        className={`text-[15px] font-bold tabular-nums ${
+                                            overdue ? "text-rose-600" : "text-slate-500"
+                                        }`}
+                                    >
+                                        {peso(num(p.penalty_amount))}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {p.penalty_message && (
+                                <p className="mt-2 flex items-start gap-2 text-[12px] text-rose-600">
+                                    <TriangleAlert size={13} className="mt-0.5 shrink-0" />
+                                    {p.penalty_message}
+                                </p>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {unpaid.length > 0 && (
+                <button
+                    onClick={onViewBilling}
+                    className="mt-3 rounded-xl bg-slate-900 px-3.5 py-2 text-[12px] font-medium text-white transition-colors hover:bg-slate-800"
+                >
+                    Go to my billing
+                </button>
+            )}
+        </section>
     );
 }
 
